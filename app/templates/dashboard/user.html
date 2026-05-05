@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+{% block title %}الرئيسية — {{ app_name }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4 py-4">
+    <div class="mb-4">
+        <h1 class="page-title mb-1"><i class="bi bi-person-circle text-primary me-2"></i>
+            مرحباً، {{ current_user.full_name }}
+        </h1>
+        <p class="text-muted mb-0">لوحة المستخدم الشخصية</p>
+    </div>
+
+    <div class="row g-4">
+        <!-- Request Access card -->
+        <div class="col-md-6">
+            <div class="section-card glass-card h-100">
+                <div class="section-card-header mb-3">
+                    <h2 class="h6 fw-bold"><i class="bi bi-key me-2 text-primary"></i>طلب صلاحية جديدة</h2>
+                </div>
+                <p class="text-muted small mb-3">إذا كنت تحتاج إلى صلاحيات إضافية، يمكنك تقديم طلب وسيتم مراجعته من قبل
+                    المسؤولين.</p>
+                <a href="{{ url_for('access.new_request') }}" class="btn btn-primary">
+                    <i class="bi bi-plus-circle me-2"></i>تقديم طلب
+                </a>
+            </div>
+        </div>
+
+        <!-- My Info -->
+        <div class="col-md-6">
+            <div class="section-card glass-card h-100">
+                <div class="section-card-header mb-3">
+                    <h2 class="h6 fw-bold"><i class="bi bi-person-badge me-2 text-info"></i>معلوماتي</h2>
+                </div>
+                <table class="table table-dark table-sm">
+                    <tr>
+                        <td class="text-muted">الاسم</td>
+                        <td>{{ current_user.full_name }}</td>
+                    </tr>
+                    <tr>
+                        <td class="text-muted">المستخدم</td>
+                        <td>{{ current_user.username }}</td>
+                    </tr>
+                    <tr>
+                        <td class="text-muted">الدور</td>
+                        <td>{{ current_user.role.name_ar if current_user.role else '—' }}</td>
+                    </tr>
+                    <tr>
+                        <td class="text-muted">المجموعة</td>
+                        <td>{{ current_user.department.name if current_user.department else '—' }}</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <!-- My recent requests -->
+        <div class="col-12">
+            <div class="section-card glass-card">
+                <div class="section-card-header d-flex align-items-center justify-content-between mb-3">
+                    <h2 class="h6 fw-bold mb-0"><i class="bi bi-file-earmark-text me-2 text-warning"></i>طلباتي الأخيرة
+                    </h2>
+                    <a href="{{ url_for('access.my_requests') }}" class="btn btn-sm btn-outline-secondary">كل
+                        الطلبات</a>
+                </div>
+                {% if my_requests %}
+                <div class="table-responsive">
+                    <table class="table table-dark table-hover table-sm align-middle">
+                        <thead>
+                            <tr>
+                                <th>الطلب</th>
+                                <th>التاريخ</th>
+                                <th>الحالة</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for req in my_requests %}
+                            <tr>
+                                <td>{{ req.requested_role_code }}</td>
+                                <td><small class="text-muted">{{ req.created_at.strftime('%Y-%m-%d') }}</small></td>
+                                <td>
+                                    {% if req.status == 'pending' %}
+                                    <span class="badge bg-warning text-dark">قيد المراجعة</span>
+                                    {% elif req.status == 'approved' %}
+                                    <span class="badge bg-success">موافق عليه</span>
+                                    {% else %}
+                                    <span class="badge bg-danger">مرفوض</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-muted text-center py-3 mb-0">لا توجد طلبات سابقة</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

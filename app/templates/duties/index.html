@@ -1,0 +1,1623 @@
+{% extends "base.html" %}
+
+{% block title %}الواجبات والمشاريع - {{ department.name if department else 'نظرة عامة' }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* ========== Page Layout ========== */
+    .duties-page {
+        min-height: calc(100vh - 60px);
+        background: linear-gradient(135deg, #f8fafc 0%, #eef2f7 100%);
+        padding: 25px;
+    }
+    
+    /* ========== Header Section ========== */
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 25px;
+        flex-wrap: wrap;
+        gap: 15px;
+    }
+    
+    .page-title {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+    
+    .page-title h1 {
+        font-size: 1.5rem;
+        color: #1e293b;
+        margin: 0;
+        font-weight: 700;
+    }
+    
+    .page-title .badge {
+        font-size: 0.8rem;
+        padding: 6px 12px;
+    }
+    
+    /* Department Selector */
+    .dept-selector {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+    
+    .dept-btn {
+        padding: 8px 16px;
+        border-radius: 20px;
+        border: 2px solid #e2e8f0;
+        background: white;
+        color: #64748b;
+        font-size: 0.85rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .dept-btn:hover {
+        border-color: #667eea;
+        color: #667eea;
+    }
+    
+    .dept-btn.active {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        border-color: transparent;
+        color: white;
+    }
+    
+    /* ========== View Toggle ========== */
+    .view-toggle {
+        display: flex;
+        background: white;
+        border-radius: 12px;
+        padding: 4px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+    
+    .view-btn {
+        padding: 10px 20px;
+        border: none;
+        background: transparent;
+        color: #64748b;
+        font-size: 0.85rem;
+        font-weight: 600;
+        cursor: pointer;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+    
+    .view-btn:hover {
+        color: #667eea;
+    }
+    
+    .view-btn.active {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+    }
+    
+    /* ========== Stats Cards ========== */
+    .stats-row {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 20px;
+        margin-bottom: 25px;
+    }
+    
+    .stat-card {
+        background: white;
+        border-radius: 16px;
+        padding: 20px;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.04);
+        border: 1px solid #f1f5f9;
+    }
+    
+    .stat-icon {
+        width: 55px;
+        height: 55px;
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.4rem;
+    }
+    
+    .stat-icon.duties { background: linear-gradient(135deg, #667eea20, #764ba220); color: #667eea; }
+    .stat-icon.objectives { background: linear-gradient(135deg, #10b98120, #06966920); color: #10b981; }
+    .stat-icon.projects { background: linear-gradient(135deg, #f5910020, #dc680120); color: #f59100; }
+    .stat-icon.activities { background: linear-gradient(135deg, #3b82f620, #1d4ed820); color: #3b82f6; }
+    
+    .stat-content h3 {
+        font-size: 1.8rem;
+        color: #1e293b;
+        margin: 0;
+        font-weight: 700;
+    }
+    
+    .stat-content p {
+        font-size: 0.85rem;
+        color: #64748b;
+        margin: 3px 0 0 0;
+    }
+    
+    /* ========== Main Content ========== */
+    .main-content {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 25px;
+    }
+    
+    /* ========== Duties List (Hierarchical View) ========== */
+    .duties-container {
+        background: white;
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+        border: 1px solid #f1f5f9;
+    }
+    
+    .duties-header {
+        padding: 20px 25px;
+        border-bottom: 1px solid #f1f5f9;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: #fafbfc;
+    }
+    
+    .duties-header h2 {
+        font-size: 1.1rem;
+        color: #1e293b;
+        margin: 0;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .duties-body {
+        padding: 20px;
+    }
+    
+    /* ========== Duty Card (OKR Style) ========== */
+    .duty-card {
+        background: #fafbfc;
+        border: 1px solid #e2e8f0;
+        border-radius: 16px;
+        margin-bottom: 20px;
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
+    
+    .duty-card:hover {
+        box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+        border-color: #cbd5e1;
+    }
+    
+    .duty-header {
+        padding: 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        cursor: pointer;
+        background: white;
+    }
+    
+    .duty-info {
+        flex: 1;
+    }
+    
+    .duty-number {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        padding: 6px 14px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 700;
+        margin-bottom: 10px;
+    }
+    
+    .duty-title {
+        font-size: 1.15rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin: 0 0 8px 0;
+    }
+    
+    .duty-meta {
+        display: flex;
+        gap: 15px;
+        flex-wrap: wrap;
+    }
+    
+    .duty-meta-item {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        font-size: 0.8rem;
+        color: #64748b;
+    }
+    
+    .duty-meta-item i {
+        color: #94a3b8;
+    }
+    
+    .duty-progress {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        min-width: 100px;
+    }
+    
+    /* Circular Progress */
+    .circular-progress {
+        position: relative;
+        width: 70px;
+        height: 70px;
+    }
+    
+    .circular-progress svg {
+        transform: rotate(-90deg);
+    }
+    
+    .circular-progress circle {
+        fill: none;
+        stroke-width: 6;
+    }
+    
+    .circular-progress .bg {
+        stroke: #e2e8f0;
+    }
+    
+    .circular-progress .progress {
+        stroke: #667eea;
+        stroke-linecap: round;
+        transition: stroke-dasharray 0.5s ease;
+    }
+    
+    .circular-progress .value {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 1rem;
+        font-weight: 700;
+        color: #1e293b;
+    }
+    
+    .duty-expand {
+        font-size: 1.2rem;
+        color: #94a3b8;
+        transition: transform 0.3s ease;
+    }
+    
+    .duty-card.expanded .duty-expand {
+        transform: rotate(180deg);
+    }
+    
+    /* Duty Content (Expandable) */
+    .duty-content {
+        display: none;
+        padding: 0 20px 20px;
+    }
+    
+    .duty-card.expanded .duty-content {
+        display: block;
+    }
+    
+    /* ========== Objective Card ========== */
+    .objective-card {
+        background: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        margin-bottom: 15px;
+        padding: 18px;
+        border-right: 4px solid #10b981;
+    }
+    
+    .objective-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 15px;
+        cursor: pointer;
+    }
+    
+    .objective-number {
+        font-size: 0.75rem;
+        color: #10b981;
+        font-weight: 700;
+        background: #d1fae5;
+        padding: 3px 10px;
+        border-radius: 10px;
+        margin-bottom: 6px;
+        display: inline-block;
+    }
+    
+    .objective-title {
+        font-size: 1rem;
+        font-weight: 600;
+        color: #1e293b;
+        margin: 0;
+    }
+    
+    .objective-progress {
+        text-align: center;
+    }
+    
+    .objective-progress .value {
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: #10b981;
+    }
+    
+    .objective-progress .label {
+        font-size: 0.7rem;
+        color: #64748b;
+    }
+    
+    /* ========== Project Card ========== */
+    .projects-list {
+        display: none;
+        margin-top: 15px;
+        padding-top: 15px;
+        border-top: 1px dashed #e2e8f0;
+    }
+    
+    .objective-card.expanded .projects-list {
+        display: block;
+    }
+    
+    .project-card {
+        background: #f8fafc;
+        border-radius: 10px;
+        padding: 15px;
+        margin-bottom: 12px;
+        border-right: 3px solid #f59e0b;
+    }
+    
+    .project-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 12px;
+        cursor: pointer;
+    }
+    
+    .project-number {
+        font-size: 0.7rem;
+        color: #f59e0b;
+        font-weight: 700;
+        background: #fef3c7;
+        padding: 2px 8px;
+        border-radius: 8px;
+        margin-left: 10px;
+    }
+    
+    .project-title {
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: #1e293b;
+        flex: 1;
+    }
+    
+    /* Linear Progress Bar */
+    .progress-bar-container {
+        background: #e2e8f0;
+        height: 6px;
+        border-radius: 3px;
+        overflow: hidden;
+        flex: 1;
+        max-width: 150px;
+        margin: 0 15px;
+    }
+    
+    .progress-bar {
+        height: 100%;
+        border-radius: 3px;
+        transition: width 0.5s ease;
+    }
+    
+    .progress-bar.low { background: #ef4444; }
+    .progress-bar.medium { background: #f59e0b; }
+    .progress-bar.high { background: #10b981; }
+    
+    .progress-value {
+        font-size: 0.85rem;
+        font-weight: 700;
+        min-width: 45px;
+        text-align: left;
+    }
+    
+    /* ========== Activities List (Timeline Style) ========== */
+    .activities-timeline {
+        display: none;
+        margin-top: 12px;
+        padding-top: 12px;
+        border-top: 1px dashed #e2e8f0;
+    }
+    
+    .project-card.expanded .activities-timeline {
+        display: block;
+    }
+    
+    .activity-item {
+        display: flex;
+        align-items: flex-start;
+        padding: 12px 0;
+        border-bottom: 1px solid #f1f5f9;
+        gap: 15px;
+    }
+    
+    .activity-item:last-child {
+        border-bottom: none;
+    }
+    
+    /* أزرار الإضافة داخل البطاقات */
+    .add-child-btn {
+        text-align: center;
+        padding: 8px;
+        border: 2px dashed #e2e8f0;
+        border-radius: 8px;
+        background: #f8fafc;
+        transition: all 0.2s;
+    }
+    
+    .add-child-btn:hover {
+        border-color: #3b82f6;
+        background: #eff6ff;
+    }
+    
+    .add-child-btn .btn {
+        font-size: 0.85rem;
+    }
+    
+    .activity-timeline-dot {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.75rem;
+        font-weight: 700;
+        flex-shrink: 0;
+    }
+    
+    .activity-timeline-dot.completed {
+        background: #d1fae5;
+        color: #059669;
+    }
+    
+    .activity-timeline-dot.in-progress {
+        background: #dbeafe;
+        color: #2563eb;
+    }
+    
+    .activity-timeline-dot.not-started {
+        background: #f1f5f9;
+        color: #64748b;
+    }
+    
+    .activity-timeline-dot.delayed {
+        background: #fee2e2;
+        color: #dc2626;
+    }
+    
+    .activity-info {
+        flex: 1;
+    }
+    
+    .activity-number {
+        font-size: 0.7rem;
+        color: #3b82f6;
+        font-weight: 700;
+        background: #dbeafe;
+        padding: 2px 6px;
+        border-radius: 6px;
+        margin-left: 8px;
+    }
+    
+    .activity-title {
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: #334155;
+    }
+    
+    .activity-dates {
+        font-size: 0.75rem;
+        color: #94a3b8;
+        margin-top: 4px;
+    }
+    
+    .activity-progress-mini {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        min-width: 100px;
+    }
+    
+    .activity-progress-mini .bar {
+        flex: 1;
+        height: 4px;
+        background: #e2e8f0;
+        border-radius: 2px;
+        overflow: hidden;
+    }
+    
+    .activity-progress-mini .bar span {
+        display: block;
+        height: 100%;
+        border-radius: 2px;
+    }
+    
+    .activity-progress-mini .value {
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: #64748b;
+        min-width: 35px;
+    }
+    
+    /* ========== Gantt Chart View ========== */
+    .gantt-container {
+        display: none;
+        background: white;
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+        border: 1px solid #f1f5f9;
+    }
+    
+    .gantt-container.active {
+        display: block;
+    }
+    
+    .gantt-header {
+        padding: 20px 25px;
+        border-bottom: 1px solid #f1f5f9;
+        background: #fafbfc;
+    }
+    
+    .gantt-header h2 {
+        font-size: 1.1rem;
+        color: #1e293b;
+        margin: 0;
+        font-weight: 600;
+    }
+    
+    .gantt-body {
+        padding: 20px;
+        overflow-x: auto;
+    }
+    
+    .gantt-timeline {
+        display: flex;
+        border-bottom: 2px solid #e2e8f0;
+        padding-bottom: 10px;
+        margin-bottom: 15px;
+        min-width: 800px;
+    }
+    
+    .gantt-label-col {
+        width: 250px;
+        flex-shrink: 0;
+    }
+    
+    .gantt-bars-col {
+        flex: 1;
+        display: flex;
+    }
+    
+    .gantt-year {
+        flex: 1;
+        text-align: center;
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: #64748b;
+        border-left: 1px solid #e2e8f0;
+        padding: 5px;
+    }
+    
+    .gantt-row {
+        display: flex;
+        min-height: 45px;
+        align-items: center;
+        border-bottom: 1px solid #f1f5f9;
+        min-width: 800px;
+    }
+    
+    .gantt-row:hover {
+        background: #f8fafc;
+    }
+    
+    .gantt-row-label {
+        width: 250px;
+        flex-shrink: 0;
+        padding: 8px 12px;
+        font-size: 0.85rem;
+        color: #1e293b;
+    }
+    
+    .gantt-row-label .duty-num {
+        font-size: 0.7rem;
+        color: #667eea;
+        font-weight: 700;
+        margin-left: 8px;
+    }
+    
+    .gantt-row-bars {
+        flex: 1;
+        display: flex;
+        position: relative;
+        height: 30px;
+    }
+    
+    .gantt-bar {
+        position: absolute;
+        height: 24px;
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        padding: 0 8px;
+        font-size: 0.7rem;
+        color: white;
+        font-weight: 600;
+        top: 3px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .gantt-bar:hover {
+        transform: scaleY(1.2);
+        z-index: 10;
+    }
+    
+    .gantt-bar.completed {
+        background: linear-gradient(135deg, #10b981, #059669);
+    }
+    
+    .gantt-bar.in-progress {
+        background: linear-gradient(135deg, #3b82f6, #2563eb);
+    }
+    
+    .gantt-bar.not-started {
+        background: linear-gradient(135deg, #94a3b8, #64748b);
+    }
+    
+    .gantt-bar.delayed {
+        background: linear-gradient(135deg, #ef4444, #dc2626);
+    }
+    
+    /* ========== Kanban View ========== */
+    .kanban-container {
+        display: none;
+        gap: 20px;
+    }
+    
+    .kanban-container.active {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+    }
+    
+    .kanban-column {
+        background: white;
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.04);
+        border: 1px solid #f1f5f9;
+    }
+    
+    .kanban-header {
+        padding: 15px 20px;
+        border-bottom: 1px solid #f1f5f9;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .kanban-header.not-started { background: #f8fafc; }
+    .kanban-header.in-progress { background: #eff6ff; }
+    .kanban-header.delayed { background: #fef2f2; }
+    .kanban-header.completed { background: #f0fdf4; }
+    
+    .kanban-header h3 {
+        font-size: 0.95rem;
+        margin: 0;
+        flex: 1;
+    }
+    
+    .kanban-count {
+        background: #e2e8f0;
+        color: #64748b;
+        padding: 3px 10px;
+        border-radius: 10px;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+    
+    .kanban-body {
+        padding: 15px;
+        max-height: 500px;
+        overflow-y: auto;
+    }
+    
+    .kanban-card {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 10px;
+        padding: 12px;
+        margin-bottom: 10px;
+        cursor: grab;
+        transition: all 0.3s ease;
+    }
+    
+    .kanban-card:hover {
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        transform: translateY(-2px);
+    }
+    
+    .kanban-card-title {
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: #1e293b;
+        margin-bottom: 8px;
+    }
+    
+    .kanban-card-meta {
+        font-size: 0.75rem;
+        color: #64748b;
+    }
+    
+    /* ========== Empty State ========== */
+    .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        color: #94a3b8;
+    }
+    
+    .empty-state i {
+        font-size: 4rem;
+        margin-bottom: 20px;
+        color: #cbd5e1;
+    }
+    
+    .empty-state h3 {
+        font-size: 1.2rem;
+        color: #64748b;
+        margin-bottom: 10px;
+    }
+    
+    .empty-state p {
+        font-size: 0.9rem;
+    }
+    
+    /* ========== Responsive ========== */
+    @media (max-width: 1200px) {
+        .kanban-container.active {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+    
+    @media (max-width: 768px) {
+        .duties-page { padding: 15px; }
+        .page-header { flex-direction: column; }
+        .dept-selector { justify-content: center; }
+        .stats-row { grid-template-columns: repeat(2, 1fr); }
+        .kanban-container.active { grid-template-columns: 1fr; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="duties-page">
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="page-title">
+            <h1><i class="bi bi-diagram-3 me-2"></i>الواجبات والمشاريع</h1>
+            {% if department %}
+            <span class="badge" style="background: {{ department.color }};">{{ department.name }}</span>
+            {% endif %}
+        </div>
+        
+        <!-- Department Selector -->
+        <div class="dept-selector">
+            <button class="dept-btn {% if not department %}active{% endif %}" 
+                    onclick="location.href='{{ url_for('duties.index') }}'">
+                الكل
+            </button>
+            {% for dept in departments %}
+            <button class="dept-btn {% if department and department.id == dept.id %}active{% endif %}"
+                    onclick="location.href='{{ url_for('duties.by_department', dept_id=dept.id) }}'"
+                    style="{% if department and department.id == dept.id %}background: {{ dept.color }}; border-color: {{ dept.color }};{% endif %}">
+                {{ dept.name }}
+            </button>
+            {% endfor %}
+        </div>
+    </div>
+    
+    <!-- View Toggle -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div class="view-toggle">
+            <button class="view-btn active" data-view="hierarchy" onclick="switchView('hierarchy')">
+                <i class="bi bi-list-nested"></i>
+                هرمي
+            </button>
+            <button class="view-btn" data-view="gantt" onclick="switchView('gantt')">
+                <i class="bi bi-bar-chart-steps"></i>
+                الجدول الزمني
+            </button>
+            <button class="view-btn" data-view="kanban" onclick="switchView('kanban')">
+                <i class="bi bi-kanban"></i>
+                Kanban
+            </button>
+        </div>
+        
+        {% if current_user.permission_level >= 60 %}
+        <button class="btn btn-primary" onclick="openAddDutyModal()">
+            <i class="bi bi-plus-lg me-1"></i>
+            واجب جديد
+        </button>
+        {% endif %}
+    </div>
+    
+    <!-- Stats Row -->
+    <div class="stats-row">
+        <div class="stat-card">
+            <div class="stat-icon duties">
+                <i class="bi bi-clipboard-check"></i>
+            </div>
+            <div class="stat-content">
+                <h3>{{ duties|length }}</h3>
+                <p>الواجبات</p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon objectives">
+                <i class="bi bi-bullseye"></i>
+            </div>
+            <div class="stat-content">
+                <h3>{{ total_objectives }}</h3>
+                <p>الأهداف</p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon projects">
+                <i class="bi bi-folder2-open"></i>
+            </div>
+            <div class="stat-content">
+                <h3>{{ total_projects }}</h3>
+                <p>المشاريع</p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon activities">
+                <i class="bi bi-activity"></i>
+            </div>
+            <div class="stat-content">
+                <h3>{{ total_activities }}</h3>
+                <p>الأنشطة</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Hierarchical View -->
+        <div class="duties-container" id="hierarchyView">
+            <div class="duties-header">
+                <h2><i class="bi bi-diagram-3"></i> هيكل الواجبات</h2>
+            </div>
+            <div class="duties-body">
+                {% if duties %}
+                    {% for duty in duties %}
+                    <div class="duty-card" id="duty-{{ duty.id }}">
+                        <div class="duty-header" onclick="toggleDuty({{ duty.id }})">
+                            <div class="duty-info">
+                                <span class="duty-number">
+                                    <i class="bi bi-clipboard-check"></i>
+                                    {{ duty.duty_number }}
+                                </span>
+                                <h3 class="duty-title">{{ duty.title }}</h3>
+                                <div class="duty-meta">
+                                    <span class="duty-meta-item">
+                                        <i class="bi bi-building"></i>
+                                        {{ duty.entity.name if duty.entity else 'غير محدد' }}
+                                    </span>
+                                    <span class="duty-meta-item">
+                                        <i class="bi bi-calendar"></i>
+                                        {{ duty.start_year }} - {{ duty.end_year }}
+                                    </span>
+                                    <span class="duty-meta-item">
+                                        <i class="bi bi-flag"></i>
+                                        {{ duty.get_status_display() }}
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="duty-progress">
+                                <div class="circular-progress" data-value="{{ duty.get_completion_percentage()|round|int }}">
+                                    <svg width="70" height="70">
+                                        <circle class="bg" cx="35" cy="35" r="30"></circle>
+                                        <circle class="progress" cx="35" cy="35" r="30"
+                                                stroke-dasharray="{{ (duty.get_completion_percentage() * 188.4) / 100 }} 188.4"></circle>
+                                    </svg>
+                                    <span class="value">{{ duty.get_completion_percentage()|round|int }}%</span>
+                                </div>
+                            </div>
+                            <i class="bi bi-chevron-down duty-expand"></i>
+                        </div>
+                        
+                        <div class="duty-content">
+                            <!-- زر إضافة هدف -->
+                            {% if current_user.permission_level >= 60 %}
+                            <div class="add-child-btn mb-3">
+                                <button class="btn btn-sm btn-outline-primary" onclick="openAddObjectiveModal({{ duty.id }}, '{{ duty.duty_number }}')">
+                                    <i class="bi bi-plus-circle me-1"></i>إضافة هدف
+                                </button>
+                            </div>
+                            {% endif %}
+                            {% for obj in duty.objectives.filter_by(is_active=True).order_by('order_index').all() %}
+                            <div class="objective-card" id="obj-{{ obj.id }}">
+                                <div class="objective-header" onclick="toggleObjective({{ obj.id }})">
+                                    <div>
+                                        <span class="objective-number">{{ obj.objective_number }}</span>
+                                        <h4 class="objective-title">{{ obj.title }}</h4>
+                                    </div>
+                                    <div class="objective-progress">
+                                        <span class="value">{{ obj.get_completion_percentage()|round|int }}%</span>
+                                        <span class="label">الإنجاز</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="projects-list">
+                                    <!-- زر إضافة مشروع -->
+                                    {% if current_user.permission_level >= 60 %}
+                                    <div class="add-child-btn mb-2">
+                                        <button class="btn btn-sm btn-outline-success" onclick="openAddProjectModal({{ obj.id }}, '{{ obj.objective_number }}')">
+                                            <i class="bi bi-plus-circle me-1"></i>إضافة مشروع
+                                        </button>
+                                    </div>
+                                    {% endif %}
+                                    {% for proj in obj.projects.filter_by(is_active=True).order_by('order_index').all() %}
+                                    <div class="project-card" id="proj-{{ proj.id }}">
+                                        <div class="project-header" onclick="toggleProject({{ proj.id }})">
+                                            <div style="display: flex; align-items: center;">
+                                                <span class="project-number">مشروع {{ proj.project_number }}</span>
+                                                <span class="project-title">{{ proj.title }}</span>
+                                            </div>
+                                            <div style="display: flex; align-items: center;">
+                                                <div class="progress-bar-container">
+                                                    {% set completion = proj.get_completion_percentage()|round|int %}
+                                                    <div class="progress-bar {% if completion < 30 %}low{% elif completion < 70 %}medium{% else %}high{% endif %}"
+                                                         style="width: {{ completion }}%;"></div>
+                                                </div>
+                                                <span class="progress-value">{{ completion }}%</span>
+                                                <i class="bi bi-chevron-down ms-2" style="color: #94a3b8;"></i>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="activities-timeline">
+                                            <!-- زر إضافة نشاط -->
+                                            {% if current_user.permission_level >= 60 %}
+                                            <div class="add-child-btn mb-2">
+                                                <button class="btn btn-sm btn-outline-info" onclick="openAddActivityModal({{ proj.id }}, '{{ proj.project_number }}')">
+                                                    <i class="bi bi-plus-circle me-1"></i>إضافة نشاط
+                                                </button>
+                                            </div>
+                                            {% endif %}
+                                            {% for act in proj.activities.filter_by(is_active=True).order_by('order_index').all() %}
+                                            <div class="activity-item">
+                                                <div class="activity-timeline-dot {% if act.completion_percentage >= 100 %}completed{% elif act.completion_percentage > 0 %}in-progress{% elif act.status == 'delayed' %}delayed{% else %}not-started{% endif %}">
+                                                    {% if act.completion_percentage >= 100 %}
+                                                        <i class="bi bi-check"></i>
+                                                    {% elif act.completion_percentage > 0 %}
+                                                        <i class="bi bi-arrow-repeat"></i>
+                                                    {% else %}
+                                                        <i class="bi bi-circle"></i>
+                                                    {% endif %}
+                                                </div>
+                                                <div class="activity-info">
+                                                    <div>
+                                                        <span class="activity-number">{{ act.activity_number }}</span>
+                                                        <span class="activity-title">{{ act.title }}</span>
+                                                    </div>
+                                                    <div class="activity-dates">
+                                                        {% if act.start_date and act.end_date %}
+                                                        <i class="bi bi-calendar3 me-1"></i>
+                                                        {{ act.start_date.strftime('%d/%m/%Y') }} - {{ act.end_date.strftime('%d/%m/%Y') }}
+                                                        {% endif %}
+                                                    </div>
+                                                </div>
+                                                <div class="activity-progress-mini">
+                                                    <div class="bar">
+                                                        <span style="width: {{ act.completion_percentage }}%; background: {% if act.completion_percentage >= 100 %}#10b981{% elif act.completion_percentage > 0 %}#3b82f6{% else %}#94a3b8{% endif %};"></span>
+                                                    </div>
+                                                    <span class="value">{{ act.completion_percentage|round|int }}%</span>
+                                                </div>
+                                            </div>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="empty-state">
+                        <i class="bi bi-clipboard-x"></i>
+                        <h3>لا توجد واجبات</h3>
+                        <p>لم يتم إضافة أي واجبات بعد لهذه المجموعة</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Gantt Chart View -->
+        <div class="gantt-container" id="ganttView">
+            <div class="gantt-header">
+                <h2><i class="bi bi-bar-chart-steps me-2"></i>الجدول الزمني (5 سنوات)</h2>
+            </div>
+            <div class="gantt-body">
+                <!-- Timeline Header -->
+                <div class="gantt-timeline">
+                    <div class="gantt-label-col">النشاط</div>
+                    <div class="gantt-bars-col">
+                        {% for year in range(current_year, current_year + 5) %}
+                        <div class="gantt-year">{{ year }}</div>
+                        {% endfor %}
+                    </div>
+                </div>
+                
+                <!-- Gantt Rows -->
+                {% for item in timeline_data %}
+                <div class="gantt-row">
+                    <div class="gantt-row-label">
+                        <span class="duty-num">{{ item.activity.activity_number }}</span>
+                        {{ item.activity.title|truncate(30) }}
+                    </div>
+                    <div class="gantt-row-bars">
+                        {% set start_offset = ((item.start - timeline_start).days / timeline_total_days) * 100 %}
+                        {% set width = ((item.end - item.start).days / timeline_total_days) * 100 %}
+                        <div class="gantt-bar {% if item.completion >= 100 %}completed{% elif item.completion > 0 %}in-progress{% else %}not-started{% endif %}"
+                             style="right: {{ start_offset }}%; width: {{ width }}%;"
+                             title="{{ item.activity.title }}: {{ item.completion|round }}%">
+                            {{ item.completion|round }}%
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        
+        <!-- Kanban View -->
+        <div class="kanban-container" id="kanbanView">
+            <div class="kanban-column">
+                <div class="kanban-header not-started">
+                    <i class="bi bi-circle" style="color: #64748b;"></i>
+                    <h3>لم يبدأ</h3>
+                    <span class="kanban-count">{{ activities_by_status.not_started|length }}</span>
+                </div>
+                <div class="kanban-body">
+                    {% for act in activities_by_status.not_started %}
+                    <div class="kanban-card">
+                        <div class="kanban-card-title">{{ act.title }}</div>
+                        <div class="kanban-card-meta">
+                            <i class="bi bi-calendar3"></i>
+                            {{ act.start_date.strftime('%d/%m') if act.start_date else '-' }}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            
+            <div class="kanban-column">
+                <div class="kanban-header in-progress">
+                    <i class="bi bi-arrow-repeat" style="color: #2563eb;"></i>
+                    <h3>قيد التنفيذ</h3>
+                    <span class="kanban-count">{{ activities_by_status.in_progress|length }}</span>
+                </div>
+                <div class="kanban-body">
+                    {% for act in activities_by_status.in_progress %}
+                    <div class="kanban-card">
+                        <div class="kanban-card-title">{{ act.title }}</div>
+                        <div class="kanban-card-meta">
+                            <i class="bi bi-percent"></i>
+                            {{ act.completion_percentage|round }}%
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            
+            <div class="kanban-column">
+                <div class="kanban-header delayed">
+                    <i class="bi bi-exclamation-triangle" style="color: #dc2626;"></i>
+                    <h3>متأخر</h3>
+                    <span class="kanban-count">{{ activities_by_status.delayed|length }}</span>
+                </div>
+                <div class="kanban-body">
+                    {% for act in activities_by_status.delayed %}
+                    <div class="kanban-card">
+                        <div class="kanban-card-title">{{ act.title }}</div>
+                        <div class="kanban-card-meta">
+                            <i class="bi bi-calendar-x"></i>
+                            متأخر
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            
+            <div class="kanban-column">
+                <div class="kanban-header completed">
+                    <i class="bi bi-check-circle" style="color: #059669;"></i>
+                    <h3>مكتمل</h3>
+                    <span class="kanban-count">{{ activities_by_status.completed|length }}</span>
+                </div>
+                <div class="kanban-body">
+                    {% for act in activities_by_status.completed %}
+                    <div class="kanban-card">
+                        <div class="kanban-card-title">{{ act.title }}</div>
+                        <div class="kanban-card-meta">
+                            <i class="bi bi-check2-all"></i>
+                            مكتمل 100%
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ========== Modals للإضافة (مبسطة) ========== -->
+
+<!-- Modal إضافة واجب -->
+<div class="modal fade" id="addDutyModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title"><i class="bi bi-clipboard-plus me-2"></i>إضافة واجب جديد</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addDutyForm">
+                    <input type="hidden" name="department_id" value="{{ department.id if department else '' }}">
+                    <div class="mb-3">
+                        <label class="form-label">رقم الواجب <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" name="duty_number" placeholder="مثل: 1.15" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">عنوان الواجب <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" name="title" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">الوصف</label>
+                        <textarea class="form-control" name="description" rows="2"></textarea>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <label class="form-label">الأولوية</label>
+                            <select class="form-select" name="priority">
+                                <option value="1">عادي</option>
+                                <option value="2">مهم</option>
+                                <option value="3">عاجل</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">من سنة</label>
+                            <input type="number" class="form-control" name="start_year" value="{{ current_year }}">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">إلى سنة</label>
+                            <input type="number" class="form-control" name="end_year" value="{{ current_year + 5 }}">
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+                <button type="button" class="btn btn-primary" onclick="submitDuty()">
+                    <i class="bi bi-plus-lg me-1"></i>إضافة
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal إضافة هدف -->
+<div class="modal fade" id="addObjectiveModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title"><i class="bi bi-bullseye me-2"></i>إضافة هدف جديد</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addObjectiveForm">
+                    <input type="hidden" name="duty_id" id="objectiveDutyId">
+                    <div class="alert alert-light mb-3">
+                        <small>إضافة هدف للواجب: <strong id="objectiveDutyLabel"></strong></small>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">رقم الهدف <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" name="objective_number" id="objectiveNumberInput" required>
+                        <small class="text-muted">سيتم إضافته بعد رقم الواجب تلقائياً</small>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">عنوان الهدف <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" name="title" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">الوصف</label>
+                        <textarea class="form-control" name="description" rows="2"></textarea>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">تاريخ البداية</label>
+                            <input type="date" class="form-control" name="start_date">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">تاريخ النهاية</label>
+                            <input type="date" class="form-control" name="end_date">
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+                <button type="button" class="btn btn-success" onclick="submitObjective()">
+                    <i class="bi bi-plus-lg me-1"></i>إضافة
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal إضافة مشروع -->
+<div class="modal fade" id="addProjectModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-warning text-dark">
+                <h5 class="modal-title"><i class="bi bi-folder-plus me-2"></i>إضافة مشروع جديد</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addProjectForm">
+                    <input type="hidden" name="objective_id" id="projectObjectiveId">
+                    <div class="alert alert-light mb-3">
+                        <small>إضافة مشروع للهدف: <strong id="projectObjectiveLabel"></strong></small>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">رقم المشروع <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" name="project_number" placeholder="مثل: 1" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">عنوان المشروع <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" name="title" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">الوصف</label>
+                        <textarea class="form-control" name="description" rows="2"></textarea>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">تاريخ البداية</label>
+                            <input type="date" class="form-control" name="start_date">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">تاريخ النهاية</label>
+                            <input type="date" class="form-control" name="end_date">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">الميزانية</label>
+                        <input type="number" class="form-control" name="budget" step="0.01" placeholder="اختياري">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+                <button type="button" class="btn btn-warning" onclick="submitProject()">
+                    <i class="bi bi-plus-lg me-1"></i>إضافة
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal إضافة نشاط -->
+<div class="modal fade" id="addActivityModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-info text-white">
+                <h5 class="modal-title"><i class="bi bi-activity me-2"></i>إضافة نشاط جديد</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addActivityForm">
+                    <input type="hidden" name="project_id" id="activityProjectId">
+                    <div class="alert alert-light mb-3">
+                        <small>إضافة نشاط للمشروع: <strong id="activityProjectLabel"></strong></small>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">رقم النشاط <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" name="activity_number" placeholder="مثل: 1.1" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">عنوان النشاط <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" name="title" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">الوصف</label>
+                        <textarea class="form-control" name="description" rows="2"></textarea>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">تاريخ البداية</label>
+                            <input type="date" class="form-control" name="start_date">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">تاريخ النهاية</label>
+                            <input type="date" class="form-control" name="end_date">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">الحالة</label>
+                        <select class="form-select" name="status">
+                            <option value="not_started">لم يبدأ</option>
+                            <option value="in_progress">قيد التنفيذ</option>
+                            <option value="delayed">متأخر</option>
+                            <option value="completed">مكتمل</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+                <button type="button" class="btn btn-info text-white" onclick="submitActivity()">
+                    <i class="bi bi-plus-lg me-1"></i>إضافة
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// ========== View Switching ==========
+function switchView(viewName) {
+    document.getElementById('hierarchyView').style.display = 'none';
+    document.getElementById('ganttView').classList.remove('active');
+    document.getElementById('kanbanView').classList.remove('active');
+    
+    document.querySelectorAll('.view-btn').forEach(btn => btn.classList.remove('active'));
+    
+    if (viewName === 'hierarchy') {
+        document.getElementById('hierarchyView').style.display = 'block';
+    } else if (viewName === 'gantt') {
+        document.getElementById('ganttView').classList.add('active');
+    } else if (viewName === 'kanban') {
+        document.getElementById('kanbanView').classList.add('active');
+    }
+    
+    document.querySelector(`.view-btn[data-view="${viewName}"]`).classList.add('active');
+}
+
+// ========== Toggle Cards ==========
+function toggleDuty(dutyId) {
+    const card = document.getElementById(`duty-${dutyId}`);
+    card.classList.toggle('expanded');
+}
+
+function toggleObjective(objId) {
+    const card = document.getElementById(`obj-${objId}`);
+    card.classList.toggle('expanded');
+}
+
+function toggleProject(projId) {
+    const card = document.getElementById(`proj-${projId}`);
+    card.classList.toggle('expanded');
+}
+
+// ========== Open Add Modals (مبسطة) ==========
+function openAddDutyModal() {
+    document.getElementById('addDutyForm').reset();
+    const modal = new bootstrap.Modal(document.getElementById('addDutyModal'));
+    modal.show();
+}
+
+function openAddObjectiveModal(dutyId, dutyNumber) {
+    document.getElementById('addObjectiveForm').reset();
+    document.getElementById('objectiveDutyId').value = dutyId;
+    document.getElementById('objectiveDutyLabel').textContent = `${dutyNumber}`;
+    document.getElementById('objectiveNumberInput').placeholder = `${dutyNumber}.`;
+    
+    const modal = new bootstrap.Modal(document.getElementById('addObjectiveModal'));
+    modal.show();
+}
+
+function openAddProjectModal(objectiveId, objectiveNumber) {
+    document.getElementById('addProjectForm').reset();
+    document.getElementById('projectObjectiveId').value = objectiveId;
+    document.getElementById('projectObjectiveLabel').textContent = objectiveNumber;
+    
+    const modal = new bootstrap.Modal(document.getElementById('addProjectModal'));
+    modal.show();
+}
+
+function openAddActivityModal(projectId, projectNumber) {
+    document.getElementById('addActivityForm').reset();
+    document.getElementById('activityProjectId').value = projectId;
+    document.getElementById('activityProjectLabel').textContent = `مشروع ${projectNumber}`;
+    
+    const modal = new bootstrap.Modal(document.getElementById('addActivityModal'));
+    modal.show();
+}
+
+// ========== Submit Functions ==========
+async function submitDuty() {
+    const form = document.getElementById('addDutyForm');
+    const formData = new FormData(form);
+    const data = Object.fromEntries(formData);
+    
+    try {
+        const response = await fetch('/duties/api/duty/add', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            showToast('تمت إضافة الواجب بنجاح', 'success');
+            bootstrap.Modal.getInstance(document.getElementById('addDutyModal')).hide();
+            setTimeout(() => location.reload(), 500);
+        } else {
+            showToast(result.message || 'حدث خطأ', 'danger');
+        }
+    } catch (err) {
+        showToast('حدث خطأ في الاتصال', 'danger');
+    }
+}
+
+async function submitObjective() {
+    const form = document.getElementById('addObjectiveForm');
+    const formData = new FormData(form);
+    const data = Object.fromEntries(formData);
+    
+    try {
+        const response = await fetch('/duties/api/objective/add', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            showToast('تمت إضافة الهدف بنجاح', 'success');
+            bootstrap.Modal.getInstance(document.getElementById('addObjectiveModal')).hide();
+            setTimeout(() => location.reload(), 500);
+        } else {
+            showToast(result.message || 'حدث خطأ', 'danger');
+        }
+    } catch (err) {
+        showToast('حدث خطأ في الاتصال', 'danger');
+    }
+}
+
+async function submitProject() {
+    const form = document.getElementById('addProjectForm');
+    const formData = new FormData(form);
+    const data = Object.fromEntries(formData);
+    
+    try {
+        const response = await fetch('/duties/api/project/add', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            showToast('تمت إضافة المشروع بنجاح', 'success');
+            bootstrap.Modal.getInstance(document.getElementById('addProjectModal')).hide();
+            setTimeout(() => location.reload(), 500);
+        } else {
+            showToast(result.message || 'حدث خطأ', 'danger');
+        }
+    } catch (err) {
+        showToast('حدث خطأ في الاتصال', 'danger');
+    }
+}
+
+async function submitActivity() {
+    const form = document.getElementById('addActivityForm');
+    const formData = new FormData(form);
+    const data = Object.fromEntries(formData);
+    
+    try {
+        const response = await fetch('/duties/api/activity/add', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            showToast('تمت إضافة النشاط بنجاح', 'success');
+            bootstrap.Modal.getInstance(document.getElementById('addActivityModal')).hide();
+            setTimeout(() => location.reload(), 500);
+        } else {
+            showToast(result.message || 'حدث خطأ', 'danger');
+        }
+    } catch (err) {
+        showToast('حدث خطأ في الاتصال', 'danger');
+    }
+}
+
+// ========== Toast Notification ==========
+function showToast(message, type = 'info') {
+    let container = document.querySelector('.toast-container');
+    if (!container) {
+        container = document.createElement('div');
+        container.className = 'toast-container position-fixed bottom-0 end-0 p-3';
+        container.style.zIndex = '9999';
+        document.body.appendChild(container);
+    }
+    
+    const toastId = 'toast-' + Date.now();
+    const icon = {
+        'success': 'check-circle',
+        'danger': 'x-circle',
+        'warning': 'exclamation-triangle',
+        'info': 'info-circle'
+    }[type] || 'info-circle';
+    
+    const html = `
+        <div id="${toastId}" class="toast align-items-center text-white bg-${type} border-0" role="alert">
+            <div class="d-flex">
+                <div class="toast-body">
+                    <i class="bi bi-${icon} me-2"></i>
+                    ${message}
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+            </div>
+        </div>
+    `;
+    
+    container.insertAdjacentHTML('beforeend', html);
+    
+    const toastEl = document.getElementById(toastId);
+    const toast = new bootstrap.Toast(toastEl);
+    toast.show();
+    
+    toastEl.addEventListener('hidden.bs.toast', () => toastEl.remove());
+}
+
+// ========== Initialize ==========
+document.addEventListener('DOMContentLoaded', function() {
+    // لا شيء - البطاقات تبقى مغلقة حتى يضغط المستخدم عليها
+});
+</script>
+{% endblock %}

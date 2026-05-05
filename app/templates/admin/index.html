@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block title %}لوحة الإدارة{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="h3"><i class="bi bi-gear ms-2"></i>الإدارة</h1>
+            <p class="text-muted">إدارة النظام والإعدادات</p>
+        </div>
+    </div>
+    
+    <div class="row g-4">
+        <!-- User Management -->
+        <div class="col-md-6 col-lg-4">
+            <a href="{{ url_for('admin.users') }}" class="card h-100 shadow-sm text-decoration-none">
+                <div class="card-body text-center py-5">
+                    <i class="bi bi-people display-4 text-primary mb-3"></i>
+                    <h5 class="card-title">إدارة المستخدمين</h5>
+                    <p class="card-text text-muted">إدارة المستخدمين والأدوار والأقسام</p>
+                </div>
+            </a>
+        </div>
+        
+        {% if current_user.permission_level >= PERMISSIONS.ADMIN %}
+        <!-- Audit Log -->
+        <div class="col-md-6 col-lg-4">
+            <a href="{{ url_for('admin.audit_log') }}" class="card h-100 shadow-sm text-decoration-none">
+                <div class="card-body text-center py-5">
+                    <i class="bi bi-journal-text display-4 text-info mb-3"></i>
+                    <h5 class="card-title">سجل المراجعة</h5>
+                    <p class="card-text text-muted">عرض نشاط النظام وأحداث الأمان</p>
+                </div>
+            </a>
+        </div>
+        {% endif %}
+        
+        {% if current_user.permission_level >= PERMISSIONS.SUPER_ADMIN %}
+        <!-- System Settings -->
+        <div class="col-md-6 col-lg-4">
+            <a href="{{ url_for('admin.settings') }}" class="card h-100 shadow-sm text-decoration-none">
+                <div class="card-body text-center py-5">
+                    <i class="bi bi-sliders display-4 text-warning mb-3"></i>
+                    <h5 class="card-title">إعدادات النظام</h5>
+                    <p class="card-text text-muted">تكوين إعدادات النظام العامة</p>
+                </div>
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

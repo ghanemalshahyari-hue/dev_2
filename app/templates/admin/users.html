@@ -1,0 +1,317 @@
+{% extends "base.html" %}
+{% block title %}الإدارة الموحدة (المستخدمين والأدوار){% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4 py-4">
+    <div class="d-flex align-items-center justify-content-between mb-4">
+        <h1 class="page-title mb-0"><i class="bi bi-gear-fill text-primary me-2"></i>الإدارة الموحدة</h1>
+    </div>
+
+    <!-- Tabs Navigation -->
+    <ul class="nav nav-tabs mb-4" id="adminTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="users-tab" data-bs-toggle="tab" data-bs-target="#users" type="button" role="tab" aria-controls="users" aria-selected="true">
+                <i class="bi bi-people-fill me-2"></i>المستخدمين
+                <span class="badge bg-secondary ms-2">{{ all_users|length }}</span>
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="roles-tab" data-bs-toggle="tab" data-bs-target="#roles" type="button" role="tab" aria-controls="roles" aria-selected="false">
+                <i class="bi bi-key-fill me-2"></i>الأدوار والصلاحيات
+                <span class="badge bg-secondary ms-2">{{ all_roles|length }}</span>
+            </button>
+        </li>
+    </ul>
+
+    <div class="tab-content" id="adminTabsContent">
+        
+        <!-- Users Tab -->
+        <div class="tab-pane fade show active" id="users" role="tabpanel" aria-labelledby="users-tab">
+            <div class="section-card glass-card">
+                <div class="table-responsive">
+                    <table class="table table-dark table-hover align-middle mb-0" id="usersTable">
+                        <thead>
+                            <tr>
+                                <th>المستخدم</th>
+                                <th>الاسم الكامل</th>
+                                <th>الدور</th>
+                                <th>المجموعة</th>
+                                <th>الحالة</th>
+                                <th>آخر دخول</th>
+                                <th class="text-center">إجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for user in all_users %}
+                            <tr>
+                                <td>
+                                    <span class="avatar-circle avatar-sm me-2">{{ user.full_name[0]|upper }}</span>
+                                    {{ user.username }}
+                                </td>
+                                <td>{{ user.full_name }}</td>
+                                <td>
+                                    {% if user.role %}
+                                    <span class="badge" style="background: var(--bs-primary)">
+                                        {{ user.role.name_ar }}
+                                    </span>
+                                    {% else %}<span class="text-muted">—</span>{% endif %}
+                                </td>
+                                <td>{{ user.department.name if user.department else '—' }}</td>
+                                <td>
+                                    {% if user.is_active %}
+                                    <span class="badge bg-success">نشط</span>
+                                    {% else %}
+                                    <span class="badge bg-danger">معطل</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <small class="text-muted">
+                                        {{ user.last_login.strftime('%Y-%m-%d %H:%M') if user.last_login else '—' }}
+                                    </small>
+                                </td>
+                                <td class="text-center">
+                                    <button class="btn btn-sm btn-outline-primary me-1" data-bs-toggle="modal"
+                                        data-bs-target="#editUserModal" data-user-id="{{ user.id }}"
+                                        data-user-name="{{ user.full_name }}" data-role-id="{{ user.role_id or '' }}"
+                                        data-dept-id="{{ user.department_id or '' }}"
+                                        data-is-active="{{ 'true' if user.is_active else 'false' }}">
+                                        <i class="bi bi-pencil"></i>
+                                    </button>
+                                    <form action="{{ url_for('admin.toggle_user_active', user_id=user.id) }}" method="POST"
+                                        class="d-inline">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                        <button type="submit"
+                                            class="btn btn-sm {{ 'btn-outline-success' if not user.is_active else 'btn-outline-danger' }}"
+                                            title="{{ 'تفعيل' if not user.is_active else 'تعطيل' }}"
+                                            onclick="return confirm('هل تريد تغيير حالة هذا المستخدم؟')">
+                                            <i class="bi bi-{{ 'check-circle' if not user.is_active else 'x-circle' }}"></i>
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="7" class="text-center text-muted py-4">لا يوجد مستخدمون</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Roles Tab -->
+        <div class="tab-pane fade" id="roles" role="tabpanel" aria-labelledby="roles-tab">
+            <div class="section-card glass-card">
+                 <div class="alert alert-info d-flex align-items-center mb-0 border-0" style="background: rgba(79, 142, 247, 0.1);">
+                    <i class="bi bi-info-circle-fill fs-4 me-3 text-primary"></i>
+                    <div>
+                        <strong>تنويه:</strong>
+                        المستويات والصلاحيات الأساسية مرتبطة برمجياً. تغيير الأسماء لا يؤثر على الصلاحيات الفعلية.
+                    </div>
+                </div>
+                <div class="table-responsive mt-3">
+                    <table class="table table-dark table-hover align-middle mb-0">
+                        <thead>
+                            <tr>
+                                <th>الرمز</th>
+                                <th>الاسم (EN)</th>
+                                <th>الاسم (AR)</th>
+                                <th>مستوى الصلاحية</th>
+                                <th>الوصف</th>
+                                <th>نظام</th>
+                                <th class="text-center">تعديل</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for role in all_roles %}
+                            <tr>
+                                <td><code class="text-primary">{{ role.code }}</code></td>
+                                <td>{{ role.name }}</td>
+                                <td>{{ role.name_ar }}</td>
+                                <td>
+                                    <span class="badge bg-primary-subtle text-primary px-2">{{ role.permission_level }}</span>
+                                </td>
+                                <td><small class="text-muted">{{ role.description[:60] }}{% if role.description|length > 60 %}...{% endif %}</small></td>
+                                <td>
+                                    {% if role.is_system %}
+                                    <i class="bi bi-lock-fill text-secondary" title="دور نظام — لا يمكن حذفه"></i>
+                                    {% endif %}
+                                </td>
+                                <td class="text-center">
+                                    <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal"
+                                        data-bs-target="#editRoleModal" data-role-id="{{ role.id }}"
+                                        data-role-name="{{ role.name }}" data-role-name-ar="{{ role.name_ar }}"
+                                        data-role-level="{{ role.permission_level }}" data-role-desc="{{ role.description }}"
+                                        data-role-system="{{ 'true' if role.is_system else 'false' }}">
+                                        <i class="bi bi-pencil"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+
+<!-- Edit User Modal -->
+<div class="modal fade" id="editUserModal" tabindex="-1" aria-labelledby="editUserModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content glass-modal text-white">
+            <form id="editUserForm" method="POST" action="">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <div class="modal-header border-0">
+                    <h5 class="modal-title" id="editUserModalLabel">
+                        <i class="bi bi-pencil-square me-2 text-primary"></i>تعديل المستخدم: <span
+                            id="editUserName"></span>
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">الدور</label>
+                        <select name="role_id" class="form-select glass-input text-white" id="editRoleSelect">
+                            {% for role in all_roles %}
+                            <option value="{{ role.id }}">{{ role.name_ar }} ({{ role.permission_level }})</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">المجموعة</label>
+                        <select name="department_id" class="form-select glass-input text-white" id="editDeptSelect">
+                            <option value="">— بدون مجموعة —</option>
+                            {% for dept in all_depts %}
+                            <option value="{{ dept.id }}">{{ dept.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" name="is_active" id="editIsActive">
+                        <label class="form-check-label" for="editIsActive">حساب نشط</label>
+                    </div>
+                </div>
+                <div class="modal-footer border-0">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+                    <button type="submit" class="btn btn-primary">حفظ التغييرات</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Role Modal -->
+<div class="modal fade" id="editRoleModal" tabindex="-1" aria-labelledby="editRoleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content glass-modal text-white">
+            <form id="editRoleForm" method="POST" action="">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <div class="modal-header border-0">
+                    <h5 class="modal-title fw-bold" id="editRoleModalLabel">
+                        <i class="bi bi-key me-2 text-primary"></i>تعديل الدور
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row g-3">
+                        <div class="col-6">
+                            <label class="form-label">الاسم (EN)</label>
+                            <input type="text" name="name" id="editRoleName" class="form-control glass-input text-white" required>
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label">الاسم (AR)</label>
+                            <input type="text" name="name_ar" id="editRoleNameAr" class="form-control glass-input text-white">
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">مستوى الصلاحية (للمعلومات فقط)</label>
+                             <input type="text" id="editRoleLevelDisplay" class="form-control glass-input text-muted" readonly disabled>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">الوصف</label>
+                            <textarea name="description" id="editRoleDesc" class="form-control glass-input text-white"
+                                rows="3"></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-0">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+                    <button type="submit" class="btn btn-primary">حفظ</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    'use strict';
+    
+    // Resume active tab from localStorage or URL hash
+    document.addEventListener('DOMContentLoaded', function() {
+        var triggerTabList = [].slice.call(document.querySelectorAll('#adminTabs a'))
+        triggerTabList.forEach(function (triggerEl) {
+          var tabTrigger = new bootstrap.Tab(triggerEl)
+          triggerEl.addEventListener('click', function (event) {
+            localStorage.setItem('activeAdminTab', event.target.getAttribute('data-bs-target'));
+          })
+        });
+
+        // Activate saved tab
+        var activeTabId = localStorage.getItem('activeAdminTab');
+        if(activeTabId) {
+            var triggerEl = document.querySelector('#adminTabs button[data-bs-target="' + activeTabId + '"]');
+            if(triggerEl) {
+                bootstrap.Tab.getInstance(triggerEl).show();
+            }
+        }
+    });
+
+    // Edit User Modal
+    var editUserModal = document.getElementById('editUserModal');
+    if (editUserModal) {
+        editUserModal.addEventListener('show.bs.modal', function (e) {
+            const btn = e.relatedTarget;
+            const userId = btn.dataset.userId;
+            const name = btn.dataset.userName;
+            const roleId = btn.dataset.roleId;
+            const deptId = btn.dataset.deptId;
+            const active = btn.dataset.isActive === 'true';
+
+            document.getElementById('editUserName').textContent = name;
+            document.getElementById('editUserForm').action = `/admin/users/${userId}/update`;
+            
+            // Handle Selects logic with fallback
+            const roleSelect = document.getElementById('editRoleSelect');
+            if (roleSelect) roleSelect.value = roleId;
+            
+            const deptSelect = document.getElementById('editDeptSelect');
+            if (deptSelect) deptSelect.value = deptId;
+            
+            const activeCheck = document.getElementById('editIsActive');
+            if (activeCheck) activeCheck.checked = active;
+        });
+    }
+
+    // Edit Role Modal
+    var editRoleModal = document.getElementById('editRoleModal');
+    if (editRoleModal) {
+        editRoleModal.addEventListener('show.bs.modal', function (e) {
+            const btn = e.relatedTarget;
+            const roleId = btn.dataset.roleId;
+            const name = btn.dataset.roleName;
+            const nameAr = btn.dataset.roleNameAr;
+            const level = btn.dataset.roleLevel;
+            const desc = btn.dataset.roleDesc;
+
+            document.getElementById('editRoleForm').action = `/admin/roles/${roleId}/update`;
+            document.getElementById('editRoleName').value = name;
+            document.getElementById('editRoleNameAr').value = nameAr;
+            document.getElementById('editRoleLevelDisplay').value = level;
+            document.getElementById('editRoleDesc').value = desc;
+        });
+    }
+</script>
+{% endblock %}

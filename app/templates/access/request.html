@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% block title %}طلب صلاحية — {{ app_name }}{% endblock %}
+
+{% block content %}
+<div class="container py-5" style="max-width:700px">
+    <div class="d-flex align-items-center gap-3 mb-4">
+        <a href="{{ url_for('dashboard.index') }}" class="btn btn-sm btn-outline-secondary">
+            <i class="bi bi-arrow-right me-1"></i>رجوع
+        </a>
+        <h1 class="page-title mb-0"><i class="bi bi-key-fill text-primary me-2"></i>طلب صلاحية جديدة</h1>
+    </div>
+
+    <div class="section-card glass-card">
+        <form method="POST" action="{{ url_for('access.new_request') }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+            <div class="mb-4">
+                <label class="form-label fw-semibold">الدور المطلوب <span class="text-danger">*</span></label>
+                <select name="role_code" class="form-select glass-input" required>
+                    <option value="">— اختر الدور —</option>
+                    {% for role in roles %}
+                    {% if role.code != 'DEVELOPER' %}
+                    <option value="{{ role.code }}">{{ role.name_ar }} (مستوى {{ role.permission_level }})</option>
+                    {% endif %}
+                    {% endfor %}
+                </select>
+                <small class="text-muted">سيتم مراجعة الطلب من قبل عدة مستويات من الإدارة</small>
+            </div>
+
+            <div class="mb-4">
+                <label class="form-label fw-semibold">المجموعة المطلوبة (اختياري)</label>
+                <select name="department_id" class="form-select glass-input">
+                    <option value="">— بدون مجموعة محددة —</option>
+                    {% for dept in depts %}
+                    <option value="{{ dept.id }}">{{ dept.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="mb-4">
+                <label class="form-label fw-semibold">مبرر الطلب <span class="text-danger">*</span></label>
+                <textarea name="justification" class="form-control glass-input" rows="4"
+                    placeholder="اشرح سبب حاجتك لهذه الصلاحيات بشكل واضح ومفصل..." required minlength="20"></textarea>
+                <small class="text-muted">20 حرف على الأقل</small>
+            </div>
+
+            <!-- Approval chain info -->
+            <div class="glass-card p-3 mb-4">
+                <h3 class="h6 fw-bold mb-2 text-muted"><i class="bi bi-diagram-3 me-2"></i>مسار الاعتماد</h3>
+                <div class="d-flex align-items-center gap-2 flex-wrap">
+                    <span class="badge bg-secondary">أنت</span>
+                    <i class="bi bi-arrow-left text-muted"></i>
+                    <span class="badge bg-primary">مدير المجموعة</span>
+                    <i class="bi bi-arrow-left text-muted"></i>
+                    <span class="badge bg-primary">نائب المدير</span>
+                    <i class="bi bi-arrow-left text-muted"></i>
+                    <span class="badge bg-primary">السكرتير</span>
+                    <i class="bi bi-arrow-left text-muted"></i>
+                    <span class="badge bg-success">المدير</span>
+                </div>
+                <small class="text-muted mt-2 d-block">أي مستوى يستطيع رفض الطلب مع ذكر السبب</small>
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100">
+                <i class="bi bi-send me-2"></i>إرسال الطلب
+            </button>
+        </form>
+    </div>
+</div>
+{% endblock %}

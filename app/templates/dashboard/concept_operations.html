@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-5">
+    <div class="card shadow-sm">
+        <div class="card-body text-center">
+            <!-- اسم المجموعة -->
+            <h2 class="mb-3">{{ department.name }}</h2>
+            <!-- الوحدة المسؤولة -->
+            <h5 class="text-muted mb-4">الوحدة المسؤولة: {{ department.manager.name if department.manager else '---' }}</h5>
+            <!-- الواجب الرئيسي 5.1 -->
+            {% if main_duty %}
+            <div class="mb-4">
+                <h4>الواجب الرئيسي: {{ main_duty.code }}</h4>
+                <p>{{ main_duty.description }}</p>
+                <div class="row justify-content-center mb-2">
+                    <div class="col-md-4">
+                        <span class="fw-bold">الوحدة المسؤولة:</span> {{ main_duty.responsible_unit }}
+                    </div>
+                    <div class="col-md-4">
+                        <span class="fw-bold">النسبة:</span> {{ main_duty.percentage }}%
+                    </div>
+                    <div class="col-md-4">
+                        <span class="fw-bold">النهاية المتوقعة:</span> {{ main_duty.expected_end }}
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <div class="alert alert-warning">لا يوجد واجب رئيسي رقم 5.1</div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+{% block title %}الطلبات المعلقة — {{ app_name }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4 py-4">
+    <div class="d-flex align-items-center justify-content-between mb-4">
+        <h1 class="page-title mb-0"><i class="bi bi-bell-fill text-warning me-2"></i>طلبات الصلاحيات المعلقة</h1>
+        <span class="badge bg-warning text-dark fs-6 px-3 py-2">{{ requests|length }} طلب</span>
+    </div>
+
+    {% if requests %}
+    <div class="row g-4">
+        {% for req in requests %}
+        <div class="col-md-6 col-xl-4">
+            <div class="glass-card request-card">
+                <div class="d-flex align-items-start justify-content-between mb-3">
+                    <div>
+                        <h3 class="h6 fw-bold mb-1">{{ req.requester.full_name if req.requester else '—' }}</h3>
+                        <small class="text-muted">{{ req.created_at.strftime('%Y-%m-%d %H:%M') }}</small>
+                    </div>
+                    <span class="badge bg-warning text-dark">معلق</span>
+                </div>
+
+                <div class="mb-3">
+                    <label class="small text-muted">الدور المطلوب</label>
+                    <div class="fw-semibold">{{ req.requested_role_code }}</div>
+                </div>
+
+                {% if req.department %}
+                <div class="mb-3">
+                    <label class="small text-muted">المجموعة</label>
+                    <div class="fw-semibold">{{ req.department.name }}</div>
+                </div>
+                {% endif %}
+
+                <div class="mb-3">
+                    <label class="small text-muted">المبرر</label>
+                    <p class="mb-0 small">{{ req.justification }}</p>
+                </div>
+
+                <!-- Approval history -->
+                {% if req.approvals %}
+                <div class="mb-3">
+                    <label class="small text-muted">سجل الاعتمادات</label>
+                    {% for approval in req.approvals %}
+                    <div class="d-flex align-items-center gap-2 mt-1">
+                        <span class="badge {{ 'bg-success' if approval.decision == 'approved' else 'bg-danger' }}">
+                            {{ 'موافق' if approval.decision == 'approved' else 'مرفوض' }}
+                        </span>
+                        <small class="text-muted">{{ approval.approver.full_name if approval.approver else '—'
+                            }}</small>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+                <!-- Actions -->
+                <div class="d-flex gap-2 mt-3">
+                    <!-- Approve -->
+                    <form action="{{ url_for('access.approve', request_id=req.id) }}" method="POST" class="flex-fill">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <button type="submit" class="btn btn-success w-100">
+                            <i class="bi bi-check-circle me-1"></i>موافقة
+                        </button>
+                    </form>
+
+                    <!-- Reject (with reason modal) -->
+                    <button class="btn btn-danger flex-fill" data-bs-toggle="modal" data-bs-target="#rejectModal"
+                        data-request-id="{{ req.id }}">
+                        <i class="bi bi-x-circle me-1"></i>رفض
+                    </button>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    {% else %}
+    <div class="text-center text-muted py-5">
+        <i class="bi bi-inbox fs-1 opacity-25"></i>
+        <p class="mt-3 h5">لا توجد طلبات معلقة</p>
+        <p>جميع الطلبات تمت معالجتها</p>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Reject Modal -->
+<div class="modal fade" id="rejectModal" tabindex="-1" aria-labelledby="rejectModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content glass-modal">
+            <form id="rejectForm" method="POST" action="">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <div class="modal-header border-0">
+                    <h5 class="modal-title fw-bold text-danger" id="rejectModalLabel">
+                        <i class="bi bi-x-circle-fill me-2"></i>رفض الطلب
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="alert alert-warning py-2">
+                        <i class="bi bi-exclamation-triangle me-2"></i>
+                        <strong>يجب</strong> ذكر سبب الرفض — هذا إلزامي.
+                    </div>
+                    <label class="form-label fw-semibold">سبب الرفض <span class="text-danger">*</span></label>
+                    <textarea name="rejection_reason" class="form-control glass-input" rows="3"
+                        placeholder="اشرح سبب الرفض بوضوح للمتقدم..." required minlength="10"></textarea>
+                </div>
+                <div class="modal-footer border-0">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+                    <button type="submit" class="btn btn-danger">تأكيد الرفض</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    'use strict';
+    document.getElementById('rejectModal').addEventListener('show.bs.modal', function (e) {
+        const reqId = e.relatedTarget.dataset.requestId;
+        document.getElementById('rejectForm').action = `/access/${reqId}/reject`;
+    });
+</script>
+{% endblock %}

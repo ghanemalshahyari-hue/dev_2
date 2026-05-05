@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+{% block title %}لوحة مدير المجموعة — {{ app_name }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4 py-4">
+    <div class="d-flex align-items-center justify-content-between mb-4">
+        <div>
+            <h1 class="page-title mb-1"><i class="bi bi-folder-fill text-primary me-2"></i>لوحة مدير المجموعة</h1>
+            <p class="text-muted mb-0">إدارة بيانات مجموعتك وتحديث المؤشرات</p>
+        </div>
+        {% if pending_requests > 0 %}
+        <a href="{{ url_for('access.pending') }}" class="btn btn-warning">
+            <i class="bi bi-bell-fill me-2"></i>{{ pending_requests }} طلب
+        </a>
+        {% endif %}
+    </div>
+
+    {% for dept in departments %}
+    <div class="section-card glass-card mb-4" style="border-right: 4px solid {{ dept.color }}">
+        <div class="section-card-header d-flex align-items-center gap-3 mb-4">
+            {% if dept.logo_file %}
+            <img src="{{ url_for('static', filename='img/' ~ dept.logo_file) }}" alt="{{ dept.name }}"
+                 style="width: 50px; height: 50px; object-fit: contain;">
+            {% else %}
+            <i class="{{ dept.icon }} fs-3" style="color:{{ dept.color }}"></i>
+            {% endif %}
+            <div>
+                <h2 class="h5 mb-0 fw-bold">{{ dept.name }}</h2>
+                <small class="text-muted">{{ dept.description or 'لا يوجد وصف' }}</small>
+            </div>
+            <div class="ms-auto text-muted small">
+                <i class="bi bi-person me-1"></i>{{ dept.responsible_person or '—' }}
+            </div>
+        </div>
+
+        <!-- Current metrics -->
+        <div class="row g-3 mb-4">
+            <div class="col-md-6">
+                <div class="glass-card p-3">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="text-muted small">نسبة الكفاءة</span>
+                        <span class="fw-bold" style="color:{{ dept.color }}">{{ dept.competence_pct|round(0)|int
+                            }}%</span>
+                    </div>
+                    <div class="progress" style="height:10px">
+                        <div class="progress-bar" style="width:{{ dept.competence_pct }}%;background:{{ dept.color }}">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="glass-card p-3">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="text-muted small">نسبة الإنجاز</span>
+                        <span class="fw-bold text-success">{{ dept.completion_pct|round(0)|int }}%</span>
+                    </div>
+                    <div class="progress" style="height:10px">
+                        <div class="progress-bar bg-success" style="width:{{ dept.completion_pct }}%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Update metrics form -->
+        <div class="glass-card p-4">
+            <h3 class="h6 fw-bold mb-3"><i class="bi bi-pencil-square me-2 text-primary"></i>تحديث المؤشرات</h3>
+            <form action="{{ url_for('admin.update_metrics', dept_id=dept.id) }}" method="POST">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <div class="row g-3 align-items-end">
+                    <div class="col-md-4">
+                        <label class="form-label small text-muted">نسبة الكفاءة %</label>
+                        <input type="number" name="competence_pct" class="form-control glass-input" min="0" max="100"
+                            step="0.5" value="{{ dept.competence_pct|round(1) }}" required>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label small text-muted">نسبة الإنجاز %</label>
+                        <input type="number" name="completion_pct" class="form-control glass-input" min="0" max="100"
+                            step="0.5" value="{{ dept.completion_pct|round(1) }}" required>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label small text-muted">ملاحظات</label>
+                        <input type="text" name="notes" class="form-control glass-input" placeholder="تعليق (اختياري)">
+                    </div>
+                    <div class="col-md-1">
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="bi bi-check-lg"></i>
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    {% else %}
+    <div class="text-center text-muted py-5">
+        <i class="bi bi-folder-x fs-1 opacity-25"></i>
+        <p class="mt-3">لم يتم تعيين مجموعة لك. تواصل مع المسؤول.</p>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

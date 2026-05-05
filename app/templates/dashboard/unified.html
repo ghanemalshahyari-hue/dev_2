@@ -1,0 +1,1013 @@
+{% extends "base.html" %}
+
+{% block title %}لوحة التحكم{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* ========== Light Theme - Easy on Eyes ========== */
+    
+    /* Main Dashboard Layout */
+    .dashboard-container {
+        min-height: calc(100vh - 60px);
+        background: linear-gradient(135deg, #f5f7fa 0%, #e4e9f2 50%, #f0f4f8 100%);
+        padding: 20px;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    /* Subtle Background Pattern */
+    .dashboard-container::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: 
+            radial-gradient(circle at 20% 80%, rgba(99, 179, 237, 0.08) 0%, transparent 50%),
+            radial-gradient(circle at 80% 20%, rgba(159, 122, 234, 0.08) 0%, transparent 50%);
+        pointer-events: none;
+    }
+    
+    /* Top Bar */
+    .top-bar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        position: relative;
+        z-index: 10;
+    }
+    
+    .user-welcome {
+        color: #2d3748;
+    }
+    
+    .user-welcome h2 {
+        font-size: 1.4rem;
+        font-weight: 600;
+        margin: 0;
+        color: #1a365d;
+    }
+    
+    .user-welcome p {
+        font-size: 0.9rem;
+        color: #718096;
+        margin: 3px 0 0 0;
+    }
+    
+    /* Mini KPIs Row */
+    .mini-kpis {
+        display: flex;
+        gap: 15px;
+    }
+    
+    .mini-kpi {
+        background: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 12px 20px;
+        text-align: center;
+        color: #2d3748;
+        min-width: 100px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
+    
+    .mini-kpi-value {
+        font-size: 1.5rem;
+        font-weight: 700;
+    }
+    
+    .mini-kpi-label {
+        font-size: 0.75rem;
+        color: #718096;
+    }
+    
+    /* Main Layout Grid */
+    .main-layout {
+        display: grid;
+        grid-template-columns: 280px 1fr 280px;
+        gap: 20px;
+        position: relative;
+        z-index: 10;
+        min-height: calc(100vh - 180px);
+    }
+    
+    /* Side Panels */
+    .side-panel {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .panel-card {
+        background: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 16px;
+        overflow: hidden;
+        flex: 1;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.04);
+    }
+    
+    .panel-header {
+        padding: 15px 18px;
+        border-bottom: 1px solid #edf2f7;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: #fafbfc;
+    }
+    
+    .panel-title {
+        color: #2d3748;
+        font-size: 0.95rem;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin: 0;
+    }
+    
+    .panel-title i {
+        color: #667eea;
+    }
+    
+    .panel-badge {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        padding: 3px 10px;
+        border-radius: 10px;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+    
+    .panel-body {
+        padding: 15px;
+        max-height: 300px;
+        overflow-y: auto;
+    }
+    
+    .panel-body::-webkit-scrollbar {
+        width: 4px;
+    }
+    
+    .panel-body::-webkit-scrollbar-thumb {
+        background: #cbd5e0;
+        border-radius: 2px;
+    }
+    
+    /* List Items in Panels */
+    .panel-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 12px;
+        background: #f7fafc;
+        border-radius: 10px;
+        margin-bottom: 8px;
+        border-right: 3px solid transparent;
+        transition: all 0.3s ease;
+    }
+    
+    .panel-item:hover {
+        background: #edf2f7;
+        transform: translateX(-3px);
+    }
+    
+    .panel-item.critical { border-color: #fc8181; background: #fff5f5; }
+    .panel-item.warning { border-color: #f6ad55; background: #fffaf0; }
+    .panel-item.info { border-color: #63b3ed; background: #ebf8ff; }
+    .panel-item.success { border-color: #68d391; background: #f0fff4; }
+    .panel-item.primary { border-color: #667eea; background: #ebf4ff; }
+    
+    .panel-item-icon {
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.9rem;
+    }
+    
+    .panel-item.critical .panel-item-icon { background: #fed7d7; color: #c53030; }
+    .panel-item.warning .panel-item-icon { background: #feebc8; color: #c05621; }
+    .panel-item.info .panel-item-icon { background: #bee3f8; color: #2b6cb0; }
+    .panel-item.success .panel-item-icon { background: #c6f6d5; color: #276749; }
+    .panel-item.primary .panel-item-icon { background: #c3dafe; color: #4c51bf; }
+    
+    .panel-item-content {
+        flex: 1;
+        min-width: 0;
+    }
+    
+    .panel-item-title {
+        color: #2d3748;
+        font-size: 0.85rem;
+        font-weight: 500;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    
+    .panel-item-meta {
+        color: #a0aec0;
+        font-size: 0.7rem;
+    }
+    
+    /* CENTER - Main Circular Dashboard */
+    .center-section {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .circular-wrapper {
+        background: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 50%;
+        padding: 30px;
+        position: relative;
+        box-shadow: 0 10px 40px rgba(102, 126, 234, 0.1);
+    }
+    
+    /* Soft Glow Effect */
+    .circular-wrapper::before {
+        content: '';
+        position: absolute;
+        top: -2px;
+        left: -2px;
+        right: -2px;
+        bottom: -2px;
+        background: linear-gradient(135deg, rgba(102, 126, 234, 0.2), rgba(159, 122, 234, 0.2));
+        border-radius: 50%;
+        z-index: -1;
+        filter: blur(15px);
+        opacity: 0.6;
+    }
+    
+    .circular-dashboard {
+        position: relative;
+        width: 500px;
+        height: 500px;
+    }
+    
+    /* Connection Lines SVG */
+    .connection-lines {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        pointer-events: none;
+    }
+    
+    .connection-lines line {
+        stroke: #cbd5e0;
+        stroke-width: 2;
+        stroke-dasharray: 8, 4;
+    }
+    
+    /* Center Hub */
+    .center-hub {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 160px;
+        height: 160px;
+        background: linear-gradient(135deg, #667eea 0%, #9f7aea 100%);
+        border-radius: 50%;
+        box-shadow: 
+            0 10px 40px rgba(102, 126, 234, 0.35),
+            inset 0 0 30px rgba(255,255,255,0.15);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        z-index: 10;
+        color: white;
+        border: 4px solid white;
+    }
+    
+    .center-hub .hub-label {
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        opacity: 0.95;
+        margin-bottom: 5px;
+    }
+    
+    .center-hub .hub-value {
+        font-size: 3rem;
+        font-weight: 700;
+        line-height: 1;
+    }
+    
+    .center-hub .hub-sublabel {
+        font-size: 0.75rem;
+        opacity: 0.9;
+        margin-top: 5px;
+    }
+    
+    /* Department Nodes */
+    .dept-node {
+        position: absolute;
+        width: 100px;
+        height: 100px;
+        transform: translate(-50%, -50%);
+        cursor: pointer;
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    
+    .dept-node:hover {
+        transform: translate(-50%, -50%) scale(1.15);
+        z-index: 20;
+    }
+    
+    .dept-card {
+        width: 100%;
+        height: 100%;
+        background: white;
+        border-radius: 50%;
+        box-shadow: 
+            0 4px 20px rgba(0, 0, 0, 0.08),
+            0 0 0 3px white;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        border: 3px solid;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .dept-node:hover .dept-card {
+        box-shadow: 
+            0 10px 35px rgba(0, 0, 0, 0.12),
+            0 0 0 3px white,
+            0 0 25px var(--dept-color, rgba(102, 126, 234, 0.3));
+    }
+    
+    /* Progress Ring */
+    .dept-card::before {
+        content: '';
+        position: absolute;
+        top: -3px;
+        left: -3px;
+        right: -3px;
+        bottom: -3px;
+        border-radius: 50%;
+        background: conic-gradient(
+            var(--dept-color, #667eea) calc(var(--progress, 0) * 1%),
+            #edf2f7 calc(var(--progress, 0) * 1%)
+        );
+        z-index: -1;
+        opacity: 0.4;
+    }
+    
+    .dept-icon {
+        font-size: 1.5rem;
+        margin-bottom: 4px;
+    }
+    
+    .dept-name {
+        font-size: 0.65rem;
+        font-weight: 700;
+        color: #2d3748;
+        text-align: center;
+        max-width: 80px;
+        line-height: 1.2;
+    }
+    
+    .dept-score {
+        font-size: 0.7rem;
+        font-weight: 700;
+        margin-top: 2px;
+        padding: 2px 8px;
+        border-radius: 10px;
+        background: #f0fff4;
+        color: #276749;
+    }
+    
+    /* Legend */
+    .circular-legend {
+        display: flex;
+        justify-content: center;
+        gap: 30px;
+        margin-top: 25px;
+        color: #4a5568;
+    }
+    
+    .legend-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 0.85rem;
+    }
+    
+    .legend-dot {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+    }
+    
+    .legend-dot.competence { background: #48bb78; }
+    .legend-dot.completion { background: #667eea; }
+    
+    /* Quick Actions - Bottom */
+    .quick-actions-bar {
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+        margin-top: 25px;
+    }
+    
+    .quick-btn {
+        background: white;
+        border: 1px solid #e2e8f0;
+        color: #4a5568;
+        padding: 12px 25px;
+        border-radius: 25px;
+        font-size: 0.9rem;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
+    
+    .quick-btn:hover {
+        background: linear-gradient(135deg, #667eea, #9f7aea);
+        border-color: transparent;
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.3);
+    }
+    
+    /* Empty State */
+    .empty-state {
+        text-align: center;
+        padding: 25px 15px;
+        color: #a0aec0;
+    }
+    
+    .empty-state i {
+        font-size: 2rem;
+        margin-bottom: 10px;
+        color: #cbd5e0;
+    }
+    
+    /* User Profile for lower roles */
+    .user-profile-card {
+        background: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 20px;
+        padding: 40px;
+        text-align: center;
+        color: #2d3748;
+        max-width: 400px;
+        margin: 0 auto;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.06);
+    }
+    
+    .profile-avatar {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #667eea 0%, #9f7aea 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2.5rem;
+        color: white;
+        margin: 0 auto 20px;
+        border: 4px solid white;
+        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+    }
+    
+    .profile-name {
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin-bottom: 8px;
+        color: #1a365d;
+    }
+    
+    .profile-role {
+        display: inline-block;
+        background: linear-gradient(135deg, #667eea, #9f7aea);
+        color: white;
+        padding: 6px 20px;
+        border-radius: 20px;
+        font-size: 0.9rem;
+        margin-bottom: 15px;
+    }
+    
+    .profile-dept {
+        color: #718096;
+        font-size: 0.95rem;
+    }
+    
+    /* My Department Card */
+    .my-dept-section {
+        max-width: 600px;
+        margin: 0 auto;
+    }
+    
+    .my-dept-card {
+        background: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 20px;
+        padding: 30px;
+        text-align: center;
+        color: #2d3748;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.06);
+    }
+    
+    .my-dept-icon {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        margin: 0 auto 15px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        color: white;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    }
+    
+    .my-dept-name {
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin-bottom: 20px;
+        color: #1a365d;
+    }
+    
+    .my-dept-metrics {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+    }
+    
+    .my-dept-metric {
+        background: #f7fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 15px;
+        padding: 20px;
+    }
+    
+    .my-dept-metric-value {
+        font-size: 2rem;
+        font-weight: 700;
+    }
+    
+    .my-dept-metric-label {
+        font-size: 0.85rem;
+        color: #718096;
+    }
+    
+    .competence { color: #38a169; }
+    .completion { color: #667eea; }
+    
+    /* Responsive */
+    @media (max-width: 1400px) {
+        .main-layout {
+            grid-template-columns: 250px 1fr 250px;
+        }
+        .circular-dashboard {
+            width: 420px;
+            height: 420px;
+        }
+        .dept-node {
+            width: 85px;
+            height: 85px;
+        }
+        .center-hub {
+            width: 130px;
+            height: 130px;
+        }
+        .center-hub .hub-value {
+            font-size: 2.5rem;
+        }
+    }
+    
+    @media (max-width: 1200px) {
+        .main-layout {
+            grid-template-columns: 1fr;
+        }
+        .side-panel {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+        }
+        .panel-body {
+            max-height: 200px;
+        }
+    }
+    
+    @media (max-width: 768px) {
+        .dashboard-container { padding: 15px; }
+        .top-bar { flex-direction: column; gap: 15px; text-align: center; }
+        .mini-kpis { justify-content: center; flex-wrap: wrap; }
+        .circular-dashboard { width: 320px; height: 320px; }
+        .dept-node { width: 65px; height: 65px; }
+        .dept-score { display: none; }
+        .center-hub { width: 100px; height: 100px; }
+        .center-hub .hub-value { font-size: 1.8rem; }
+        .side-panel { grid-template-columns: 1fr; }
+        .quick-actions-bar { flex-wrap: wrap; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <!-- Top Bar -->
+    <div class="top-bar">
+        <div class="user-welcome">
+            <h2>مرحباً، {{ current_user.full_name }}</h2>
+            <p>{{ current_user.role.display_name if current_user.role else 'مستخدم' }}{% if current_user.department %} • {{ current_user.department.name }}{% endif %}</p>
+        </div>
+        
+        {% if can_view_kpis %}
+        <div class="mini-kpis">
+            <div class="mini-kpi">
+                <div class="mini-kpi-value" style="color: #38a169;">{{ overview.average_competence|default(0)|round|int }}%</div>
+                <div class="mini-kpi-label">الجاهزية</div>
+            </div>
+            <div class="mini-kpi">
+                <div class="mini-kpi-value" style="color: #667eea;">{{ overview.average_completion|default(0)|round|int }}%</div>
+                <div class="mini-kpi-label">الإنجاز</div>
+            </div>
+            <div class="mini-kpi">
+                <div class="mini-kpi-value" style="color: #4a5568;">{{ departments|length if departments else 0 }}</div>
+                <div class="mini-kpi-label">المجموعات</div>
+            </div>
+            {% if alerts %}
+            <div class="mini-kpi">
+                <div class="mini-kpi-value" style="color: #dd6b20;">{{ alerts|length }}</div>
+                <div class="mini-kpi-label">التنبيهات</div>
+            </div>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+    
+    {% if can_view_groups_circular and departments %}
+    <!-- Main Layout with Circular Dashboard in Center -->
+    <div class="main-layout">
+        <!-- Left Panel -->
+        <div class="side-panel">
+            {% if can_view_alerts and alerts %}
+            <div class="panel-card">
+                <div class="panel-header">
+                    <h3 class="panel-title"><i class="bi bi-bell"></i> التنبيهات</h3>
+                    <span class="panel-badge">{{ alerts|length }}</span>
+                </div>
+                <div class="panel-body">
+                    {% for alert in alerts[:6] %}
+                    <div class="panel-item {{ alert.alert_type|default('info') }}">
+                        <div class="panel-item-icon">
+                            {% if alert.alert_type == 'critical' %}
+                                <i class="bi bi-x-circle"></i>
+                            {% elif alert.alert_type == 'warning' %}
+                                <i class="bi bi-exclamation-triangle"></i>
+                            {% else %}
+                                <i class="bi bi-info-circle"></i>
+                            {% endif %}
+                        </div>
+                        <div class="panel-item-content">
+                            <div class="panel-item-title">{{ alert.title }}</div>
+                            <div class="panel-item-meta">{{ alert.created_at.strftime('%H:%M') if alert.created_at else 'الآن' }}</div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+            
+            {% if can_view_plans and plans %}
+            <div class="panel-card">
+                <div class="panel-header">
+                    <h3 class="panel-title"><i class="bi bi-calendar-check"></i> الخطط</h3>
+                </div>
+                <div class="panel-body">
+                    {% for plan in plans[:4] %}
+                    <div class="panel-item primary">
+                        <div class="panel-item-icon">
+                            <i class="bi bi-calendar-check"></i>
+                        </div>
+                        <div class="panel-item-content">
+                            <div class="panel-item-title">{{ plan.name }}</div>
+                            <div class="panel-item-meta">{{ plan.completion_percentage|default(0)|round }}% مكتمل</div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+            
+            {% if not (can_view_alerts and alerts) and not (can_view_plans and plans) %}
+            <div class="panel-card">
+                <div class="panel-header">
+                    <h3 class="panel-title"><i class="bi bi-info-circle"></i> المعلومات</h3>
+                </div>
+                <div class="panel-body">
+                    <div class="empty-state">
+                        <i class="bi bi-check-circle"></i>
+                        <p>لا توجد تنبيهات جديدة</p>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        
+        <!-- Center - Circular Dashboard -->
+        <div class="center-section">
+            <div class="circular-wrapper">
+                <div class="circular-dashboard" id="circularDashboard">
+                    <svg class="connection-lines" id="connectionLines"></svg>
+                    
+                    <!-- Center Hub -->
+                    <div class="center-hub">
+                        <span class="hub-label">الاستراتيجية العسكرية</span>
+                        <span class="hub-value">{{ overview.average_completion|default(0)|round|int }}%</span>
+                        <span class="hub-sublabel">نسبة الإنجاز</span>
+                    </div>
+                    
+                    <!-- Department Nodes -->
+                    {% for dept in departments %}
+                    <div class="dept-node" data-color="{{ dept.color }}" style="--dept-color: {{ dept.color }}; --progress: {{ dept.completion|default(0) }}; cursor: pointer;" onclick="location.href='{{ url_for('dashboard.group_dashboard', group_id=dept.id) }}'">
+                        <div class="dept-card" style="border-color: {{ dept.color }};">
+                            <span class="dept-icon" style="color: {{ dept.color }};">
+                                <i class="bi bi-{{ dept.icon|default('folder') }}"></i>
+                            </span>
+                            <span class="dept-name">{{ dept.name }}</span>
+                            <span class="dept-score">{{ dept.completion|default(0)|round|int }}%</span>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            
+            <div class="circular-legend">
+                <div class="legend-item">
+                    <span class="legend-dot competence"></span>
+                    <span>الجاهزية</span>
+                </div>
+                <div class="legend-item">
+                    <span class="legend-dot completion"></span>
+                    <span>الإنجاز</span>
+                </div>
+            </div>
+            
+            <div class="quick-actions-bar">
+                <button class="quick-btn" onclick="location.href='{{ url_for('duties.index') }}'">
+                    <i class="bi bi-clipboard-check"></i>
+                    <span>الواجبات</span>
+                </button>
+                <button class="quick-btn" onclick="location.href='#'">
+                    <i class="bi bi-grid-3x3-gap"></i>
+                    <span>المجموعات</span>
+                </button>
+                <button class="quick-btn" onclick="location.href='#'">
+                    <i class="bi bi-bar-chart"></i>
+                    <span>التقارير</span>
+                </button>
+                <button class="quick-btn" onclick="location.href='#'">
+                    <i class="bi bi-gear"></i>
+                    <span>الإعدادات</span>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Right Panel -->
+        <div class="side-panel">
+            {% if can_view_directives and directives %}
+            <div class="panel-card">
+                <div class="panel-header">
+                    <h3 class="panel-title"><i class="bi bi-list-task"></i> التوجيهات</h3>
+                    <span class="panel-badge">{{ directives|length }}</span>
+                </div>
+                <div class="panel-body">
+                    {% for directive in directives[:6] %}
+                    <div class="panel-item {% if directive.status == 'pending' %}warning{% elif directive.status == 'in_progress' %}primary{% else %}success{% endif %}">
+                        <div class="panel-item-icon">
+                            {% if directive.status == 'pending' %}
+                                <i class="bi bi-hourglass-split"></i>
+                            {% elif directive.status == 'in_progress' %}
+                                <i class="bi bi-arrow-repeat"></i>
+                            {% else %}
+                                <i class="bi bi-check-lg"></i>
+                            {% endif %}
+                        </div>
+                        <div class="panel-item-content">
+                            <div class="panel-item-title">{{ directive.title }}</div>
+                            <div class="panel-item-meta">
+                                {% if directive.due_date %}{{ directive.due_date.strftime('%d/%m') }}{% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+            
+            {% if can_view_approvals and pending_requests %}
+            <div class="panel-card">
+                <div class="panel-header">
+                    <h3 class="panel-title"><i class="bi bi-clipboard-check"></i> الموافقات</h3>
+                    <span class="panel-badge">{{ pending_requests|length }}</span>
+                </div>
+                <div class="panel-body">
+                    {% for request in pending_requests[:4] %}
+                    <div class="panel-item warning">
+                        <div class="panel-item-icon">
+                            <i class="bi bi-person"></i>
+                        </div>
+                        <div class="panel-item-content">
+                            <div class="panel-item-title">{{ request.title|default('طلب صلاحيات') }}</div>
+                            <div class="panel-item-meta">{{ request.requester.full_name if request.requester else 'غير محدد' }}</div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+            
+            {% if can_view_workshops and workshops %}
+            <div class="panel-card">
+                <div class="panel-header">
+                    <h3 class="panel-title"><i class="bi bi-calendar-event"></i> ورش العمل</h3>
+                </div>
+                <div class="panel-body">
+                    {% for workshop in workshops[:4] %}
+                    <div class="panel-item info">
+                        <div class="panel-item-icon">
+                            <i class="bi bi-calendar-event"></i>
+                        </div>
+                        <div class="panel-item-content">
+                            <div class="panel-item-title">{{ workshop.title }}</div>
+                            <div class="panel-item-meta">{{ workshop.scheduled_date.strftime('%d/%m') if workshop.scheduled_date else '' }}</div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+            
+            {% if not (can_view_directives and directives) and not (can_view_approvals and pending_requests) and not (can_view_workshops and workshops) %}
+            <div class="panel-card">
+                <div class="panel-header">
+                    <h3 class="panel-title"><i class="bi bi-lightning"></i> الإجراءات</h3>
+                </div>
+                <div class="panel-body">
+                    <div class="empty-state">
+                        <i class="bi bi-check-circle"></i>
+                        <p>لا توجد مهام معلقة</p>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    
+    {% elif can_view_my_department and my_department %}
+    <!-- Department Manager View -->
+    <div class="my-dept-section">
+        <div class="my-dept-card">
+            <div class="my-dept-icon" style="background: {{ my_department.color|default('#6c757d') }};">
+                <i class="bi bi-{{ my_department.icon|default('folder') }}"></i>
+            </div>
+            <div class="my-dept-name">{{ my_department.name }}</div>
+            
+            <div class="my-dept-metrics">
+                <div class="my-dept-metric">
+                    <div class="my-dept-metric-value competence">{{ my_department_metrics.competence_percentage|default(0)|round|int }}%</div>
+                    <div class="my-dept-metric-label">الجاهزية</div>
+                </div>
+                <div class="my-dept-metric">
+                    <div class="my-dept-metric-value completion">{{ my_department_metrics.completion_percentage|default(0)|round|int }}%</div>
+                    <div class="my-dept-metric-label">الإنجاز</div>
+                </div>
+            </div>
+        </div>
+        
+        {% if teams %}
+        <div class="panel-card" style="margin-top: 20px;">
+            <div class="panel-header">
+                <h3 class="panel-title"><i class="bi bi-people"></i> فرق المجموعة</h3>
+                <span class="panel-badge">{{ teams|length }}</span>
+            </div>
+            <div class="panel-body">
+                {% for team in teams[:6] %}
+                <div class="panel-item primary">
+                    <div class="panel-item-icon">
+                        <i class="bi bi-people-fill"></i>
+                    </div>
+                    <div class="panel-item-content">
+                        <div class="panel-item-title">{{ team.name }}</div>
+                        <div class="panel-item-meta">{{ team.members|length if team.members else 0 }} عضو</div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+    
+    {% else %}
+    <!-- Regular User View -->
+    <div style="display: flex; align-items: center; justify-content: center; min-height: 60vh;">
+        <div class="user-profile-card">
+            <div class="profile-avatar">
+                <i class="bi bi-person"></i>
+            </div>
+            <div class="profile-name">{{ current_user.full_name }}</div>
+            <div class="profile-role">{{ current_user.role.display_name if current_user.role else 'مستخدم' }}</div>
+            {% if current_user.department %}
+            <div class="profile-dept">
+                <i class="bi bi-folder ms-1"></i>
+                {{ current_user.department.name }}
+            </div>
+            {% endif %}
+            
+            <div class="quick-actions-bar" style="margin-top: 30px;">
+                <button class="quick-btn" onclick="location.href='#'">
+                    <i class="bi bi-person-gear"></i>
+                    <span>الإعدادات</span>
+                </button>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const circularDashboard = document.getElementById('circularDashboard');
+    if (circularDashboard) {
+        positionDepartmentNodes();
+        drawConnectionLines();
+        
+        window.addEventListener('resize', function() {
+            positionDepartmentNodes();
+            drawConnectionLines();
+        });
+    }
+});
+
+function positionDepartmentNodes() {
+    const container = document.getElementById('circularDashboard');
+    if (!container) return;
+    
+    const nodes = container.querySelectorAll('.dept-node');
+    const centerX = container.offsetWidth / 2;
+    const centerY = container.offsetHeight / 2;
+    const radius = Math.min(centerX, centerY) * 0.75;
+    const startAngle = -90; // Start from top
+    const angleStep = 360 / nodes.length;
+    
+    nodes.forEach((node, index) => {
+        const angle = (startAngle + index * angleStep) * (Math.PI / 180);
+        const x = centerX + radius * Math.cos(angle);
+        const y = centerY + radius * Math.sin(angle);
+        
+        node.style.left = x + 'px';
+        node.style.top = y + 'px';
+    });
+}
+
+function drawConnectionLines() {
+    const container = document.getElementById('circularDashboard');
+    const svg = document.getElementById('connectionLines');
+    if (!container || !svg) return;
+    
+    svg.innerHTML = '';
+    
+    const nodes = container.querySelectorAll('.dept-node');
+    const centerX = container.offsetWidth / 2;
+    const centerY = container.offsetHeight / 2;
+    
+    nodes.forEach(node => {
+        const nodeRect = node.getBoundingClientRect();
+        const containerRect = container.getBoundingClientRect();
+        
+        const nodeX = nodeRect.left - containerRect.left + nodeRect.width / 2;
+        const nodeY = nodeRect.top - containerRect.top + nodeRect.height / 2;
+        
+        const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        line.setAttribute('x1', centerX);
+        line.setAttribute('y1', centerY);
+        line.setAttribute('x2', nodeX);
+        line.setAttribute('y2', nodeY);
+        svg.appendChild(line);
+    });
+}
+</script>
+{% endblock %}

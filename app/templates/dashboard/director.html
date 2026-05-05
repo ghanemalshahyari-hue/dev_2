@@ -1,0 +1,718 @@
+{% extends "base.html" %}
+
+{% block title %}لوحة المدير — {{ app_name }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* ─── Spider-web / Radial layout ─────────────────────────────────── */
+    .ceo-spider-container {
+        position: relative;
+        width: 100%;
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 1rem 0 2rem;
+    }
+
+    /* SVG lines behind the cards */
+    #spiderWebSvg {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        overflow: visible;
+        z-index: 0;
+    }
+
+    #spiderWebSvg line {
+        stroke: rgba(79, 142, 247, 0.22);
+        stroke-width: 1.5;
+        stroke-dasharray: 6 4;
+    }
+
+    /* Center hub */
+    .center-hub {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 10;
+        text-align: center;
+        width: 150px;
+    }
+
+    .center-hub-card {
+        padding: 1.25rem 1rem;
+        border-radius: 50% !important;
+        width: 150px;
+        height: 150px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background: radial-gradient(circle at top left, #FFFFFF, #FDF9F3);
+        border: 2px solid var(--primary, #C97C5D) !important;
+        box-shadow: 0 0 40px rgba(201, 124, 93, 0.35), inset 0 0 20px rgba(194, 146, 64, 0.2);
+        cursor: default;
+        transition: all 0.4s ease;
+    }
+
+    .center-hub-card:hover {
+        box-shadow: 0 0 60px rgba(201, 124, 93, 0.5), inset 0 0 30px rgba(194, 146, 64, 0.3);
+        transform: scale(1.05);
+    }
+
+    .center-hub-icon {
+        font-size: 2.2rem;
+        color: var(--primary, #C97C5D);
+        margin-bottom: 0.3rem;
+        filter: drop-shadow(0 0 8px rgba(201, 124, 93, 0.4));
+    }
+
+    .center-hub-name {
+        font-size: 0.82rem;
+        font-weight: 800;
+        color: #2E2010;
+        line-height: 1.3;
+        text-align: center;
+    }
+
+    .center-hub-badge {
+        font-size: 0.65rem;
+        color: #6B4E36;
+        border: 1px solid rgba(201, 124, 93, 0.3);
+        background: rgba(201, 124, 93, 0.1);
+        border-radius: 20px;
+        padding: 2px 8px;
+        margin-top: 0.35rem;
+        font-weight: 600;
+    }
+
+    /* Satellite group cards */
+    .satellite-group {
+        position: absolute;
+        width: 270px;
+        /* عريض — يتسع للنص الطويل وأسماء المسؤولين */
+        transform: translate(-50%, -50%);
+        z-index: 10;
+        text-align: center;
+    }
+
+    /* اسم المسؤول — يظهر تحت البطاقة */
+    .satellite-responsible {
+        font-size: 0.73rem;
+        font-weight: 700;
+        color: var(--primary);
+        margin-top: 5px;
+        white-space: normal;
+        /* يلف السطر بدل القطع */
+        word-break: break-word;
+        display: block;
+        line-height: 1.35;
+        padding: 0 2px;
+    }
+
+    .satellite-responsible i {
+        margin-left: 3px;
+        font-size: 0.65rem;
+    }
+
+    /* وصف المجموعة — تحت الاسم داخل البطاقة */
+    .satellite-desc {
+        font-size: 0.60rem;
+        font-weight: 600;
+        color: #2E2010;
+        /* بني قوي كالمركز */
+        line-height: 1.4;
+        margin-bottom: 0.4rem;
+        max-width: 100%;
+        word-break: break-word;
+        white-space: normal;
+    }
+
+    /* المفهوم العملياتي المشترك — أسفل الوصف */
+    .satellite-concept {
+        font-size: 0.70rem;
+        font-weight: 700;
+        border: 1px solid;
+        border-radius: 20px;
+        padding: 3px 10px;
+        margin-bottom: 0.3rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        white-space: nowrap;
+        max-width: 100%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        color: #2E2010 !important;
+        border-color: rgba(201, 124, 93, 0.4) !important;
+        background: rgba(201, 124, 93, 0.05);
+    }
+
+    .satellite-card {
+        padding: 1rem 0.9rem 0.85rem;
+        border-radius: 14px !important;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        min-height: 110px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start;
+        margin-bottom: 0.6rem;
+    }
+
+    .satellite-card:hover {
+        transform: scale(1.07);
+    }
+
+    .satellite-icon {
+        font-size: 1.8rem;
+        margin-bottom: 0.4rem;
+        flex-shrink: 0;
+    }
+
+    .satellite-name {
+        font-size: 1.15rem;
+        font-weight: 800;
+        color: #2E2010;
+        /* بني غامق واضح مطابق لمركز الاستراتيجية */
+        line-height: 1.3;
+        margin-bottom: 0.2rem;
+        word-break: break-word;
+        white-space: normal;
+        max-width: 100%;
+    }
+    
+    .satellite-desc {
+        font-size: 0.75rem;
+        color: #5c4736;
+        line-height: 1.25;
+        margin-bottom: 0.3rem;
+        opacity: 0.9;
+        font-weight: 600;
+    }
+
+    /* Progress mini rings inside satellite cards */
+    .ring-pair {
+        display: flex;
+        justify-content: center;
+        gap: 6px;
+        margin-top: 0.35rem;
+    }
+
+    .mini-badge {
+        font-size: 0.68rem;
+        padding: 2px 6px;
+        border-radius: 20px;
+        border: 1px solid;
+        color: var(--text-secondary, #6B4E36);
+        /* بني متوسط — قابل للقراءة */
+        white-space: nowrap;
+    }
+
+    /* Notes textarea area (slides in on click) */
+    .notes-panel {
+        display: none;
+        position: absolute;
+        top: calc(100% + 10px);
+        left: 50%;
+        transform: translateX(-50%);
+        width: 290px;
+        background: #FFFFFF;
+        border: 1px solid var(--border-color, #DDD0B8);
+        border-radius: 12px;
+        padding: 0.75rem;
+        z-index: 100;
+        box-shadow: 0 8px 32px rgba(80, 40, 10, 0.18);
+        text-align: right;
+    }
+
+    .notes-panel.visible {
+        display: block;
+    }
+
+    .notes-panel textarea {
+        width: 100%;
+        font-size: 0.8rem;
+        min-height: 70px;
+        resize: vertical;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 8px;
+        color: #e6edf3;
+        padding: 0.4rem 0.6rem;
+    }
+
+    .notes-panel .notes-actions {
+        display: flex;
+        gap: 0.4rem;
+        margin-top: 0.5rem;
+        justify-content: flex-end;
+    }
+
+    .notes-panel .btn-save-note {
+        background: #4F8EF7;
+        border: none;
+        color: #fff;
+        font-size: 0.75rem;
+        padding: 3px 10px;
+        border-radius: 6px;
+        cursor: pointer;
+    }
+
+    .notes-panel .btn-save-note:hover {
+        background: #3d7ae6;
+    }
+
+    .notes-panel .btn-close-note {
+        background: transparent;
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        color: #8b949e;
+        font-size: 0.75rem;
+        padding: 3px 10px;
+        border-radius: 6px;
+        cursor: pointer;
+    }
+
+    .notes-has-content {
+        box-shadow: 0 0 12px rgba(79, 142, 247, 0.3) !important;
+    }
+
+    .note-indicator {
+        position: absolute;
+        top: 6px;
+        right: 6px;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #4F8EF7;
+    }
+
+    /* Spacer to give the spider room */
+    .spider-spacer {
+        height: 850px;
+        /* أكبر لتتسع البطاقات العريضة */
+    }
+
+    /* ─── Averages bar ───────────────────────────────────────────────── */
+    .avg-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 30px;
+        padding: 0.35rem 1rem;
+        font-size: 0.85rem;
+    }
+
+    /* Secretary can rename the central group */
+    .central-rename-btn {
+        background: none;
+        border: none;
+        color: #4F8EF7;
+        font-size: 0.7rem;
+        cursor: pointer;
+        padding: 0;
+        text-decoration: underline dotted;
+        opacity: 0;
+        transition: opacity 0.2s;
+    }
+
+    .center-hub:hover .central-rename-btn {
+        opacity: 1;
+    }
+    
+    /* Department Logo - dynamically positioned */
+    .dept-logo {
+        position: absolute;
+        width: 60px;
+        height: 60px;
+        top: -15px;
+        background: #fff;
+        border: 2px solid #fff;
+        border-radius: 50%;
+        padding: 4px;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        object-fit: contain;
+        z-index: 20;
+        transition: all 0.3s ease;
+    }
+
+    .dept-logo:hover {
+        transform: scale(1.1);
+        z-index: 25;
+    }
+
+    /* Right-side positioning (for cards on the right) */
+    .satellite-group.pos-right .dept-logo {
+        right: -35px;
+    }
+
+    /* Left-side positioning (for cards on the left) */
+    .satellite-group.pos-left .dept-logo {
+        left: -35px;
+    }
+
+    .concept-badge {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        display: inline-flex !important;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        font-family: inherit; /* Use default sans-serif font, avoids cartoonish look */
+        font-weight: 700;
+        font-size: 1.3rem;
+        margin-bottom: 0.5rem;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        flex-shrink: 0;
+        border: 2px solid #fff;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4 py-4">
+
+
+
+    <!-- ═══ Spider-web Layout ══════════════════════════════════════ -->
+    <div class="glass-card mb-4" style="padding: 0.5rem; overflow: visible;">
+        <div class="ceo-spider-container" id="spiderContainer">
+
+            <!-- SVG lines (drawn by JS) -->
+            <svg id="spiderWebSvg" aria-hidden="true"></svg>
+
+            <!-- Spacer for height -->
+            <div class="spider-spacer"></div>
+
+            <!-- Central Hub: الاستراتيجية -->
+            {% set central = departments | selectattr('is_central') | list | first %}
+            {% if central %}
+            <div class="center-hub" id="centerHub">
+                <div class="center-hub-card glass-card">
+                    <i class="{{ central.icon }} center-hub-icon"></i>
+                    <div class="center-hub-name">{{ central.name }}</div>
+                    <div class="center-hub-badge">المحور الاستراتيجي</div>
+                    
+
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Satellite Groups (arranged by JS) -->
+            {% set satellites = departments | rejectattr('is_central') | list %}
+            {% for dept in satellites %}
+            <div class="satellite-group" id="sat_{{ loop.index0 }}" data-dept-id="{{ dept.id }}"
+                data-name="{{ dept.name }}" data-color="{{ dept.color }}" data-icon="{{ dept.icon }}"
+                data-comp="{{ dept.competence_pct }}" data-done="{{ dept.completion_pct }}"
+                data-notes="{{ dept.director_notes | e }}">
+
+                {% if dept.logo_file %}
+                <img src="{{ url_for('static', filename='img/' + dept.logo_file) }}" class="dept-logo" alt="{{ dept.name }}">
+                {% endif %}
+
+                <div class="satellite-card glass-card position-relative" style="border-color: {{ dept.color }}40"
+                    onclick="window.location.href='{{ url_for('dashboard.department_detail', dept_id=dept.id) | safe }}'"
+                    title="عرض التفاصيل والواجبات">
+
+                    {% if dept.director_notes %}
+                    <span class="note-indicator" title="يوجد ملاحظات"></span>
+                    {% endif %}
+
+                    {% if dept.concept_number %}
+                    <template title="Operational Concept Number">
+                         <!-- Renders concept number as the main icon -->
+                    </template>
+                    <div class="concept-badge" style="background-color: {{ dept.color }}">
+                        {{ dept.concept_number }}
+                    </div>
+                    {% else %}
+                    <i class="{{ dept.icon }} satellite-icon" style="color:{{ dept.color }}"></i>
+                    {% endif %}
+
+                    <div class="satellite-name">
+                        {{ dept.name }} 
+                        {% if dept.concept_number %}
+                        <span style="font-size: 0.9em;">رقم ({{ dept.concept_number }})</span>
+                        {% endif %}
+                    </div>
+
+
+
+                    {# الوصف تحت الاسم داخل البطاقة #}
+
+                    {% if dept.description %}
+                    <div class="satellite-desc">{{ dept.description }}</div>
+                    {% endif %}
+
+                    {# عدد الواجبات الرئيسية #}
+                    <div class="satellite-concept" title="عدد الواجبات الرئيسية">
+                        <i class="bi bi-list-task"></i> عدد الواجبات: {{ dept.duties_count }}
+                    </div>
+
+                    {# Metrics removed per user request #}
+                </div>
+
+                {# اسم المسؤول تحت البطاقة #}
+                {% if dept.responsible_person %}
+                <span class="satellite-responsible">
+                    <i class="bi bi-person-fill"></i>{{ dept.responsible_person }}
+                </span>
+                {% endif %}
+
+                <!-- Notes panel (toggles on click) -->
+                <div class="notes-panel" id="notes_{{ dept.id }}">
+                    <label class="text-muted" style="font-size:0.72rem">
+                        <i class="bi bi-pencil-square me-1"></i>ملاحظة على {{ dept.name }}
+                    </label>
+                    <textarea id="noteTxt_{{ dept.id }}">{{ dept.director_notes }}</textarea>
+                    <div class="notes-actions">
+                        <button class="btn-close-note" onclick="closeNotes({{ dept.id }})">إلغاء</button>
+                        <button class="btn-save-note" onclick="saveNote({{ dept.id }})">
+                            <i class="bi bi-check2 me-1"></i>حفظ
+                        </button>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+
+        </div><!-- /ceo-spider-container -->
+    </div><!-- /glass-card -->
+
+    <!-- ═══ Groups data table (below the web) ═══════════════════ -->
+    <div class="section-card glass-card">
+        <div class="section-card-header d-flex align-items-center gap-2 mb-3">
+            <i class="bi bi-table text-primary fs-5"></i>
+            <h2 class="h6 fw-bold mb-0">ملخص المجموعات</h2>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-dark table-hover align-middle table-sm mb-0">
+                <thead>
+                    <tr>
+                        <th>المجموعة</th>
+                        <th>المسؤول</th>
+                        <!-- Metrics columns removed -->
+                        <th>ملاحظات المدير</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for dept in departments %}
+                    <tr>
+                        <td>
+                            <i class="{{ dept.icon }} me-2" style="color:{{ dept.color }}"></i>
+                            {{ dept.name }}
+                            {% if dept.is_central %}
+                            <span class="badge bg-primary ms-1" style="font-size:0.6rem">مركزي</span>
+                            {% endif %}
+                        </td>
+                        <td><small>{{ dept.responsible_person or '—' }}</small></td>
+                        <!-- Metrics cells removed -->
+                        <td>
+                            <small class="text-muted">
+                                {{ (dept.director_notes[:60] + '…') if dept.director_notes and
+                                dept.director_notes|length > 60 else (dept.director_notes or '—') }}
+                            </small>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div><!-- /summary table -->
+
+</div><!-- /container -->
+
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    'use strict';
+
+    // ─── Spider Web: Radial positioning ─────────────────────────────────
+    (function initSpiderLayout() {
+        const container = document.getElementById('spiderContainer');
+        if (!container) return;
+
+        const svg = document.getElementById('spiderWebSvg');
+        const satellites = Array.from(container.querySelectorAll('.satellite-group'));
+        const centerHub = document.getElementById('centerHub');
+        if (!satellites.length || !centerHub) return;
+
+        function positionCards() {
+            const W = container.offsetWidth;
+            const H = container.offsetHeight;
+            const cx = W / 2;
+            const cy = H / 2;
+            const radius = Math.min(W, H) * 0.35;   // bigger orbit for wider cards
+            const n = satellites.length;
+            const startAngle = -Math.PI / 2;
+
+            // Clear SVG lines
+            svg.innerHTML = '';
+
+            // Draw decorative orbit circle
+            const orbit = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            orbit.setAttribute('cx', cx);
+            orbit.setAttribute('cy', cy);
+            orbit.setAttribute('r', radius);
+            orbit.setAttribute('fill', 'none');
+            orbit.setAttribute('stroke', 'rgba(79,142,247,0.08)');
+            orbit.setAttribute('stroke-width', '1');
+            orbit.setAttribute('stroke-dasharray', '4 6');
+            svg.appendChild(orbit);
+
+            satellites.forEach(function (card, i) {
+                const angle = startAngle + (2 * Math.PI / n) * i;
+                const x = cx + radius * Math.cos(angle);
+                const y = cy + radius * Math.sin(angle);
+
+                // Position the card
+                card.style.left = x + 'px';
+                card.style.top = y + 'px';
+
+                // Determine position relative to center (for logo placement)
+                card.classList.remove('pos-left', 'pos-right');
+                if (x < cx) {
+                    card.classList.add('pos-left');
+                } else {
+                    card.classList.add('pos-right');
+                }
+
+                // Draw spoke from center to card
+                const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                line.setAttribute('x1', cx);
+                line.setAttribute('y1', cy);
+                line.setAttribute('x2', x);
+                line.setAttribute('y2', y);
+                const color = card.dataset.color || 'rgba(79,142,247,0.3)';
+                line.setAttribute('stroke', color.replace(')', ',0.3)').replace('rgb(', 'rgba('));
+                svg.appendChild(line);
+            });
+        }
+
+        positionCards();
+        window.addEventListener('resize', positionCards);
+    })();
+
+
+    // ─── Notes panel toggle ──────────────────────────────────────────────
+    let _openNoteId = null;
+
+    function toggleNotes(cardEl) {
+        const group = cardEl.closest('.satellite-group');
+        const deptId = group.dataset.deptId;
+        const panel = document.getElementById('notes_' + deptId);
+        if (!panel) return;
+
+        // Close previously open panel
+        if (_openNoteId && _openNoteId !== deptId) {
+            const prev = document.getElementById('notes_' + _openNoteId);
+            if (prev) prev.classList.remove('visible');
+        }
+        panel.classList.toggle('visible');
+        _openNoteId = panel.classList.contains('visible') ? deptId : null;
+    }
+
+    function closeNotes(deptId) {
+        const panel = document.getElementById('notes_' + deptId);
+        if (panel) panel.classList.remove('visible');
+        _openNoteId = null;
+    }
+
+    async function saveNote(deptId) {
+        const txt = document.getElementById('noteTxt_' + deptId);
+        if (!txt) return;
+
+        const resp = await fetch('/api/departments/' + deptId + '/notes', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCsrfToken() },
+            body: JSON.stringify({ notes: txt.value }),
+        });
+
+        if (resp.ok) {
+            closeNotes(deptId);
+            // Show indicator dot if there's content
+            const group = document.querySelector('[data-dept-id="' + deptId + '"]');
+            if (group) {
+                const indic = group.querySelector('.note-indicator');
+                if (txt.value.trim()) {
+                    if (!indic) {
+                        const dot = document.createElement('span');
+                        dot.className = 'note-indicator';
+                        group.querySelector('.satellite-card').appendChild(dot);
+                    }
+                } else if (indic) {
+                    indic.remove();
+                }
+            }
+            showToast('تم حفظ الملاحظة ✓', 'success');
+        } else {
+            showToast('حدث خطأ أثناء الحفظ', 'danger');
+        }
+    }
+
+
+    // ─── Change central group (Secretary) ───────────────────────────────
+    function openRenameModal() {
+        const m = new bootstrap.Modal(document.getElementById('renameCentralModal'));
+        m.show();
+    }
+
+    async function saveCentralGroup() {
+        const deptId = document.getElementById('centralGroupSelect').value;
+        const resp = await fetch('/api/departments/' + deptId + '/set-central', {
+            method: 'POST',
+            headers: { 'X-CSRFToken': getCsrfToken() },
+        });
+        if (resp.ok) {
+            location.reload();
+        } else {
+            showToast('حدث خطأ أثناء التغيير', 'danger');
+        }
+    }
+
+
+    // ─── Helpers ─────────────────────────────────────────────────────────
+    function getCsrfToken() {
+        // Flask-WTF sets a cookie named 'csrf_token'
+        const match = document.cookie.match(/csrf_token=([^;]+)/);
+        return match ? match[1] : '';
+    }
+
+    function showToast(msg, type) {
+        const el = document.createElement('div');
+        el.className = 'alert alert-' + type + ' glass-alert position-fixed';
+        el.style.cssText = 'bottom:1.5rem;left:50%;transform:translateX(-50%);z-index:9999;min-width:220px;text-align:center';
+        el.textContent = msg;
+        document.body.appendChild(el);
+        setTimeout(() => el.remove(), 2800);
+    }
+
+
+    // ─── Auto-poll every 60s ─────────────────────────────────────────────
+    (function poll() {
+        setInterval(async function () {
+            try {
+                const r = await fetch('/api/dashboard/overview', { credentials: 'same-origin' });
+                if (!r.ok) return;
+                const d = await r.json();
+                const ac = document.getElementById('avgCompetence');
+                const ad = document.getElementById('avgCompletion');
+                const lu = document.getElementById('lastUpdate');
+                const ri = document.getElementById('refreshIcon');
+                if (ac) ac.textContent = (d.averages.competence || 0).toFixed(1) + '%';
+                if (ad) ad.textContent = (d.averages.completion || 0).toFixed(1) + '%';
+                if (lu) lu.textContent = new Date(d.updated_at).toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' });
+                if (ri) { ri.classList.add('spin'); setTimeout(() => ri.classList.remove('spin'), 800); }
+            } catch (_) { }
+        }, 60_000);
+    })();
+</script>
+{% endblock %}

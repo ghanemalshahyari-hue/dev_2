@@ -1,0 +1,392 @@
+{% extends "base.html" %}
+
+{% block title %}{{ 'تعديل' if role else 'إنشاء' }} دور{% endblock %}
+
+{% block extra_css %}
+<style>
+    .form-container {
+        padding: 30px;
+        background: linear-gradient(135deg, #f5f7fa 0%, #e4e8ec 100%);
+        min-height: calc(100vh - 120px);
+    }
+    
+    .form-card {
+        max-width: 700px;
+        margin: 0 auto;
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+        overflow: hidden;
+    }
+    
+    .form-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 25px 30px;
+    }
+    
+    .form-header h2 {
+        margin: 0;
+        font-size: 1.5rem;
+        font-weight: 600;
+    }
+    
+    .form-header p {
+        margin: 5px 0 0;
+        opacity: 0.9;
+        font-size: 0.95rem;
+    }
+    
+    .form-body {
+        padding: 30px;
+    }
+    
+    .form-group {
+        margin-bottom: 25px;
+    }
+    
+    .form-label {
+        font-weight: 600;
+        color: #1a1a2e;
+        margin-bottom: 8px;
+    }
+    
+    .form-label .required {
+        color: #dc3545;
+    }
+    
+    .form-control {
+        border-radius: 10px;
+        padding: 12px 15px;
+        border: 1px solid #dee2e6;
+        transition: all 0.3s ease;
+    }
+    
+    .form-control:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15);
+    }
+    
+    .form-text {
+        color: #6c757d;
+        font-size: 0.875rem;
+        margin-top: 6px;
+    }
+    
+    .permission-slider {
+        margin-top: 15px;
+    }
+    
+    .permission-slider input[type="range"] {
+        width: 100%;
+        height: 8px;
+        border-radius: 4px;
+        background: linear-gradient(to left, #dc3545, #ffc107, #198754);
+        outline: none;
+        -webkit-appearance: none;
+    }
+    
+    .permission-slider input[type="range"]::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        background: white;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        cursor: pointer;
+        border: 2px solid #667eea;
+    }
+    
+    .permission-labels {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 8px;
+        font-size: 0.8rem;
+        color: #6c757d;
+    }
+    
+    .permission-value {
+        text-align: center;
+        font-size: 2rem;
+        font-weight: 700;
+        color: #1a1a2e;
+        margin: 15px 0;
+    }
+    
+    .color-picker {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+    
+    .color-option {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        cursor: pointer;
+        border: 3px solid transparent;
+        transition: all 0.3s ease;
+    }
+    
+    .color-option:hover {
+        transform: scale(1.1);
+    }
+    
+    .color-option.selected {
+        border-color: #1a1a2e;
+    }
+    
+    .icon-picker {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+    
+    .icon-option {
+        width: 50px;
+        height: 50px;
+        border-radius: 10px;
+        background: #f8f9fa;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        border: 2px solid transparent;
+        transition: all 0.3s ease;
+        font-size: 1.3rem;
+        color: #6c757d;
+    }
+    
+    .icon-option:hover {
+        background: #e9ecef;
+    }
+    
+    .icon-option.selected {
+        border-color: #667eea;
+        background: rgba(102, 126, 234, 0.1);
+        color: #667eea;
+    }
+    
+    .form-actions {
+        display: flex;
+        gap: 15px;
+        padding-top: 20px;
+        border-top: 1px solid #e9ecef;
+    }
+    
+    .form-actions .btn {
+        flex: 1;
+        padding: 12px;
+        border-radius: 10px;
+        font-weight: 600;
+    }
+    
+    .preview-card {
+        background: #f8f9fa;
+        border-radius: 12px;
+        padding: 20px;
+        margin-top: 20px;
+    }
+    
+    .preview-title {
+        font-weight: 600;
+        color: #6c757d;
+        margin-bottom: 15px;
+        font-size: 0.9rem;
+    }
+    
+    .preview-role {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+    
+    .preview-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.3rem;
+    }
+    
+    .preview-info .name {
+        font-weight: 600;
+        color: #1a1a2e;
+    }
+    
+    .preview-info .code {
+        font-size: 0.85rem;
+        color: #6c757d;
+        font-family: monospace;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="form-container">
+    <div class="form-card">
+        <div class="form-header">
+            <h2>
+                <i class="bi bi-{{ 'pencil' if role else 'plus-circle' }} ms-2"></i>
+                {{ 'تعديل الدور' if role else 'إنشاء دور جديد' }}
+            </h2>
+            <p>
+                {% if role %}
+                تعديل إعدادات الدور "{{ role.name }}"
+                {% else %}
+                أضف دور جديد للنظام مع تحديد الصلاحيات المناسبة
+                {% endif %}
+            </p>
+        </div>
+        
+        <div class="form-body">
+            <form method="POST" id="roleForm">
+                <!-- الاسم -->
+                <div class="form-group">
+                    <label class="form-label">
+                        اسم الدور <span class="required">*</span>
+                    </label>
+                    <input type="text" class="form-control" name="name" id="roleName"
+                           value="{{ role.name if role else '' }}" 
+                           placeholder="مثال: مشرف المحتوى" required>
+                    <div class="form-text">اسم الدور كما سيظهر للمستخدمين</div>
+                </div>
+                
+                <!-- الرمز -->
+                <div class="form-group">
+                    <label class="form-label">
+                        رمز الدور <span class="required">*</span>
+                    </label>
+                    <input type="text" class="form-control" name="code" id="roleCode"
+                           value="{{ role.code if role else '' }}" 
+                           placeholder="مثال: CONTENT_MANAGER"
+                           style="font-family: monospace; text-transform: uppercase;"
+                           {{ 'readonly' if role else '' }} required>
+                    <div class="form-text">رمز فريد للاستخدام البرمجي (لا يمكن تغييره لاحقاً)</div>
+                </div>
+                
+                <!-- مستوى الصلاحية -->
+                <div class="form-group">
+                    <label class="form-label">
+                        مستوى الصلاحية <span class="required">*</span>
+                    </label>
+                    <div class="permission-value" id="permissionDisplay">
+                        {{ role.permission_level if role else 50 }}
+                    </div>
+                    <div class="permission-slider">
+                        <input type="range" name="permission_level" id="permissionLevel"
+                               min="1" max="{{ current_user.permission_level - 1 }}"
+                               value="{{ role.permission_level if role else 50 }}"
+                               oninput="updatePermissionDisplay(this.value)">
+                        <div class="permission-labels">
+                            <span>1 (أقل)</span>
+                            <span>صلاحية محدودة</span>
+                            <span>صلاحية متوسطة</span>
+                            <span>{{ current_user.permission_level - 1 }} (أعلى)</span>
+                        </div>
+                    </div>
+                    <div class="form-text mt-3">كلما زاد الرقم، زادت صلاحيات المستخدم. الحد الأقصى المتاح لك: {{ current_user.permission_level - 1 }}</div>
+                </div>
+                
+                <!-- الوصف -->
+                <div class="form-group">
+                    <label class="form-label">وصف الدور</label>
+                    <textarea class="form-control" name="description" id="roleDescription" rows="3"
+                              placeholder="وصف مختصر لصلاحيات ومهام هذا الدور...">{{ role.description if role else '' }}</textarea>
+                </div>
+                
+                <!-- اللون -->
+                <div class="form-group">
+                    <label class="form-label">لون الدور</label>
+                    <input type="hidden" name="color" id="roleColor" value="{{ role.color if role else '#6c757d' }}">
+                    <div class="color-picker">
+                        {% set colors = ['#dc3545', '#fd7e14', '#ffc107', '#198754', '#20c997', '#0dcaf0', '#0d6efd', '#6f42c1', '#d63384', '#6c757d'] %}
+                        {% for color in colors %}
+                        <div class="color-option {% if (role and role.color == color) or (not role and color == '#6c757d') %}selected{% endif %}"
+                             style="background: {{ color }};"
+                             data-color="{{ color }}"
+                             onclick="selectColor('{{ color }}')"></div>
+                        {% endfor %}
+                    </div>
+                </div>
+                
+                <!-- الأيقونة -->
+                <div class="form-group">
+                    <label class="form-label">أيقونة الدور</label>
+                    <input type="hidden" name="icon" id="roleIcon" value="{{ role.icon if role else 'person' }}">
+                    <div class="icon-picker">
+                        {% set icons = ['person', 'person-circle', 'person-check', 'people', 'shield', 'shield-check', 'key', 'gear', 'clipboard-data', 'graph-up', 'code-slash', 'terminal', 'briefcase', 'building', 'star'] %}
+                        {% for icon in icons %}
+                        <div class="icon-option {% if (role and role.icon == icon) or (not role and icon == 'person') %}selected{% endif %}"
+                             data-icon="{{ icon }}"
+                             onclick="selectIcon('{{ icon }}')">
+                            <i class="bi bi-{{ icon }}"></i>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                
+                <!-- معاينة -->
+                <div class="preview-card">
+                    <div class="preview-title">معاينة الدور</div>
+                    <div class="preview-role">
+                        <div class="preview-icon" id="previewIcon" style="background: {{ role.color if role else '#6c757d' }};">
+                            <i class="bi bi-{{ role.icon if role else 'person' }}" id="previewIconClass"></i>
+                        </div>
+                        <div class="preview-info">
+                            <div class="name" id="previewName">{{ role.name if role else 'اسم الدور' }}</div>
+                            <div class="code" id="previewCode">{{ role.code if role else 'ROLE_CODE' }}</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- الأزرار -->
+                <div class="form-actions">
+                    <a href="{{ url_for('admin.roles') }}" class="btn btn-outline-secondary">
+                        <i class="bi bi-x-lg ms-1"></i> إلغاء
+                    </a>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-check-lg ms-1"></i>
+                        {{ 'حفظ التعديلات' if role else 'إنشاء الدور' }}
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function updatePermissionDisplay(value) {
+    document.getElementById('permissionDisplay').textContent = value;
+}
+
+function selectColor(color) {
+    document.querySelectorAll('.color-option').forEach(el => el.classList.remove('selected'));
+    document.querySelector(`.color-option[data-color="${color}"]`).classList.add('selected');
+    document.getElementById('roleColor').value = color;
+    document.getElementById('previewIcon').style.background = color;
+}
+
+function selectIcon(icon) {
+    document.querySelectorAll('.icon-option').forEach(el => el.classList.remove('selected'));
+    document.querySelector(`.icon-option[data-icon="${icon}"]`).classList.add('selected');
+    document.getElementById('roleIcon').value = icon;
+    document.getElementById('previewIconClass').className = 'bi bi-' + icon;
+}
+
+// تحديث المعاينة أثناء الكتابة
+document.getElementById('roleName').addEventListener('input', function() {
+    document.getElementById('previewName').textContent = this.value || 'اسم الدور';
+});
+
+document.getElementById('roleCode').addEventListener('input', function() {
+    this.value = this.value.toUpperCase().replace(/[^A-Z0-9_]/g, '');
+    document.getElementById('previewCode').textContent = this.value || 'ROLE_CODE';
+});
+</script>
+{% endblock %}

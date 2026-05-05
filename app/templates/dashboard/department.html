@@ -1,0 +1,305 @@
+{% extends "base.html" %}
+
+{% block title %}{{ department.name }} Dashboard{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('dashboard.index') }}">Dashboard</a></li>
+            <li class="breadcrumb-item active">{{ department.name }}</li>
+        </ol>
+    </nav>
+    
+    <!-- Department Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow-sm border-0" style="border-left: 5px solid {{ department.color }} !important;">
+                <div class="card-body d-flex align-items-center">
+                    <div class="dept-icon-lg me-4" style="color: {{ department.color }};">
+                        <i class="{{ department.icon }}" style="font-size: 3rem;"></i>
+                    </div>
+                    <div>
+                        <h1 class="h3 mb-1">{{ department.name }}</h1>
+                        <p class="text-muted mb-0">
+                            <span class="badge bg-secondary">{{ department.code }}</span>
+                            <span class="ms-2">{{ department.user_count }} users</span>
+                            <span class="ms-2">{{ department.team_count }} teams</span>
+                        </p>
+                    </div>
+                    {% if current_user.permission_level >= PERMISSIONS.GROUP_ADMIN %}
+                    <div class="ms-auto">
+                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#updateMetricsModal">
+                            <i class="bi bi-pencil me-1"></i> Update Metrics
+                        </button>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Metrics Overview -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-6">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body text-center">
+                    <h6 class="text-muted mb-3">Competence (Data Quality)</h6>
+                    <div class="progress-circle-container mx-auto" style="width: 150px; height: 150px;">
+                        <svg viewBox="0 0 150 150">
+                            <circle cx="75" cy="75" r="60" fill="none" stroke="#e9ecef" stroke-width="12"/>
+                            <circle cx="75" cy="75" r="60" fill="none" 
+                                    stroke="{{ department.color }}" 
+                                    stroke-width="12"
+                                    stroke-linecap="round"
+                                    stroke-dasharray="{{ 377 * (metrics.competence_percentage if metrics else 0) / 100 }} 377"
+                                    transform="rotate(-90 75 75)"/>
+                        </svg>
+                        <div class="progress-circle-value">
+                            <span class="h2 mb-0">{{ (metrics.competence_percentage if metrics else 0)|round|int }}%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body text-center">
+                    <h6 class="text-muted mb-3">Completion (Progress)</h6>
+                    <div class="progress-circle-container mx-auto" style="width: 150px; height: 150px;">
+                        <svg viewBox="0 0 150 150">
+                            <circle cx="75" cy="75" r="60" fill="none" stroke="#e9ecef" stroke-width="12"/>
+                            <circle cx="75" cy="75" r="60" fill="none" 
+                                    stroke="#0d6efd" 
+                                    stroke-width="12"
+                                    stroke-linecap="round"
+                                    stroke-dasharray="{{ 377 * (metrics.completion_percentage if metrics else 0) / 100 }} 377"
+                                    transform="rotate(-90 75 75)"/>
+                        </svg>
+                        <div class="progress-circle-value">
+                            <span class="h2 mb-0">{{ (metrics.completion_percentage if metrics else 0)|round|int }}%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Data Entries -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0"><i class="bi bi-database me-2"></i>Data Entry Progress</h5>
+                </div>
+                <div class="card-body">
+                    {% if metrics %}
+                    <div class="row align-items-center">
+                        <div class="col-md-8">
+                            <div class="progress" style="height: 30px;">
+                                <div class="progress-bar bg-success" 
+                                     style="width: {{ (metrics.data_entries_completed / metrics.data_entries_required * 100) if metrics.data_entries_required > 0 else 0 }}%">
+                                    {{ metrics.data_entries_completed }}/{{ metrics.data_entries_required }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 text-md-end mt-3 mt-md-0">
+                            <span class="text-muted">Quality Score: </span>
+                            <span class="h5 mb-0">{{ metrics.quality_score|round(1) }}</span>
+                        </div>
+                    </div>
+                    {% else %}
+                    <p class="text-muted text-center mb-0">No data entries recorded yet.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Teams & Users -->
+    <div class="row g-4">
+        <!-- Teams -->
+        <div class="col-lg-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="bi bi-people me-2"></i>Teams</h5>
+                    <span class="badge bg-primary">{{ teams|length }}</span>
+                </div>
+                <div class="card-body">
+                    {% if teams %}
+                    <div class="list-group list-group-flush">
+                        {% for team in teams %}
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>
+                                <strong>{{ team.name }}</strong>
+                                {% if team.lead %}
+                                <br><small class="text-muted">Lead: {{ team.lead.full_name }}</small>
+                                {% endif %}
+                            </div>
+                            <span class="badge bg-secondary">{{ team.member_count }} members</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <p class="text-muted text-center mb-0">No teams created yet.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Recent Users -->
+        <div class="col-lg-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="bi bi-person me-2"></i>Department Users</h5>
+                    <span class="badge bg-primary">{{ users|length }}</span>
+                </div>
+                <div class="card-body">
+                    {% if users %}
+                    <div class="list-group list-group-flush">
+                        {% for user in users[:10] %}
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>
+                                <strong>{{ user.full_name }}</strong>
+                                <br><small class="text-muted">{{ user.role.name }}</small>
+                            </div>
+                            {% if user.is_active %}
+                            <span class="badge bg-success">Active</span>
+                            {% else %}
+                            <span class="badge bg-secondary">Inactive</span>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% if users|length > 10 %}
+                    <div class="text-center mt-3">
+                        <a href="{{ url_for('admin.users') }}?department={{ department.id }}" class="btn btn-sm btn-outline-primary">
+                            View All Users
+                        </a>
+                    </div>
+                    {% endif %}
+                    {% else %}
+                    <p class="text-muted text-center mb-0">No users in this department.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Update Metrics Modal -->
+{% if current_user.permission_level >= PERMISSIONS.GROUP_ADMIN %}
+<div class="modal fade" id="updateMetricsModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Update Department Metrics</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="updateMetricsForm">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Competence (%)</label>
+                        <input type="number" class="form-control" name="competence" 
+                               min="0" max="100" step="0.1"
+                               value="{{ metrics.competence_percentage if metrics else 0 }}">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Completion (%)</label>
+                        <input type="number" class="form-control" name="completion" 
+                               min="0" max="100" step="0.1"
+                               value="{{ metrics.completion_percentage if metrics else 0 }}">
+                    </div>
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="mb-3">
+                                <label class="form-label">Entries Required</label>
+                                <input type="number" class="form-control" name="entries_required" 
+                                       min="0" value="{{ metrics.data_entries_required if metrics else 0 }}">
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="mb-3">
+                                <label class="form-label">Entries Completed</label>
+                                <input type="number" class="form-control" name="entries_completed" 
+                                       min="0" value="{{ metrics.data_entries_completed if metrics else 0 }}">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Quality Score</label>
+                        <input type="number" class="form-control" name="quality" 
+                               min="0" max="100" step="0.1"
+                               value="{{ metrics.quality_score if metrics else 0 }}">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Notes</label>
+                        <textarea class="form-control" name="notes" rows="2">{{ metrics.notes if metrics else '' }}</textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<style>
+.progress-circle-container {
+    position: relative;
+}
+.progress-circle-value {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+{% if current_user.permission_level >= PERMISSIONS.GROUP_ADMIN %}
+document.getElementById('updateMetricsForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(this);
+    const data = {
+        department_id: {{ department.id }},
+        competence: parseFloat(formData.get('competence')),
+        completion: parseFloat(formData.get('completion')),
+        entries_required: parseInt(formData.get('entries_required')),
+        entries_completed: parseInt(formData.get('entries_completed')),
+        quality: parseFloat(formData.get('quality')),
+        notes: formData.get('notes')
+    };
+    
+    fetch('/api/dashboard/metrics', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': '{{ csrf_token() }}'
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => response.json())
+    .then(result => {
+        if (result.success) {
+            location.reload();
+        } else {
+            alert('Error: ' + result.error);
+        }
+    })
+    .catch(err => {
+        alert('Error updating metrics');
+        console.error(err);
+    });
+});
+{% endif %}
+</script>
+{% endblock %}

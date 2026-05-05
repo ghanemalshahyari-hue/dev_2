@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+{% block title %}لوحة نائب المدير — {{ app_name }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4 py-4">
+    <div class="d-flex align-items-center justify-content-between mb-4">
+        <div>
+            <h1 class="page-title mb-1"><i class="bi bi-person-check-fill text-primary me-2"></i>لوحة نائب المدير</h1>
+            <p class="text-muted mb-0">القرارات والاعتمادات</p>
+        </div>
+        {% if pending_requests > 0 %}
+        <a href="{{ url_for('access.pending') }}" class="btn btn-warning">
+            <i class="bi bi-bell-fill me-2"></i>{{ pending_requests }} طلب بانتظار قرارك
+        </a>
+        {% endif %}
+    </div>
+
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="stat-card glass-card text-center">
+                <div class="stat-icon text-primary"><i class="bi bi-graph-up-arrow"></i></div>
+                <div class="stat-value">{{ averages.competence }}%</div>
+                <div class="stat-label">متوسط الكفاءة</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card glass-card text-center">
+                <div class="stat-icon text-success"><i class="bi bi-check-circle-fill"></i></div>
+                <div class="stat-value">{{ averages.completion }}%</div>
+                <div class="stat-label">متوسط الإنجاز</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card glass-card text-center">
+                <div class="stat-icon text-info"><i class="bi bi-grid-3x3-gap-fill"></i></div>
+                <div class="stat-value">{{ departments|length }}</div>
+                <div class="stat-label">المجموعات</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card glass-card text-center">
+                <div class="stat-icon text-warning"><i class="bi bi-hourglass-split"></i></div>
+                <div class="stat-value">{{ pending_requests }}</div>
+                <div class="stat-label">طلبات معلقة لديك</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Groups Overview -->
+    <div class="section-card glass-card mb-4">
+        <div class="section-card-header d-flex align-items-center gap-2 mb-3">
+            <i class="bi bi-grid text-primary fs-5"></i>
+            <h2 class="h5 mb-0 fw-bold">نظرة على المجموعات</h2>
+        </div>
+        <div class="row g-3">
+            {% for dept in departments %}
+            <div class="col-md-4 col-lg-3">
+                <div class="dept-mini-card glass-card p-3 text-center" style="border-color: {{ dept.color }}40">
+                    <i class="{{ dept.icon }} fs-3 mb-2" style="color:{{ dept.color }}"></i>
+                    <div class="fw-semibold small mb-2">{{ dept.name }}</div>
+                    <div class="d-flex justify-content-between small text-muted">
+                        <span><i class="bi bi-graph-up"></i> {{ dept.competence_pct|round(0)|int }}%</span>
+                        <span><i class="bi bi-check2"></i> {{ dept.completion_pct|round(0)|int }}%</span>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="row g-3">
+        <div class="col-md-6">
+            <a href="{{ url_for('access.pending') }}" class="action-card glass-card d-block text-decoration-none">
+                <div class="action-icon text-warning"><i class="bi bi-bell"></i></div>
+                <div class="action-title">مراجعة الطلبات المعلقة</div>
+                <div class="action-desc text-muted small">{{ pending_requests }} طلب بانتظار قرارك</div>
+            </a>
+        </div>
+        <div class="col-md-6">
+            <a href="{{ url_for('admin.users') }}" class="action-card glass-card d-block text-decoration-none">
+                <div class="action-icon text-info"><i class="bi bi-people"></i></div>
+                <div class="action-title">إدارة المستخدمين</div>
+                <div class="action-desc text-muted small">تعديل الأدوار والصلاحيات</div>
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,480 @@
+{% extends "base.html" %}
+
+{% block title %}لوحة تحكم الرئيس{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* CEO Dashboard Styles */
+    .dashboard-container {
+        min-height: calc(100vh - 120px);
+        background: linear-gradient(135deg, #f5f7fa 0%, #e4e8ec 100%);
+        padding: 30px;
+    }
+    
+    .dashboard-header {
+        text-align: center;
+        margin-bottom: 40px;
+    }
+    
+    .dashboard-header h1 {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #1a1a2e;
+        margin-bottom: 10px;
+    }
+    
+    .dashboard-header p {
+        color: #6c757d;
+        font-size: 1.1rem;
+    }
+    
+    /* Circular Dashboard Layout */
+    .circular-dashboard {
+        position: relative;
+        width: 100%;
+        max-width: 800px;
+        margin: 0 auto;
+        aspect-ratio: 1;
+    }
+    
+    /* Center Stats */
+    .center-stats {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 200px;
+        height: 200px;
+        background: white;
+        border-radius: 50%;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        z-index: 10;
+    }
+    
+    .center-stats .company-name {
+        font-size: 0.9rem;
+        color: #6c757d;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 10px;
+    }
+    
+    .center-stats .overall-score {
+        font-size: 3rem;
+        font-weight: 700;
+        color: #1a1a2e;
+        line-height: 1;
+    }
+    
+    .center-stats .overall-label {
+        font-size: 0.85rem;
+        color: #6c757d;
+        margin-top: 5px;
+    }
+    
+    /* Department Nodes */
+    .dept-node {
+        position: absolute;
+        width: 140px;
+        height: 140px;
+        transform: translate(-50%, -50%);
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .dept-node:hover {
+        transform: translate(-50%, -50%) scale(1.1);
+        z-index: 20;
+    }
+    
+    .dept-card {
+        width: 100%;
+        height: 100%;
+        background: white;
+        border-radius: 50%;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        overflow: hidden;
+        border: 3px solid transparent;
+        transition: all 0.3s ease;
+    }
+    
+    .dept-node:hover .dept-card {
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    }
+    
+    .dept-icon {
+        font-size: 1.8rem;
+        margin-bottom: 5px;
+    }
+    
+    .dept-code {
+        font-size: 0.9rem;
+        font-weight: 700;
+        color: #1a1a2e;
+    }
+    
+    .dept-metrics {
+        display: flex;
+        gap: 8px;
+        margin-top: 5px;
+    }
+    
+    .metric-badge {
+        font-size: 0.7rem;
+        padding: 2px 6px;
+        border-radius: 10px;
+        font-weight: 600;
+    }
+    
+    .metric-competence {
+        background: rgba(25, 135, 84, 0.15);
+        color: #198754;
+    }
+    
+    .metric-completion {
+        background: rgba(13, 110, 253, 0.15);
+        color: #0d6efd;
+    }
+    
+    /* Progress Ring */
+    .progress-ring {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+    }
+    
+    .progress-ring circle {
+        fill: none;
+        stroke-width: 6;
+        transform: rotate(-90deg);
+        transform-origin: 50% 50%;
+    }
+    
+    .progress-ring .bg {
+        stroke: #e9ecef;
+    }
+    
+    .progress-ring .progress-competence {
+        stroke-linecap: round;
+        transition: stroke-dashoffset 1s ease;
+    }
+    
+    .progress-ring .progress-completion {
+        stroke-linecap: round;
+        transition: stroke-dashoffset 1s ease;
+    }
+    
+    /* Connecting Lines */
+    .connection-lines {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        pointer-events: none;
+    }
+    
+    .connection-lines line {
+        stroke: #dee2e6;
+        stroke-width: 2;
+        stroke-dasharray: 5, 5;
+    }
+    
+    /* Stats Cards Row */
+    .stats-row {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 20px;
+        margin-top: 40px;
+        max-width: 800px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    
+    .stat-card {
+        background: white;
+        border-radius: 16px;
+        padding: 20px;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+        text-align: center;
+    }
+    
+    .stat-card i {
+        font-size: 2rem;
+        margin-bottom: 10px;
+    }
+    
+    .stat-card .stat-value {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #1a1a2e;
+    }
+    
+    .stat-card .stat-label {
+        font-size: 0.9rem;
+        color: #6c757d;
+    }
+    
+    /* Legend */
+    .dashboard-legend {
+        display: flex;
+        justify-content: center;
+        gap: 30px;
+        margin-top: 30px;
+    }
+    
+    .legend-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 0.9rem;
+        color: #6c757d;
+    }
+    
+    .legend-dot {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+    }
+    
+    .legend-dot.competence {
+        background: #198754;
+    }
+    
+    .legend-dot.completion {
+        background: #0d6efd;
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+        .circular-dashboard {
+            max-width: 100%;
+        }
+        
+        .dept-node {
+            width: 100px;
+            height: 100px;
+        }
+        
+        .center-stats {
+            width: 140px;
+            height: 140px;
+        }
+        
+        .center-stats .overall-score {
+            font-size: 2rem;
+        }
+        
+        .dept-icon {
+            font-size: 1.3rem;
+        }
+        
+        .dept-code {
+            font-size: 0.75rem;
+        }
+        
+        .dept-metrics {
+            display: none;
+        }
+    }
+    
+    /* Tooltip */
+    .dept-tooltip {
+        position: absolute;
+        bottom: 100%;
+        left: 50%;
+        transform: translateX(-50%);
+        background: #1a1a2e;
+        color: white;
+        padding: 10px 15px;
+        border-radius: 8px;
+        font-size: 0.85rem;
+        white-space: nowrap;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+        z-index: 30;
+    }
+    
+    .dept-tooltip::after {
+        content: '';
+        position: absolute;
+        top: 100%;
+        left: 50%;
+        transform: translateX(-50%);
+        border: 6px solid transparent;
+        border-top-color: #1a1a2e;
+    }
+    
+    .dept-node:hover .dept-tooltip {
+        opacity: 1;
+        visibility: visible;
+        bottom: calc(100% + 10px);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <div class="dashboard-header">
+        <h1><i class="bi bi-speedometer2 ms-2"></i>نظرة عامة على الشركة</h1>
+        <p>مقاييس أداء الأقسام في الوقت الفعلي</p>
+    </div>
+    
+    <!-- Circular Dashboard -->
+    <div class="circular-dashboard" id="circularDashboard">
+        <!-- Connection Lines SVG -->
+        <svg class="connection-lines" id="connectionLines">
+            <!-- Lines will be drawn by JavaScript -->
+        </svg>
+        
+        <!-- Center Stats -->
+        <div class="center-stats">
+            <span class="company-name">متوسط الشركة</span>
+            <span class="overall-score" id="overallScore">{{ overview.avg_completion|round|int }}%</span>
+            <span class="overall-label">التقدم الإجمالي</span>
+        </div>
+        
+        <!-- Department Nodes (positioned by JavaScript) -->
+        {% for dept in departments %}
+        <div class="dept-node" data-dept-id="{{ dept.id }}" data-order="{{ dept.order }}">
+            <div class="dept-tooltip">
+                <strong>{{ dept.name }}</strong><br>
+                الكفاءة: {{ dept.competence|round|int }}%<br>
+                الإنجاز: {{ dept.completion|round|int }}%
+            </div>
+            
+            <!-- Progress Ring SVG -->
+            <svg class="progress-ring" viewBox="0 0 140 140">
+                <circle class="bg" cx="70" cy="70" r="60"/>
+                <circle class="progress-competence" cx="70" cy="70" r="60"
+                        style="stroke: {{ dept.color }}; opacity: 0.3;"
+                        stroke-dasharray="377"
+                        stroke-dashoffset="{{ 377 - (377 * dept.competence / 100) }}"/>
+                <circle class="progress-completion" cx="70" cy="70" r="52"
+                        style="stroke: {{ dept.color }};"
+                        stroke-dasharray="327"
+                        stroke-dashoffset="{{ 327 - (327 * dept.completion / 100) }}"/>
+            </svg>
+            
+            <div class="dept-card" style="border-color: {{ dept.color }}20;">
+                <i class="{{ dept.icon }} dept-icon" style="color: {{ dept.color }};"></i>
+                <span class="dept-code">{{ dept.code }}</span>
+                <div class="dept-metrics">
+                    <span class="metric-badge metric-competence">{{ dept.competence|round|int }}%</span>
+                    <span class="metric-badge metric-completion">{{ dept.completion|round|int }}%</span>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    
+    <!-- Legend -->
+    <div class="dashboard-legend">
+        <div class="legend-item">
+            <span class="legend-dot competence"></span>
+            <span>الكفاءة (جودة البيانات)</span>
+        </div>
+        <div class="legend-item">
+            <span class="legend-dot completion"></span>
+            <span>الإنجاز (التقدم)</span>
+        </div>
+    </div>
+    
+    <!-- Stats Cards -->
+    <div class="stats-row">
+        <div class="stat-card">
+            <i class="bi bi-graph-up-arrow text-success"></i>
+            <div class="stat-value">{{ overview.avg_competence|round|int }}%</div>
+            <div class="stat-label">متوسط الكفاءة</div>
+        </div>
+        <div class="stat-card">
+            <i class="bi bi-pie-chart-fill text-primary"></i>
+            <div class="stat-value">{{ overview.avg_completion|round|int }}%</div>
+            <div class="stat-label">متوسط الإنجاز</div>
+        </div>
+        <div class="stat-card">
+            <i class="bi bi-building text-info"></i>
+            <div class="stat-value">{{ overview.total_departments }}</div>
+            <div class="stat-label">الأقسام</div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const dashboard = document.getElementById('circularDashboard');
+        const nodes = document.querySelectorAll('.dept-node');
+        const svg = document.getElementById('connectionLines');
+        
+        function positionNodes() {
+            const rect = dashboard.getBoundingClientRect();
+            const centerX = rect.width / 2;
+            const centerY = rect.height / 2;
+            const radius = Math.min(centerX, centerY) * 0.65;
+            
+            const nodeCount = nodes.length;
+            const angleStep = (2 * Math.PI) / nodeCount;
+            const startAngle = -Math.PI / 2; // Start from top
+            
+            // Clear existing lines
+            svg.innerHTML = '';
+            
+            nodes.forEach((node, index) => {
+                const angle = startAngle + (index * angleStep);
+                const x = centerX + radius * Math.cos(angle);
+                const y = centerY + radius * Math.sin(angle);
+                
+                node.style.left = x + 'px';
+                node.style.top = y + 'px';
+                
+                // Draw connection line to center
+                const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                line.setAttribute('x1', centerX);
+                line.setAttribute('y1', centerY);
+                line.setAttribute('x2', x);
+                line.setAttribute('y2', y);
+                svg.appendChild(line);
+            });
+        }
+        
+        // Position nodes on load and resize
+        positionNodes();
+        window.addEventListener('resize', positionNodes);
+        
+        // Click handler for department nodes
+        nodes.forEach(node => {
+            node.addEventListener('click', function() {
+                const deptId = this.dataset.deptId;
+                window.location.href = `/dashboard/department/${deptId}`;
+            });
+        });
+        
+        // Auto-refresh data every 60 seconds
+        setInterval(function() {
+            fetch('/api/dashboard/overview')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        document.getElementById('overallScore').textContent = 
+                            Math.round(data.data.avg_completion) + '%';
+                    }
+                })
+                .catch(err => console.log('Refresh failed:', err));
+        }, 60000);
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,401 @@
+{% extends "base.html" %}
+
+{% block title %}تفاصيل: {{ dept.name }} — {{ app_name }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .dept-header {
+        background: radial-gradient(circle at top right, #FFFFFF, #FDF9F3);
+        border-radius: 20px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        border: 1px solid var(--border-color, #DDD0B8);
+        box-shadow: 0 10px 30px rgba(80, 40, 10, 0.05);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .dept-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 120px;
+        height: 100%;
+        background: var(--primary, #C97C5D);
+        opacity: 0.1;
+        clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 100%);
+    }
+
+    .dept-icon-wrapper {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        background: rgba(201, 124, 93, 0.1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2.5rem;
+        color: var(--primary, #C97C5D);
+        border: 2px solid var(--primary, #C97C5D);
+    }
+
+    .task-card {
+        background: #FFFFFF;
+        border-radius: 16px;
+        border: 1px solid var(--border-color, #DDD0B8);
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        position: relative;
+    }
+
+    .task-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 35px rgba(80, 40, 10, 0.08);
+        border-color: var(--primary, #C97C5D);
+    }
+
+    .task-number-badge {
+        background: var(--primary, #C97C5D);
+        color: #FFFFFF;
+        padding: 0.4rem 1rem;
+        border-radius: 30px;
+        font-weight: 700;
+        font-size: 0.9rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .warning-badge {
+        background: #DC3545;
+        color: #FFF;
+        padding: 0.2rem 0.6rem;
+        border-radius: 12px;
+        font-size: 0.75rem;
+        font-weight: bold;
+        animation: pulse-red 2s infinite;
+    }
+
+    @keyframes pulse-red {
+        0% {
+            box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.7);
+        }
+
+        70% {
+            box-shadow: 0 0 0 10px rgba(220, 53, 69, 0);
+        }
+
+        100% {
+            box-shadow: 0 0 0 0 rgba(220, 53, 69, 0);
+        }
+    }
+
+    .department-tag {
+        background: rgba(194, 146, 64, 0.15);
+        /* Secondary amber */
+        color: #2E2010;
+        border: 1px solid rgba(194, 146, 64, 0.3);
+        padding: 0.2rem 0.8rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.3rem;
+    }
+
+    .responsible-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1.2rem;
+        border-radius: 50px;
+        background: #fff;
+        border: 2px solid #E5DBC6; /* Thicker border to stand out */
+        color: #8F6B4E;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08); /* Stronger shadow */
+        z-index: 10;
+        font-weight: 700;
+        margin-bottom: 1rem; /* Space if stacked on mobile */
+    }
+
+    @media (min-width: 768px) {
+        .responsible-badge {
+            position: absolute;
+            top: -25px;       /* Pull outside the top edge */
+            right: 140px;     /* Horizontal position near the icon */
+            margin-bottom: 0;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-5 mt-5">
+
+    <!-- Header Section (Wrapped for positioning) -->
+    <div class="position-relative mb-4">
+        
+        {% if dept.responsible_person %}
+        <div class="responsible-badge">
+            <i class="bi bi-person-vcard fs-5"></i>
+            <span style="font-size: 0.95rem;">{{ dept.responsible_person }}</span>
+        </div>
+        {% endif %}
+
+        <div class="dept-header d-flex flex-column flex-md-row align-items-center gap-4">
+            
+            <!-- Concept Number or Icon -->
+        {% if dept.concept_number %}
+        <div class="dept-icon-wrapper shadow-lg" 
+             style="border-color: #fff; background: {{ dept.color }}; color: #fff; border-width: 4px; width: 90px; height: 90px; font-size: 2.8rem; font-weight: bold;">
+            {{ dept.concept_number }}
+        </div>
+        {% else %}
+        <div class="dept-icon-wrapper" style="border-color: {{ dept.color }}; color: {{ dept.color }}">
+            <i class="{{ dept.icon }}"></i>
+        </div>
+        {% endif %}
+
+        <div class="flex-grow-1 text-center">
+            <h1 class="h2 fw-bold mb-2" style="color: #2E2010;">{{ dept.name }}</h1>
+
+            {% if dept.description %}
+            <p class="mt-3 mb-0 mx-auto fw-bold" style="color: #6B4E36; max-width: 800px; font-size: 1.2rem;">
+                <span style="font-size: 1.8rem; vertical-align: middle;">(</span>
+                ----- {{ dept.description }} -----
+                <span style="font-size: 1.8rem; vertical-align: middle;">)</span>
+            </p>
+            {% endif %}
+        </div>
+        <div class="text-md-end mt-3 mt-md-0">
+            <a href="{{ url_for('dashboard.director') }}" class="btn btn-outline-secondary rounded-pill pe-4 ps-4">
+                <i class="bi bi-arrow-right me-2"></i>العودة للرئيسية
+            </a>
+
+            {% if current_user.has_permission(100) or current_user.has_permission(90) or
+            current_user.has_permission(999) %}
+            <button class="btn btn-primary rounded-pill pe-4 ps-4 mt-2 mt-md-0 ms-0 ms-md-2" data-bs-toggle="modal"
+                data-bs-target="#addTaskModal">
+                <i class="bi bi-plus-lg me-2"></i>إضافة واجب
+            </button>
+            {% endif %}
+        </div>
+    </div>
+    </div>
+
+    <!-- Tasks List Section -->
+    <h3 class="h4 fw-bold mb-4" style="color: #2E2010;">
+        <i class="bi bi-list-task me-2" style="color: var(--primary);"></i>
+        عدد الواجبات الرئيسية ({{ tasks|length }})
+    </h3>
+
+    {% if not tasks %}
+    <div class="text-center py-5"
+        style="background: rgba(255,255,255,0.5); border-radius: 20px; border: 2px dashed #DDD0B8;">
+        <i class="bi bi-inbox fs-1 text-muted mb-3 d-block"></i>
+        <h5 class="text-muted">لا توجد واجبات رئيسية مسجلة لهذه المجموعة بعد.</h5>
+    </div>
+    {% else %}
+    <div class="row">
+        {% for task in tasks %}
+        <div class="col-12 mb-3">
+            <div class="task-card">
+                <div class="d-flex flex-column flex-lg-row justify-content-between gap-3">
+
+                    <!-- Right Side: Info -->
+                    <div class="flex-grow-1">
+                        <div class="d-flex align-items-center gap-3 mb-3">
+                            <span class="task-number-badge">
+                                <i class="bi bi-hash"></i> الواجب {{ task.task_number }}
+                            </span>
+
+                            <span class="text-muted d-flex align-items-center gap-1" style="font-size: 0.9rem;">
+                                <i class="bi bi-calendar-event"></i> النطاق المتوقع: {{
+                                task.expected_end_date.strftime('%Y-%m-%d') }}
+                            </span>
+
+                            {% if task.is_overdue_5_years %}
+                            <span class="warning-badge" title="تنبيه: تاريخ النهاية يتجاوز 5 سنوات">
+                                <i class="bi bi-exclamation-triangle-fill me-1"></i> تتجاوز 5 سنوات
+                            </span>
+                            {% endif %}
+                        </div>
+
+                        <p class="fs-6" style="color: #2E2010; line-height: 1.6;">
+                            {{ task.description }}
+                        </p>
+
+                        <!-- Departments Attached -->
+                        <div class="d-flex flex-wrap gap-2 mt-3">
+                            <span class="text-muted me-2 mt-1" style="font-size: 0.85rem;">الجهات المعنية:</span>
+
+
+                            <!-- Secondary -->
+                            {% for sec_name in task.secondary_departments_parsed %}
+                            <span class="department-tag">
+                                <i class="bi bi-tag-fill text-muted me-1"></i>
+                                {{ sec_name }}
+                            </span>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <!-- Left Side: Progress & Actions -->
+                    <div class="d-flex flex-column align-items-lg-end justify-content-center border-start ps-lg-4 ms-lg-2 py-2"
+                        style="border-color: #DDD0B8 !important; min-width: 200px;">
+                        <div class="text-center w-100 mb-2">
+                            <span class="d-block text-muted mb-1" style="font-size: 0.85rem;">نسبة الإنجاز</span>
+                            <h3 class="mb-0 fw-bold" style="color: var(--secondary, #C29240);">{{ task.completion_pct
+                                }}%</h3>
+                        </div>
+
+                        <div class="progress w-100 mb-3"
+                            style="height: 8px; border-radius: 10px; background-color: #F5EED8;">
+                            <div class="progress-bar" role="progressbar"
+                                style="width: {{ task.completion_pct }}%; background-color: var(--secondary, #C29240);"
+                                aria-valuenow="{{ task.completion_pct }}" aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+</div>
+
+<!-- Modal: Add Task -->
+<div class="modal fade" id="addTaskModal" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content"
+            style="border-radius: 20px; border: none; box-shadow: 0 20px 40px rgba(80,40,10,0.15);">
+            <div class="modal-header border-bottom"
+                style="border-color: #DDD0B8 !important; background: #FDF9F3; border-radius: 20px 20px 0 0;">
+                <h5 class="modal-title fw-bold" style="color: #2E2010;"><i class="bi bi-plus-circle me-2"></i>إضافة واجب
+                    رئيسي جديد</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <form id="taskForm">
+                <div class="modal-body p-4">
+                    <input type="hidden" name="primary_dept_id" id="primary_dept_id" value="{{ dept.id }}">
+
+                    <div class="row g-3">
+                        <!-- Task Number & Date -->
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold" style="color: #6B4E36;">رقم الواجب (مثال: 1.24)</label>
+                            <input type="text" class="form-control" name="task_number" id="task_number" required
+                                style="border-radius: 10px; border-color: #DDD0B8;">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold" style="color: #6B4E36;">تاريخ النهاية المتوقع</label>
+                            <input type="date" class="form-control" name="expected_end_date" id="expected_end_date"
+                                required style="border-radius: 10px; border-color: #DDD0B8;">
+                        </div>
+
+                        <!-- Description -->
+                        <div class="col-12">
+                            <label class="form-label fw-bold" style="color: #6B4E36;">وصف / عنوان الواجب</label>
+                            <textarea class="form-control" name="description" id="description" rows="3" required
+                                style="border-radius: 10px; border-color: #DDD0B8;"></textarea>
+                        </div>
+
+                        <!-- Initial Completion -->
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold" style="color: #6B4E36;">نسبة الإنجاز المتوقعة/الحالية
+                                (%)</label>
+                            <input type="number" class="form-control" name="completion_pct" id="completion_pct" min="0"
+                                max="100" value="0" required style="border-radius: 10px; border-color: #DDD0B8;">
+                        </div>
+
+                        <!-- Secondary Departments (Custom Text Tags) -->
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold" style="color: #6B4E36;">الجهات المشتركة (أدخل الأسماء
+                                مفصولة بفاصلة)</label>
+                            <input type="text" class="form-control" name="secondary_dept_list" id="secondary_dept_list"
+                                placeholder="مثال: المالية, الرقابة, تقنية المعلومات"
+                                style="border-radius: 10px; border-color: #DDD0B8;">
+                            <small class="text-muted d-block mt-1">اكتب اسم الجهة ثم ضع فاصلة (,) لإضافة جهة
+                                أخرى</small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer border-top"
+                    style="border-color: #DDD0B8 !important; background: #FDF9F3; border-radius: 0 0 20px 20px;">
+                    <button type="button" class="btn btn-outline-secondary rounded-pill px-4"
+                        data-bs-dismiss="modal">إلغاء</button>
+                    <button type="submit" class="btn btn-primary rounded-pill px-4" id="btnSaveTask">
+                        <i class="bi bi-save me-1"></i> حفظ الواجب
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const taskForm = document.getElementById('taskForm');
+        if (!taskForm) return;
+
+        taskForm.addEventListener('submit', function (e) {
+            e.preventDefault();
+            const btn = document.getElementById('btnSaveTask');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> جاري الحفظ...';
+
+            // Parse custom custom text string into an array
+            const secString = document.getElementById('secondary_dept_list').value;
+            let secondaryList = [];
+            if (secString.trim()) {
+                secondaryList = secString.split(',').map(s => s.trim()).filter(s => s !== '');
+            }
+
+            const payload = {
+                task_number: document.getElementById('task_number').value,
+                description: document.getElementById('description').value,
+                expected_end_date: document.getElementById('expected_end_date').value,
+                completion_pct: parseInt(document.getElementById('completion_pct').value) || 0,
+                primary_dept_id: parseInt(document.getElementById('primary_dept_id').value),
+                secondary_dept_list: secondaryList
+            };
+
+            fetch("{{ url_for('api.create_main_task') }}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token() }}' // Must have csrf token in templates
+                },
+                body: JSON.stringify(payload)
+            })
+                .then(response => response.json().then(data => ({ status: response.status, body: data })))
+                .then(res => {
+                    if (res.status === 200 || res.status === 201) {
+                        // Success - reload page to show new task
+                        window.location.reload();
+                    } else {
+                        alert('خطأ أثناء الحفظ: ' + (res.body.error || 'Unknown Error'));
+                        btn.disabled = false;
+                        btn.innerHTML = '<i class="bi bi-save me-1"></i> حفظ الواجب';
+                    }
+                })
+                .catch(err => {
+                    console.error('Fetch Error:', err);
+                    alert('حدث خطأ في الاتصال بالخادم.');
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="bi bi-save me-1"></i> حفظ الواجب';
+                });
+        });
+    });
+</script>
+
+{% endblock %}

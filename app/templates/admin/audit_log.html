@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% block title %}سجل التدقيق — {{ app_name }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4 py-4">
+    <div class="d-flex align-items-center justify-content-between mb-4">
+        <h1 class="page-title mb-0"><i class="bi bi-journal-text text-primary me-2"></i>سجل التدقيق</h1>
+        <form method="GET" class="d-flex gap-2">
+            <input type="text" name="action" class="form-control glass-input" placeholder="فلتر الإجراء..."
+                value="{{ action_filter }}">
+            <button type="submit" class="btn btn-outline-primary"><i class="bi bi-search"></i></button>
+        </form>
+    </div>
+
+    <div class="section-card glass-card">
+        <div class="table-responsive">
+            <table class="table table-dark table-hover table-sm align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th>التاريخ والوقت</th>
+                        <th>المستخدم</th>
+                        <th>الإجراء</th>
+                        <th>النوع</th>
+                        <th>التفاصيل</th>
+                        <th>عنوان IP</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for log in logs.items %}
+                    <tr>
+                        <td><small>{{ log.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</small></td>
+                        <td>{{ log.username }}</td>
+                        <td>
+                            <code
+                                class="{% if 'login_failed' in log.action or 'rejected' in log.action or 'deleted' in log.action %}text-danger{% elif 'login_success' in log.action or 'approved' in log.action %}text-success{% else %}text-info{% endif %}">
+                {{ log.action }}
+              </code>
+                        </td>
+                        <td><small class="text-muted">{{ log.resource_type or '—' }}</small></td>
+                        <td><small class="text-muted">{{ (log.details or '')[:50] }}</small></td>
+                        <td><small class="text-muted">{{ log.ip_address or '—' }}</small></td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="6" class="text-center text-muted py-4">لا توجد سجلات</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination -->
+        {% if logs.pages > 1 %}
+        <nav class="d-flex justify-content-center mt-3">
+            <ul class="pagination pagination-sm mb-0">
+                {% if logs.has_prev %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ logs.prev_num }}&action={{ action_filter }}">السابق</a>
+                </li>
+                {% endif %}
+                {% for p in logs.iter_pages() %}
+                {% if p %}
+                <li class="page-item {{ 'active' if p == logs.page }}">
+                    <a class="page-link" href="?page={{ p }}&action={{ action_filter }}">{{ p }}</a>
+                </li>
+                {% else %}
+                <li class="page-item disabled"><span class="page-link">…</span></li>
+                {% endif %}
+                {% endfor %}
+                {% if logs.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ logs.next_num }}&action={{ action_filter }}">التالي</a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

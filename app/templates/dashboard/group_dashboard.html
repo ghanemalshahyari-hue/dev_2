@@ -1,0 +1,813 @@
+{% extends "base.html" %}
+
+{% block title %}{{ department.name }} - لوحة المجموعة{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Group Dashboard Styles */
+    .dashboard-container {
+        min-height: calc(100vh - 120px);
+        background: linear-gradient(135deg, #f5f7fa 0%, #e8edf3 100%);
+        padding: 30px;
+    }
+    
+    /* Group Header */
+    .group-header {
+        background: linear-gradient(135deg, {{ department.color|default('#667eea') }}22 0%, {{ department.color|default('#667eea') }}11 100%);
+        border-radius: 20px;
+        padding: 30px;
+        margin-bottom: 30px;
+        border: 1px solid {{ department.color|default('#667eea') }}33;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .group-header::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -50%;
+        width: 100%;
+        height: 100%;
+        background: radial-gradient(circle, {{ department.color|default('#667eea') }}11 0%, transparent 70%);
+        pointer-events: none;
+    }
+    
+    .group-header-content {
+        position: relative;
+        z-index: 1;
+        display: flex;
+        align-items: center;
+        gap: 25px;
+    }
+    
+    .group-icon-large {
+        width: 80px;
+        height: 80px;
+        background: white;
+        border-radius: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2.5rem;
+        color: {{ department.color|default('#667eea') }};
+        box-shadow: 0 10px 30px {{ department.color|default('#667eea') }}33;
+    }
+    
+    .group-info h1 {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: #1a1a2e;
+        margin-bottom: 5px;
+    }
+    
+    .group-info .group-meta {
+        font-size: 0.95rem;
+        color: #6c757d;
+    }
+    
+    .group-info .group-meta span {
+        margin-left: 20px;
+    }
+    
+    .group-header-stats {
+        margin-right: auto;
+        display: flex;
+        gap: 20px;
+    }
+    
+    .header-stat {
+        text-align: center;
+        padding: 15px 25px;
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    }
+    
+    .header-stat-value {
+        font-size: 2rem;
+        font-weight: 700;
+        color: {{ department.color|default('#667eea') }};
+        line-height: 1;
+    }
+    
+    .header-stat-label {
+        font-size: 0.85rem;
+        color: #6c757d;
+        margin-top: 5px;
+    }
+    
+    /* Quick Stats */
+    .quick-stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+        margin-bottom: 30px;
+    }
+    
+    .stat-card {
+        background: white;
+        border-radius: 15px;
+        padding: 20px;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        transition: transform 0.3s ease;
+    }
+    
+    .stat-card:hover {
+        transform: translateY(-3px);
+    }
+    
+    .stat-icon {
+        width: 55px;
+        height: 55px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+    }
+    
+    .stat-info .stat-value {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: #1a1a2e;
+        line-height: 1;
+    }
+    
+    .stat-info .stat-label {
+        font-size: 0.88rem;
+        color: #6c757d;
+        margin-top: 5px;
+    }
+    
+    /* Section Cards */
+    .section-card {
+        background: white;
+        border-radius: 15px;
+        padding: 25px;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+        margin-bottom: 20px;
+    }
+    
+    .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        padding-bottom: 15px;
+        border-bottom: 1px solid #e9ecef;
+    }
+    
+    .section-title {
+        font-size: 1.15rem;
+        font-weight: 600;
+        color: #1a1a2e;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin: 0;
+    }
+    
+    .section-badge {
+        background: {{ department.color|default('#667eea') }}22;
+        color: {{ department.color|default('#667eea') }};
+        padding: 5px 12px;
+        border-radius: 15px;
+        font-size: 0.85rem;
+        font-weight: 600;
+    }
+    
+    /* Team Members */
+    .team-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 15px;
+    }
+    
+    .team-member-card {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        padding: 15px;
+        background: #f8f9fa;
+        border-radius: 12px;
+        transition: all 0.3s ease;
+    }
+    
+    .team-member-card:hover {
+        background: #e9ecef;
+        transform: translateX(-5px);
+    }
+    
+    .member-avatar {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, {{ department.color|default('#667eea') }} 0%, {{ department.color|default('#667eea') }}cc 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.2rem;
+        font-weight: 600;
+    }
+    
+    .member-info .member-name {
+        font-weight: 600;
+        color: #1a1a2e;
+        font-size: 0.95rem;
+    }
+    
+    .member-info .member-role {
+        font-size: 0.82rem;
+        color: #6c757d;
+    }
+    
+    .member-status {
+        margin-right: auto;
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: #28a745;
+    }
+    
+    .member-status.offline {
+        background: #adb5bd;
+    }
+    
+    /* Duties Section */
+    .duty-item {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        padding: 18px;
+        background: #f8f9fa;
+        border-radius: 12px;
+        margin-bottom: 12px;
+        border-right: 4px solid {{ department.color|default('#667eea') }};
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+    
+    .duty-item:hover {
+        background: #e9ecef;
+        transform: translateX(-5px);
+    }
+    
+    .duty-icon {
+        width: 45px;
+        height: 45px;
+        border-radius: 10px;
+        background: {{ department.color|default('#667eea') }}22;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+        color: {{ department.color|default('#667eea') }};
+    }
+    
+    .duty-content {
+        flex: 1;
+    }
+    
+    .duty-title {
+        font-weight: 600;
+        color: #1a1a2e;
+        font-size: 0.95rem;
+        margin-bottom: 3px;
+    }
+    
+    .duty-meta {
+        font-size: 0.82rem;
+        color: #6c757d;
+    }
+    
+    .duty-progress {
+        width: 100px;
+    }
+    
+    .progress {
+        height: 8px;
+        border-radius: 4px;
+        background: #e9ecef;
+    }
+    
+    .progress-bar {
+        border-radius: 4px;
+        background: linear-gradient(90deg, {{ department.color|default('#667eea') }} 0%, {{ department.color|default('#667eea') }}cc 100%);
+    }
+    
+    .duty-percentage {
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: {{ department.color|default('#667eea') }};
+        text-align: center;
+        margin-top: 3px;
+    }
+    
+    /* Activity Timeline */
+    .timeline {
+        position: relative;
+        padding-right: 25px;
+    }
+    
+    .timeline::before {
+        content: '';
+        position: absolute;
+        right: 8px;
+        top: 0;
+        bottom: 0;
+        width: 2px;
+        background: #e9ecef;
+    }
+    
+    .timeline-item {
+        position: relative;
+        padding-bottom: 20px;
+    }
+    
+    .timeline-item::before {
+        content: '';
+        position: absolute;
+        right: -21px;
+        top: 5px;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: white;
+        border: 3px solid {{ department.color|default('#667eea') }};
+    }
+    
+    .timeline-item:last-child {
+        padding-bottom: 0;
+    }
+    
+    .timeline-content {
+        background: #f8f9fa;
+        padding: 15px;
+        border-radius: 10px;
+    }
+    
+    .timeline-title {
+        font-weight: 600;
+        color: #1a1a2e;
+        font-size: 0.9rem;
+        margin-bottom: 5px;
+    }
+    
+    .timeline-meta {
+        font-size: 0.8rem;
+        color: #6c757d;
+    }
+    
+    /* Directive Items */
+    .directive-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 15px;
+        background: #f8f9fa;
+        border-radius: 10px;
+        margin-bottom: 10px;
+        border-right: 3px solid;
+        transition: all 0.3s ease;
+    }
+    
+    .directive-item:hover {
+        background: #e9ecef;
+    }
+    
+    .directive-pending { border-color: #ffc107; }
+    .directive-in_progress { border-color: #0d6efd; }
+    .directive-completed { border-color: #198754; }
+    
+    .directive-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.1rem;
+    }
+    
+    .directive-pending .directive-icon { background: rgba(255, 193, 7, 0.15); color: #ffc107; }
+    .directive-in_progress .directive-icon { background: rgba(13, 110, 253, 0.15); color: #0d6efd; }
+    .directive-completed .directive-icon { background: rgba(25, 135, 84, 0.15); color: #198754; }
+    
+    .directive-content {
+        flex: 1;
+    }
+    
+    .directive-title {
+        font-weight: 600;
+        color: #1a1a2e;
+        margin-bottom: 3px;
+        font-size: 0.9rem;
+    }
+    
+    .directive-meta {
+        font-size: 0.8rem;
+        color: #6c757d;
+    }
+    
+    /* Empty State */
+    .empty-state {
+        text-align: center;
+        padding: 40px 20px;
+        color: #6c757d;
+    }
+    
+    .empty-state i {
+        font-size: 3rem;
+        margin-bottom: 15px;
+        opacity: 0.5;
+        color: {{ department.color|default('#667eea') }};
+    }
+    
+    /* Quick Actions */
+    .quick-actions {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-top: 20px;
+        padding-top: 20px;
+        border-top: 1px solid #e9ecef;
+    }
+    
+    .action-btn {
+        padding: 10px 20px;
+        border-radius: 10px;
+        border: none;
+        background: {{ department.color|default('#667eea') }}11;
+        color: {{ department.color|default('#667eea') }};
+        font-weight: 500;
+        font-size: 0.9rem;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+    
+    .action-btn:hover {
+        background: {{ department.color|default('#667eea') }};
+        color: white;
+    }
+    
+    /* Back Button */
+    .back-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        color: #6c757d;
+        text-decoration: none;
+        font-size: 0.95rem;
+        margin-bottom: 20px;
+        transition: color 0.3s ease;
+    }
+    
+    .back-link:hover {
+        color: {{ department.color|default('#667eea') }};
+    }
+    
+    /* Responsive */
+    @media (max-width: 992px) {
+        .group-header-content {
+            flex-wrap: wrap;
+        }
+        
+        .group-header-stats {
+            width: 100%;
+            justify-content: center;
+            margin-top: 20px;
+        }
+    }
+    
+    @media (max-width: 768px) {
+        .dashboard-container {
+            padding: 15px;
+        }
+        
+        .group-header {
+            padding: 20px;
+        }
+        
+        .group-icon-large {
+            width: 60px;
+            height: 60px;
+            font-size: 1.8rem;
+        }
+        
+        .group-info h1 {
+            font-size: 1.4rem;
+        }
+        
+        .quick-stats {
+            grid-template-columns: repeat(2, 1fr);
+        }
+        
+        .team-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <div class="container-fluid">
+        <!-- Back Link -->
+        <a href="{{ url_for('dashboard.index') }}" class="back-link">
+            <i class="bi bi-arrow-right"></i>
+            العودة للوحة الرئيسية
+        </a>
+        
+        <!-- Group Header -->
+        <div class="group-header">
+            <div class="group-header-content">
+                <div class="group-icon-large">
+                    <i class="bi bi-{{ department.icon|default('folder') }}"></i>
+                </div>
+                <div class="group-info">
+                    <h1>{{ department.name }}</h1>
+                    <div class="group-meta">
+                        <span><i class="bi bi-person-circle ms-1"></i> {{ department.manager.full_name if department.manager else 'غير محدد' }}</span>
+                        <span><i class="bi bi-people ms-1"></i> {{ members|length }} عضو</span>
+                        <span><i class="bi bi-hash ms-1"></i> {{ department.code }}</span>
+                    </div>
+                </div>
+                <div class="group-header-stats">
+                    <div class="header-stat">
+                        <div class="header-stat-value">{{ metrics.competence_percentage|default(0)|round|int }}%</div>
+                        <div class="header-stat-label">الجاهزية</div>
+                    </div>
+                    <div class="header-stat">
+                        <div class="header-stat-value">{{ metrics.completion_percentage|default(0)|round|int }}%</div>
+                        <div class="header-stat-label">الإنجاز</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Quick Stats -->
+        <div class="quick-stats">
+            <div class="stat-card">
+                <div class="stat-icon" style="background: rgba(102, 126, 234, 0.15); color: #667eea;">
+                    <i class="bi bi-clipboard-check"></i>
+                </div>
+                <div class="stat-info">
+                    <div class="stat-value">{{ duties|length|default(0) }}</div>
+                    <div class="stat-label">الواجبات</div>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon" style="background: rgba(32, 201, 151, 0.15); color: #20c997;">
+                    <i class="bi bi-check2-all"></i>
+                </div>
+                <div class="stat-info">
+                    <div class="stat-value">{{ completed_duties|default(0) }}</div>
+                    <div class="stat-label">مكتمل</div>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon" style="background: rgba(255, 193, 7, 0.15); color: #ffc107;">
+                    <i class="bi bi-hourglass-split"></i>
+                </div>
+                <div class="stat-info">
+                    <div class="stat-value">{{ pending_duties|default(0) }}</div>
+                    <div class="stat-label">قيد التنفيذ</div>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon" style="background: rgba(220, 53, 69, 0.15); color: #dc3545;">
+                    <i class="bi bi-exclamation-triangle"></i>
+                </div>
+                <div class="stat-info">
+                    <div class="stat-value">{{ delayed_duties|default(0) }}</div>
+                    <div class="stat-label">متأخر</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row">
+            <!-- Main Content -->
+            <div class="col-lg-8">
+                <!-- Duties Section -->
+                <div class="section-card">
+                    <div class="section-header">
+                        <h3 class="section-title">
+                            <i class="bi bi-list-task"></i>
+                            الواجبات والمشاريع
+                        </h3>
+                        <span class="section-badge">{{ duties|length|default(0) }}</span>
+                    </div>
+                    
+                    {% if duties %}
+                        {% for duty in duties[:5] %}
+                        <div class="duty-item" onclick="location.href='{{ url_for('duties.duty_detail', duty_id=duty.id) }}'">
+                            <div class="duty-icon">
+                                <i class="bi bi-folder-check"></i>
+                            </div>
+                            <div class="duty-content">
+                                <div class="duty-title">{{ duty.name }}</div>
+                                <div class="duty-meta">
+                                    {{ duty.code }} • {{ duty.projects|length|default(0) }} مشروع
+                                </div>
+                            </div>
+                            <div class="duty-progress">
+                                <div class="progress">
+                                    <div class="progress-bar" style="width: {{ duty.completion_percentage|default(0) }}%;"></div>
+                                </div>
+                                <div class="duty-percentage">{{ duty.completion_percentage|default(0)|round|int }}%</div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                        
+                        {% if duties|length > 5 %}
+                        <div class="text-center mt-3">
+                            <a href="{{ url_for('duties.index') }}?dept={{ department.id }}" class="action-btn">
+                                <i class="bi bi-list"></i>
+                                عرض الكل ({{ duties|length }})
+                            </a>
+                        </div>
+                        {% endif %}
+                    {% else %}
+                        <div class="empty-state">
+                            <i class="bi bi-clipboard-x"></i>
+                            <p>لا توجد واجبات حالياً</p>
+                        </div>
+                    {% endif %}
+                    
+                    <div class="quick-actions">
+                        <button class="action-btn" onclick="location.href='{{ url_for('duties.index') }}?dept={{ department.id }}'">
+                            <i class="bi bi-eye"></i>
+                            عرض الواجبات
+                        </button>
+                        {% if can_edit %}
+                        <button class="action-btn">
+                            <i class="bi bi-plus-lg"></i>
+                            إضافة واجب
+                        </button>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <!-- Directives Section -->
+                {% if directives %}
+                <div class="section-card">
+                    <div class="section-header">
+                        <h3 class="section-title">
+                            <i class="bi bi-megaphone"></i>
+                            التوجيهات
+                        </h3>
+                        <span class="section-badge">{{ directives|length }}</span>
+                    </div>
+                    
+                    {% for directive in directives[:4] %}
+                    <div class="directive-item directive-{{ directive.status }}">
+                        <div class="directive-icon">
+                            {% if directive.status == 'pending' %}
+                                <i class="bi bi-hourglass-split"></i>
+                            {% elif directive.status == 'in_progress' %}
+                                <i class="bi bi-arrow-repeat"></i>
+                            {% else %}
+                                <i class="bi bi-check-lg"></i>
+                            {% endif %}
+                        </div>
+                        <div class="directive-content">
+                            <div class="directive-title">{{ directive.title }}</div>
+                            <div class="directive-meta">
+                                {{ directive.due_date.strftime('%Y/%m/%d') if directive.due_date else 'غير محدد' }}
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+            
+            <!-- Sidebar -->
+            <div class="col-lg-4">
+                <!-- Team Members -->
+                <div class="section-card">
+                    <div class="section-header">
+                        <h3 class="section-title">
+                            <i class="bi bi-people"></i>
+                            أعضاء الفريق
+                        </h3>
+                        <span class="section-badge">{{ members|length }}</span>
+                    </div>
+                    
+                    {% if members %}
+                    <div class="team-grid">
+                        {% for member in members[:6] %}
+                        <div class="team-member-card">
+                            <div class="member-avatar">
+                                {{ member.full_name[0] if member.full_name else 'م' }}
+                            </div>
+                            <div class="member-info">
+                                <div class="member-name">{{ member.full_name }}</div>
+                                <div class="member-role">{{ member.role.display_name if member.role else 'عضو' }}</div>
+                            </div>
+                            <div class="member-status {% if not member.is_active %}offline{% endif %}"></div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    
+                    {% if members|length > 6 %}
+                    <div class="text-center mt-3">
+                        <button class="action-btn">
+                            <i class="bi bi-people"></i>
+                            عرض الكل ({{ members|length }})
+                        </button>
+                    </div>
+                    {% endif %}
+                    {% else %}
+                    <div class="empty-state">
+                        <i class="bi bi-people"></i>
+                        <p>لا يوجد أعضاء</p>
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <!-- Activity Timeline -->
+                <div class="section-card">
+                    <div class="section-header">
+                        <h3 class="section-title">
+                            <i class="bi bi-clock-history"></i>
+                            آخر النشاطات
+                        </h3>
+                    </div>
+                    
+                    {% if activities %}
+                    <div class="timeline">
+                        {% for activity in activities[:5] %}
+                        <div class="timeline-item">
+                            <div class="timeline-content">
+                                <div class="timeline-title">{{ activity.description }}</div>
+                                <div class="timeline-meta">
+                                    {{ activity.user.full_name if activity.user else 'غير محدد' }} • 
+                                    {{ activity.created_at.strftime('%m/%d %H:%M') if activity.created_at else '' }}
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="empty-state">
+                        <i class="bi bi-clock"></i>
+                        <p>لا توجد نشاطات حديثة</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Animate stats on load
+    const statValues = document.querySelectorAll('.stat-value, .header-stat-value');
+    statValues.forEach(elem => {
+        const value = parseInt(elem.textContent);
+        if (!isNaN(value)) {
+            animateValue(elem, 0, value, 800);
+        }
+    });
+});
+
+function animateValue(elem, start, end, duration) {
+    const range = end - start;
+    const startTime = performance.now();
+    
+    function updateValue(currentTime) {
+        const elapsed = currentTime - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        const current = Math.floor(start + range * easeOutQuart(progress));
+        elem.textContent = current;
+        
+        if (progress < 1) {
+            requestAnimationFrame(updateValue);
+        } else {
+            elem.textContent = end;
+        }
+    }
+    
+    requestAnimationFrame(updateValue);
+}
+
+function easeOutQuart(x) {
+    return 1 - Math.pow(1 - x, 4);
+}
+</script>
+{% endblock %}

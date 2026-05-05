@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block title %}طلب صلاحية جديدة{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0"><i class="bi bi-key ms-2"></i>طلب صلاحية</h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST" class="needs-validation" novalidate>
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold">نوع الصلاحية <span class="text-danger">*</span></label>
+                            <select name="permission" class="form-select" required>
+                                <option value="">اختر الصلاحية المطلوبة...</option>
+                                <option value="department_view">عرض بيانات المجموعة</option>
+                                <option value="department_edit">تعديل بيانات المجموعة</option>
+                                <option value="report_access">الوصول للتقارير</option>
+                                <option value="data_export">تصدير البيانات</option>
+                                <option value="user_management">إدارة المستخدمين</option>
+                                <option value="other">أخرى (حدد في المبرر)</option>
+                            </select>
+                            <div class="invalid-feedback">يرجى اختيار نوع الصلاحية.</div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold">النطاق (اختياري)</label>
+                            <input type="text" name="scope" class="form-control" 
+                                   placeholder="مثلاً: مجموعة محددة، مشروع، أو مورد">
+                            <small class="text-muted">حدد إذا كان لمنطقة أو مورد معين.</small>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold">المبرر <span class="text-danger">*</span></label>
+                            <textarea name="justification" class="form-control" rows="5" 
+                                      required minlength="20" 
+                                      placeholder="يرجى توضيح سبب حاجتك لهذه الصلاحية وكيف ستستخدمها..."></textarea>
+                            <small class="text-muted">
+                                قدم شرحاً تفصيلياً (20 حرفاً على الأقل). 
+                                ستتم مراجعته من قبل الموافقين.
+                            </small>
+                            <div class="invalid-feedback">يرجى تقديم مبرر تفصيلي.</div>
+                        </div>
+                        
+                        <div class="alert alert-info mb-4">
+                            <i class="bi bi-info-circle ms-2"></i>
+                            <strong>مسار الموافقة:</strong> سيتم مراجعة طلبك من قبل:
+                            <ol class="mb-0 mt-2">
+                                <li>قائد فريقك</li>
+                                <li>مسؤول مجموعتك</li>
+                                <li>مسؤول النظام (إذا كان عبر مجموعات)</li>
+                            </ol>
+                        </div>
+                        
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-send ms-1"></i>إرسال الطلب
+                            </button>
+                            <a href="{{ url_for('access.my_requests') }}" class="btn btn-outline-secondary">
+                                إلغاء
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
