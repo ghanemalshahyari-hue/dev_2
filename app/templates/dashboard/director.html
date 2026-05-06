@@ -70,6 +70,14 @@
         filter: drop-shadow(0 0 8px rgba(201, 124, 93, 0.4));
     }
 
+    .center-hub-image {
+        width: 80px;
+        height: 80px;
+        object-fit: contain;
+        margin-bottom: 0.3rem;
+        filter: drop-shadow(0 0 8px rgba(201, 124, 93, 0.4));
+    }
+
     .center-hub-name {
         font-size: 0.82rem;
         font-weight: 800;
@@ -396,7 +404,7 @@
             {% if central %}
             <div class="center-hub" id="centerHub">
                 <div class="center-hub-card glass-card">
-                    <i class="{{ central.icon }} center-hub-icon"></i>
+                    <img src="{{ url_for('static', filename='img/uae-map.png') }}" alt="UAE Map" class="center-hub-image">
                     <div class="center-hub-name">{{ central.name }}</div>
                     <div class="center-hub-badge">المحور الاستراتيجي</div>
                     
