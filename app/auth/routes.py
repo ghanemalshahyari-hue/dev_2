@@ -129,17 +129,8 @@ def logout():
 # ── Helpers ────────────────────────────────────────────────────────────────────
 
 def _role_dashboard() -> str:
-    """Return the URL for the current user's default dashboard."""
-    role = current_user.role_code if current_user.is_authenticated else 'USER'
-    mapping = {
-        'DEVELOPER':   url_for('dashboard.developer'),
-        'DIRECTOR':    url_for('dashboard.director'),
-        'SECRETARY':   url_for('dashboard.secretary'),
-        'DEPUTY':      url_for('dashboard.deputy'),
-        'GROUP_ADMIN': url_for('dashboard.group_admin'),
-        'USER':        url_for('dashboard.user_view'),
-    }
-    return mapping.get(role, url_for('dashboard.user_view'))
+    """Return the shared landing screen after login."""
+    return url_for('dashboard.index')
 
 
 def _provision_user(ldap_user) -> User:

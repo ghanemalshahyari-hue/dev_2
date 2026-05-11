@@ -1,0 +1,741 @@
+{% extends "base.html" %}
+
+{% block title %}تقرير الأداء الربع سنوي — {{ app_name }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .quarterly-page {
+        min-height: calc(100vh - var(--navbar-height));
+        padding: 1.5rem;
+        background:
+            linear-gradient(135deg, rgba(255, 255, 255, 0.78), rgba(239, 246, 250, 0.74)),
+            var(--bg-base);
+    }
+
+    .quarterly-shell {
+        max-width: 1440px;
+        margin: 0 auto;
+        display: grid;
+        gap: 1rem;
+    }
+
+    .report-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        background: var(--bg-surface);
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        box-shadow: var(--shadow-card);
+        padding: 1.15rem 1.25rem;
+    }
+
+    .report-title {
+        font-size: clamp(1.35rem, 2vw, 2rem);
+        font-weight: 900;
+        color: var(--text-primary);
+        margin: 0;
+    }
+
+    .report-subtitle {
+        color: var(--text-secondary);
+        margin: 0.35rem 0 0;
+    }
+
+    .report-meta {
+        display: flex;
+        align-items: center;
+        gap: 0.55rem;
+        flex-wrap: wrap;
+    }
+
+    .report-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        min-height: 34px;
+        padding: 0.35rem 0.7rem;
+        border-radius: 999px;
+        border: 1px solid rgba(221, 208, 184, 0.9);
+        background: #fff;
+        color: var(--text-secondary);
+        font-weight: 800;
+        font-size: 0.82rem;
+        white-space: nowrap;
+    }
+
+    .report-ticker {
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+        background: #2E2010;
+        color: #FDF9F3;
+        border: 1px solid rgba(194, 146, 64, 0.35);
+        border-radius: 8px;
+        padding: 0.72rem 1rem;
+    }
+
+    .report-ticker-title {
+        color: #F6D08A;
+        font-weight: 900;
+        flex: 0 0 auto;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+    }
+
+    .report-ticker-window {
+        overflow: hidden;
+        min-width: 0;
+        flex: 1;
+    }
+
+    .report-ticker-track {
+        display: inline-flex;
+        gap: 2.4rem;
+        white-space: nowrap;
+        animation: reportTicker 30s linear infinite;
+    }
+
+    .report-ticker-track span {
+        color: rgba(253, 249, 243, 0.88);
+        font-size: 0.92rem;
+    }
+
+    @keyframes reportTicker {
+        from { transform: translateX(-50%); }
+        to { transform: translateX(0); }
+    }
+
+    .quarterly-layout {
+        display: grid;
+        grid-template-columns: minmax(280px, 360px) minmax(0, 1fr);
+        gap: 1rem;
+        align-items: stretch;
+    }
+
+    .report-explainer,
+    .report-network-panel {
+        background: var(--bg-surface);
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        box-shadow: var(--shadow-card);
+    }
+
+    .report-explainer {
+        grid-column: 1;
+        padding: 1.2rem;
+        display: grid;
+        align-content: start;
+        gap: 1rem;
+    }
+
+    .report-explainer-badge {
+        width: 54px;
+        height: 54px;
+        border-radius: 8px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(201, 124, 93, 0.12);
+        color: var(--primary);
+        font-size: 1.45rem;
+    }
+
+    .report-explainer h2 {
+        font-size: 1.1rem;
+        font-weight: 900;
+        margin: 0;
+        color: var(--text-primary);
+    }
+
+    .report-explainer p {
+        color: var(--text-secondary);
+        line-height: 1.85;
+        margin: 0;
+    }
+
+    .explain-note {
+        border-inline-start: 4px solid var(--primary);
+        background: rgba(201, 124, 93, 0.08);
+        padding: 0.9rem;
+        border-radius: 8px;
+        color: var(--text-secondary);
+        font-weight: 700;
+    }
+
+    .explainer-stats {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 0.65rem;
+    }
+
+    .explainer-stat {
+        border: 1px solid rgba(221, 208, 184, 0.82);
+        border-radius: 8px;
+        padding: 0.8rem;
+        background: #fff;
+    }
+
+    .explainer-stat span {
+        color: var(--text-muted);
+        font-size: 0.76rem;
+        font-weight: 800;
+        display: block;
+    }
+
+    .explainer-stat strong {
+        display: block;
+        margin-top: 0.2rem;
+        font-size: 1.25rem;
+        color: var(--text-primary);
+    }
+
+    .report-network-panel {
+        grid-column: 2;
+        min-width: 0;
+        padding: 0.75rem;
+        overflow: hidden;
+    }
+
+    .network-stage {
+        position: relative;
+        min-height: 720px;
+        border-radius: 8px;
+        background:
+            radial-gradient(circle at center, rgba(201, 124, 93, 0.10) 0, rgba(201, 124, 93, 0.04) 11%, transparent 24%),
+            linear-gradient(180deg, #fff 0%, #FCFAF5 100%);
+        overflow: hidden;
+    }
+
+    .network-lines {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 0;
+        pointer-events: none;
+    }
+
+    .network-lines line {
+        stroke-width: 1.5;
+        stroke-dasharray: 7 6;
+    }
+
+    .network-lines ellipse {
+        stroke: rgba(74, 122, 155, 0.13);
+        stroke-width: 1;
+        stroke-dasharray: 5 8;
+        fill: none;
+    }
+
+    .network-center {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 148px;
+        height: 148px;
+        transform: translate(-50%, -50%);
+        z-index: 4;
+        border-radius: 50%;
+        background: #FFFDF9;
+        border: 2px solid var(--primary);
+        box-shadow: 0 16px 46px rgba(201, 124, 93, 0.22);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        padding: 0.9rem;
+    }
+
+    .network-center img {
+        width: 72px;
+        height: 54px;
+        object-fit: contain;
+        margin-bottom: 0.25rem;
+    }
+
+    .network-center strong {
+        display: block;
+        font-size: 0.76rem;
+        line-height: 1.45;
+        color: var(--text-primary);
+    }
+
+    .network-center span {
+        display: inline-flex;
+        margin-top: 0.3rem;
+        border: 1px solid rgba(201, 124, 93, 0.35);
+        border-radius: 999px;
+        padding: 0.12rem 0.48rem;
+        font-size: 0.64rem;
+        color: var(--text-secondary);
+        font-weight: 800;
+    }
+
+    .report-node {
+        position: absolute;
+        width: min(290px, 28vw);
+        transform: translate(-50%, -50%);
+        z-index: 3;
+        text-align: center;
+    }
+
+    .report-node-card {
+        position: relative;
+        min-height: 132px;
+        border: 1px solid var(--node-color, var(--primary));
+        background: rgba(255, 255, 255, 0.96);
+        border-radius: 8px;
+        padding: 1rem 1rem 0.9rem;
+        box-shadow: 0 10px 28px rgba(80, 40, 10, 0.10);
+        transition: transform var(--transition), box-shadow var(--transition);
+    }
+
+    .report-node-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 16px 36px rgba(80, 40, 10, 0.16);
+    }
+
+    .node-logo {
+        position: absolute;
+        top: -20px;
+        width: 54px;
+        height: 54px;
+        border-radius: 50%;
+        padding: 4px;
+        background: #fff;
+        border: 1px solid rgba(221, 208, 184, 0.85);
+        box-shadow: 0 8px 18px rgba(80, 40, 10, 0.14);
+        object-fit: contain;
+    }
+
+    .report-node.node-left .node-logo {
+        left: -22px;
+    }
+
+    .report-node:not(.node-left) .node-logo {
+        right: -22px;
+    }
+
+    .node-number {
+        width: 48px;
+        height: 48px;
+        margin: -0.25rem auto 0.7rem;
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: var(--node-color, var(--primary));
+        color: #fff;
+        border: 3px solid #fff;
+        box-shadow: 0 8px 20px rgba(80, 40, 10, 0.16);
+        font-size: 1.1rem;
+        font-weight: 900;
+    }
+
+    .node-title {
+        color: #1F160C;
+        font-size: 1rem;
+        font-weight: 900;
+        line-height: 1.45;
+        margin-bottom: 0.25rem;
+    }
+
+    .node-desc {
+        color: var(--text-secondary);
+        font-size: 0.82rem;
+        line-height: 1.55;
+        margin: 0 0 0.55rem;
+    }
+
+    .node-duty {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        border: 1px solid rgba(201, 124, 93, 0.34);
+        border-radius: 999px;
+        padding: 0.25rem 0.65rem;
+        color: var(--text-primary);
+        background: rgba(201, 124, 93, 0.06);
+        font-size: 0.76rem;
+        font-weight: 800;
+    }
+
+    .node-owner {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.35rem;
+        margin-top: 0.55rem;
+        color: var(--primary);
+        font-size: 0.78rem;
+        font-weight: 900;
+    }
+
+    .people-section {
+        background: var(--bg-surface);
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        box-shadow: var(--shadow-card);
+        padding: 1.2rem;
+    }
+
+    .people-head {
+        display: flex;
+        align-items: end;
+        justify-content: space-between;
+        gap: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .people-head h2 {
+        font-size: 1.1rem;
+        font-weight: 900;
+        margin: 0;
+        color: var(--text-primary);
+    }
+
+    .people-head p {
+        color: var(--text-secondary);
+        margin: 0.3rem 0 0;
+    }
+
+    .people-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 0.9rem;
+    }
+
+    .person-card {
+        border: 1px solid rgba(221, 208, 184, 0.86);
+        border-radius: 8px;
+        overflow: hidden;
+        background: #fff;
+    }
+
+    .person-photo {
+        aspect-ratio: 4 / 3;
+        display: grid;
+        place-items: center;
+        background:
+            linear-gradient(135deg, rgba(74, 122, 155, 0.12), rgba(201, 124, 93, 0.12)),
+            #FDF9F3;
+        color: var(--text-muted);
+        font-size: 2.4rem;
+    }
+
+    .person-copy {
+        padding: 0.9rem;
+    }
+
+    .person-copy h3 {
+        font-size: 0.95rem;
+        font-weight: 900;
+        margin: 0 0 0.35rem;
+        color: var(--text-primary);
+    }
+
+    .person-copy p {
+        color: var(--text-secondary);
+        font-size: 0.83rem;
+        line-height: 1.65;
+        margin: 0;
+    }
+
+    @media (max-width: 1180px) {
+        .quarterly-layout {
+            grid-template-columns: 1fr;
+        }
+
+        .report-explainer,
+        .report-network-panel {
+            grid-column: auto;
+        }
+
+        .report-explainer {
+            order: 2;
+        }
+
+        .report-network-panel {
+            order: 1;
+        }
+
+        .people-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+    }
+
+    @media (max-width: 860px) {
+        .quarterly-page {
+            padding: 1rem;
+        }
+
+        .report-header,
+        .people-head {
+            align-items: flex-start;
+            flex-direction: column;
+        }
+
+        .network-stage {
+            min-height: auto;
+            padding: 1rem;
+            display: grid;
+            gap: 0.85rem;
+        }
+
+        .network-lines {
+            display: none;
+        }
+
+        .network-center,
+        .report-node {
+            position: static;
+            transform: none;
+            width: 100%;
+        }
+
+        .network-center {
+            height: auto;
+            min-height: 132px;
+            border-radius: 8px;
+        }
+
+        .report-node-card {
+            min-height: 0;
+        }
+
+        .node-logo {
+            top: 0.75rem;
+            right: auto;
+            left: 0.75rem;
+        }
+    }
+
+    @media (max-width: 600px) {
+        .report-meta,
+        .explainer-stats,
+        .people-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .people-grid {
+            display: grid;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="quarterly-page">
+    <div class="quarterly-shell">
+        <section class="report-header" aria-label="عنوان التقرير">
+            <div>
+                <h1 class="report-title">تقرير الأداء الربع سنوي</h1>
+                <p class="report-subtitle">عرض المفاهيم المشتركة حول المحور الاستراتيجي مع مساحة للشرح والصور.</p>
+            </div>
+            <div class="report-meta">
+                <span class="report-chip"><i class="bi bi-diagram-3"></i>{{ report_departments|length }} مفاهيم</span>
+                <span class="report-chip"><i class="bi bi-graph-up-arrow"></i>{{ averages.completion|default(0) }}% إنجاز</span>
+                <span class="report-chip"><i class="bi bi-shield-check"></i>{{ averages.competence|default(0) }}% جاهزية</span>
+            </div>
+        </section>
+
+        <section class="report-ticker" aria-label="الشريط المتحرك">
+            <span class="report-ticker-title"><i class="bi bi-broadcast"></i>موجز الربع</span>
+            <div class="report-ticker-window">
+                <div class="report-ticker-track">
+                    <span>متابعة تنفيذ الواجبات الرئيسية حسب المفهوم المشترك.</span>
+                    <span>إظهار المسؤول أسفل كل بطاقة لتسهيل القراءة والمتابعة.</span>
+                    <span>مساحة الصور أسفل التقرير جاهزة لإضافة الأشخاص والشروحات.</span>
+                    <span>متابعة تنفيذ الواجبات الرئيسية حسب المفهوم المشترك.</span>
+                    <span>إظهار المسؤول أسفل كل بطاقة لتسهيل القراءة والمتابعة.</span>
+                    <span>مساحة الصور أسفل التقرير جاهزة لإضافة الأشخاص والشروحات.</span>
+                </div>
+            </div>
+        </section>
+
+        <section class="quarterly-layout" aria-label="محتوى التقرير">
+            <aside class="report-explainer">
+                <span class="report-explainer-badge"><i class="bi bi-file-earmark-text"></i></span>
+                <div>
+                    <h2>شرح الكلمة</h2>
+                    <p>
+                        يكتب هنا شرح الكلمة أو الملخص التنفيذي للتقرير الربع سنوي. يمكن استخدام هذا الصندوق لشرح محور الأداء، أبرز النتائج، أو الرسالة المطلوب إبرازها للقيادة.
+                    </p>
+                </div>
+                <div class="explain-note">
+                    هذا الصندوق موضوع في الجهة اليسرى من الشاشة على الشاشات الكبيرة، ويتحول تلقائياً أسفل المخطط في الشاشات الصغيرة.
+                </div>
+                <div class="explainer-stats">
+                    <div class="explainer-stat">
+                        <span>عدد المفاهيم</span>
+                        <strong>{{ report_departments|length }}</strong>
+                    </div>
+                    <div class="explainer-stat">
+                        <span>الواجبات</span>
+                        <strong>{{ report_departments|sum(attribute='duties_count') }}</strong>
+                    </div>
+                </div>
+            </aside>
+
+            <div class="report-network-panel">
+                <div class="network-stage" id="quarterlyNetwork">
+                    <svg class="network-lines" id="quarterlyLines" aria-hidden="true"></svg>
+
+                    <div class="network-center" id="quarterlyCenter">
+                        <div>
+                            <img src="{{ url_for('static', filename='img/uae-map.png') }}" alt="">
+                            <strong>{{ central_department.name if central_department else 'الاستراتيجية العسكرية' }}</strong>
+                            <span>المحور الاستراتيجي</span>
+                        </div>
+                    </div>
+
+                    {% for dept in report_departments %}
+                    {% set number = dept.concept_number or loop.index %}
+                    <div class="report-node" style="--node-color: {{ dept.color }};" data-color="{{ dept.color }}">
+                        <div class="report-node-card">
+                            {% if dept.logo_file %}
+                            <img class="node-logo" src="{{ url_for('static', filename='img/' + dept.logo_file) }}" alt="">
+                            {% else %}
+                            <img class="node-logo" src="{{ url_for('static', filename='img/logo.svg') }}" alt="">
+                            {% endif %}
+                            <span class="node-number">{{ number }}</span>
+                            <div class="node-title">المفهوم المشترك رقم ({{ number }})</div>
+                            <p class="node-desc">{{ dept.description or 'الشرح هنا' }}</p>
+                            <span class="node-duty"><i class="bi bi-list-task"></i>عدد الواجبات: {{ dept.duties_count|default(0) }}</span>
+                        </div>
+                        <span class="node-owner">
+                            <i class="bi bi-person-fill"></i>{{ dept.responsible_person or 'رئيس هيئة' }}
+                        </span>
+                    </div>
+                    {% else %}
+                    <div class="report-node">
+                        <div class="report-node-card">
+                            <span class="node-number">1</span>
+                            <div class="node-title">المفهوم المشترك رقم (1)</div>
+                            <p class="node-desc">الشرح هنا</p>
+                            <span class="node-duty"><i class="bi bi-list-task"></i>عدد الواجبات: 0</span>
+                        </div>
+                        <span class="node-owner"><i class="bi bi-person-fill"></i>رئيس هيئة</span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </section>
+
+        <section class="people-section" aria-label="صور الأشخاص">
+            <div class="people-head">
+                <div>
+                    <h2>صور الأشخاص</h2>
+                    <p>مساحة مخصصة لوضع صورة كل شخص مع شرح مختصر أسفل الصورة.</p>
+                </div>
+                <span class="report-chip"><i class="bi bi-images"></i>قابل للتحديث</span>
+            </div>
+
+            <div class="people-grid">
+                <article class="person-card">
+                    <div class="person-photo"><i class="bi bi-person-bounding-box"></i></div>
+                    <div class="person-copy">
+                        <h3>اسم الشخص</h3>
+                        <p>شرح الصورة يكتب هنا، مثل المنصب أو الدور في التقرير الربع سنوي.</p>
+                    </div>
+                </article>
+                <article class="person-card">
+                    <div class="person-photo"><i class="bi bi-person-bounding-box"></i></div>
+                    <div class="person-copy">
+                        <h3>اسم الشخص</h3>
+                        <p>شرح الصورة يكتب هنا، ويمكن استبدال المساحة بصورة فعلية لاحقاً.</p>
+                    </div>
+                </article>
+                <article class="person-card">
+                    <div class="person-photo"><i class="bi bi-person-bounding-box"></i></div>
+                    <div class="person-copy">
+                        <h3>اسم الشخص</h3>
+                        <p>شرح الصورة يكتب هنا، مع إبقاء البطاقة بنفس الحجم والترتيب.</p>
+                    </div>
+                </article>
+                <article class="person-card">
+                    <div class="person-photo"><i class="bi bi-person-bounding-box"></i></div>
+                    <div class="person-copy">
+                        <h3>اسم الشخص</h3>
+                        <p>شرح الصورة يكتب هنا، لعرض الملاحظات أو الإنجازات المرتبطة بالشخص.</p>
+                    </div>
+                </article>
+            </div>
+        </section>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    (function () {
+        const stage = document.getElementById('quarterlyNetwork');
+        const svg = document.getElementById('quarterlyLines');
+        const center = document.getElementById('quarterlyCenter');
+        if (!stage || !svg || !center) return;
+
+        const nodes = Array.from(stage.querySelectorAll('.report-node'));
+        if (!nodes.length) return;
+
+        function transparentColor(color) {
+            if (!color || color.charAt(0) !== '#') return 'rgba(74, 122, 155, 0.22)';
+            return color + '55';
+        }
+
+        function layoutNetwork() {
+            const width = stage.clientWidth;
+            const height = stage.clientHeight;
+
+            if (window.matchMedia('(max-width: 860px)').matches) {
+                svg.innerHTML = '';
+                nodes.forEach(function (node) {
+                    node.classList.remove('node-left');
+                });
+                return;
+            }
+
+            const cx = width / 2;
+            const cy = height / 2;
+            const radiusX = Math.min(width * 0.37, 430);
+            const radiusY = Math.min(height * 0.34, 260);
+            const startAngle = -Math.PI / 2;
+
+            svg.setAttribute('viewBox', '0 0 ' + width + ' ' + height);
+            svg.innerHTML = '';
+
+            const orbit = document.createElementNS('http://www.w3.org/2000/svg', 'ellipse');
+            orbit.setAttribute('cx', cx);
+            orbit.setAttribute('cy', cy);
+            orbit.setAttribute('rx', radiusX);
+            orbit.setAttribute('ry', radiusY);
+            svg.appendChild(orbit);
+
+            nodes.forEach(function (node, index) {
+                const angle = startAngle + (Math.PI * 2 * index / nodes.length);
+                const x = cx + radiusX * Math.cos(angle);
+                const y = cy + radiusY * Math.sin(angle);
+                const color = node.dataset.color || '#4A7A9B';
+
+                node.style.left = x + 'px';
+                node.style.top = y + 'px';
+                node.classList.toggle('node-left', x < cx);
+
+                const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                line.setAttribute('x1', cx);
+                line.setAttribute('y1', cy);
+                line.setAttribute('x2', x);
+                line.setAttribute('y2', y);
+                line.setAttribute('stroke', transparentColor(color));
+                svg.appendChild(line);
+            });
+        }
+
+        layoutNetwork();
+        window.addEventListener('resize', layoutNetwork);
+    })();
+</script>
+{% endblock %}

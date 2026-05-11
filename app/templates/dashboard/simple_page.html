@@ -1,0 +1,173 @@
+{% extends "base.html" %}
+
+{% block title %}{{ page_title }} — {{ app_name }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .simple-page {
+        min-height: calc(100vh - var(--navbar-height));
+        padding: 1.5rem;
+        background:
+            linear-gradient(135deg, rgba(255, 255, 255, 0.70), rgba(239, 246, 250, 0.76)),
+            var(--bg-base);
+    }
+
+    .simple-shell {
+        max-width: 1120px;
+        margin: 0 auto;
+        display: grid;
+        gap: 1rem;
+    }
+
+    .simple-panel {
+        background: var(--bg-surface);
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        box-shadow: var(--shadow-card);
+        padding: 1.35rem;
+    }
+
+    .simple-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+    }
+
+    .simple-icon {
+        width: 54px;
+        height: 54px;
+        border-radius: 8px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(74, 122, 155, 0.10);
+        color: var(--info);
+        font-size: 1.55rem;
+        flex: 0 0 auto;
+    }
+
+    .simple-title {
+        font-size: 1.45rem;
+        font-weight: 800;
+        margin: 0;
+        color: var(--text-primary);
+    }
+
+    .simple-desc {
+        color: var(--text-secondary);
+        margin: 0.45rem 0 0;
+        max-width: 760px;
+    }
+
+    .simple-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 0.8rem;
+    }
+
+    .simple-dept {
+        border: 1px solid rgba(221, 208, 184, 0.78);
+        border-radius: 8px;
+        padding: 0.9rem;
+        background: #fff;
+        display: grid;
+        gap: 0.45rem;
+    }
+
+    .simple-dept-head {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        min-width: 0;
+    }
+
+    .simple-dept-color {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: var(--dept-color, var(--primary));
+        flex: 0 0 auto;
+    }
+
+    .simple-dept-title {
+        font-weight: 800;
+        color: var(--text-primary);
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .simple-dept-meta {
+        color: var(--text-muted);
+        font-size: 0.82rem;
+        margin: 0;
+    }
+
+    @media (max-width: 900px) {
+        .simple-head {
+            align-items: flex-start;
+            flex-direction: column;
+        }
+
+        .simple-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+    }
+
+    @media (max-width: 600px) {
+        .simple-page {
+            padding: 1rem;
+        }
+
+        .simple-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="simple-page">
+    <div class="simple-shell">
+        <section class="simple-panel">
+            <div class="simple-head">
+                <div class="d-flex align-items-center gap-3">
+                    <span class="simple-icon"><i class="bi {{ page_icon }}"></i></span>
+                    <div>
+                        <h1 class="simple-title">{{ page_title }}</h1>
+                        <p class="simple-desc">{{ page_description }}</p>
+                    </div>
+                </div>
+                {% if action_url %}
+                <a class="btn btn-primary" href="{{ action_url }}">
+                    <i class="bi bi-arrow-left-circle me-2"></i>{{ action_label }}
+                </a>
+                {% endif %}
+            </div>
+        </section>
+
+        <section class="simple-panel">
+            <div class="d-flex align-items-center justify-content-between gap-3 mb-3">
+                <h2 class="h6 fw-bold mb-0">المجموعات المرتبطة</h2>
+                <span class="badge bg-secondary">{{ departments|length }}</span>
+            </div>
+            <div class="simple-grid">
+                {% for dept in departments %}
+                <article class="simple-dept" style="--dept-color: {{ dept.color }};">
+                    <div class="simple-dept-head">
+                        <span class="simple-dept-color"></span>
+                        <span class="simple-dept-title">{{ dept.name }}</span>
+                    </div>
+                    <p class="simple-dept-meta">
+                        {{ dept.responsible_person or 'لم يحدد المسؤول' }} · {{ dept.duties_count|default(0) }} واجب
+                    </p>
+                </article>
+                {% else %}
+                <p class="text-muted mb-0">لا توجد بيانات لعرضها حالياً.</p>
+                {% endfor %}
+            </div>
+        </section>
+    </div>
+</div>
+{% endblock %}

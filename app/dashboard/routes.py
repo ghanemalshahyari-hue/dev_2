@@ -9,7 +9,7 @@ User      → Personal view + access request
 Developer → Full dev panel (all views available)
 """
 
-from flask import render_template, redirect, url_for, abort
+from flask import render_template, url_for, abort
 from flask_login import login_required, current_user
 
 from app.dashboard import dashboard_bp
@@ -23,17 +23,81 @@ from app.models.role import PERMISSIONS
 @dashboard_bp.route('/')
 @login_required
 def index():
-    """Route all users to their role-specific dashboard."""
-    mapping = {
-        'DEVELOPER':   'dashboard.developer',
-        'DIRECTOR':    'dashboard.director',
-        'SECRETARY':   'dashboard.secretary',
-        'DEPUTY':      'dashboard.deputy',
-        'GROUP_ADMIN': 'dashboard.group_admin',
-        'USER':        'dashboard.user_view',
-    }
-    target = mapping.get(current_user.role_code, 'dashboard.user_view')
-    return redirect(url_for(target))
+    """Main landing screen after login."""
+    departments = get_overview_metrics()
+    averages = get_company_averages()
+    return render_template(
+        'dashboard/home.html',
+        departments=departments,
+        averages=averages,
+        page_title='الرئيسية',
+    )
+
+
+@dashboard_bp.route('/org-structure')
+@login_required
+def org_structure():
+    """Organizational structure entry page."""
+    departments = get_overview_metrics()
+    return render_template(
+        'dashboard/simple_page.html',
+        departments=departments,
+        page_title='الهيكل التنظيمي',
+        page_icon='bi-diagram-3',
+        page_description='مساحة مخصصة لعرض الهيكل التنظيمي، المجموعات، والمسؤوليات المرتبطة بكل جهة.',
+        action_url=url_for('dashboard.quarterly_performance'),
+        action_label='عرض تقرير الأداء',
+    )
+
+
+@dashboard_bp.route('/agenda')
+@login_required
+def agenda():
+    """Agenda entry page."""
+    departments = get_overview_metrics()
+    return render_template(
+        'dashboard/simple_page.html',
+        departments=departments,
+        page_title='الأجندة',
+        page_icon='bi-calendar3',
+        page_description='واجهة تمهيدية للأجندة والاجتماعات والمحطات المهمة ضمن الخطة العسكرية.',
+        action_url=url_for('dashboard.quarterly_performance'),
+        action_label='فتح التقرير الربع سنوي',
+    )
+
+
+@dashboard_bp.route('/military-strategy-booklet')
+@login_required
+def strategy_booklet():
+    """Military strategy booklet entry page."""
+    departments = get_overview_metrics()
+    return render_template(
+        'dashboard/simple_page.html',
+        departments=departments,
+        page_title='كراسة الاستراتيجية العسكرية',
+        page_icon='bi-journal-bookmark',
+        page_description='مكان مخصص لكراسة الاستراتيجية العسكرية والملخصات التنفيذية والوثائق المرجعية.',
+        action_url=url_for('dashboard.quarterly_performance'),
+        action_label='استعراض الأداء الربع سنوي',
+    )
+
+
+@dashboard_bp.route('/quarterly-performance')
+@login_required
+def quarterly_performance():
+    """Quarterly performance report screen."""
+    departments = get_overview_metrics()
+    averages = get_company_averages()
+    central_department = next((d for d in departments if d.get('is_central')), None)
+    report_departments = [d for d in departments if not d.get('is_central')] or departments
+    return render_template(
+        'dashboard/quarterly_report.html',
+        departments=departments,
+        central_department=central_department,
+        report_departments=report_departments,
+        averages=averages,
+        page_title='تقرير الأداء الربع سنوي',
+    )
 
 
 # ─── Director / CEO ───────────────────────────────────────────────────────────

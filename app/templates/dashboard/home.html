@@ -1,0 +1,572 @@
+﻿{% extends "base.html" %}
+
+{% block title %}الرئيسية — {{ app_name }}{% endblock %}
+{% block body_class %}app-body dashboard-home-body{% endblock %}
+
+{% block extra_css %}
+<style>
+:root {
+    --home-bg: #F8F6F1;
+    --home-surface: #FFFFFF;
+    --home-surface-soft: #FFFCF7;
+    --home-accent: #C89B3C;
+    --home-accent-soft: #F4E9C8;
+    --home-accent-deep: #A67C23;
+    --home-text: #3B2A1E;
+    --home-text-soft: #705544;
+    --home-border: rgba(200, 155, 60, 0.18);
+    --home-shadow: 0 18px 40px rgba(103, 76, 27, 0.08);
+    --home-shadow-soft: 0 10px 24px rgba(103, 76, 27, 0.06);
+    --home-radius-lg: 28px;
+    --home-radius-md: 22px;
+    --home-radius-sm: 18px;
+}
+
+.dashboard-home-body {
+    background:
+        radial-gradient(circle at top right, rgba(200, 155, 60, 0.08), transparent 26rem),
+        linear-gradient(180deg, #FCFBF8 0%, var(--home-bg) 100%);
+    color: var(--home-text);
+}
+
+.dashboard-home-body .main-content {
+    padding: 1.15rem 0 2.25rem;
+}
+
+.dashboard-home-body .app-navbar {
+    background: rgba(255, 251, 244, 0.94) !important;
+    border-bottom: 1px solid rgba(200, 155, 60, 0.18);
+    box-shadow: 0 12px 30px rgba(80, 56, 22, 0.08);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+}
+
+.dashboard-home-body .app-navbar .navbar-brand {
+    color: var(--home-text) !important;
+    font-weight: 800;
+}
+
+.dashboard-home-body .text-primary-glow {
+    color: var(--home-accent);
+    filter: none;
+}
+
+.dashboard-home-body .app-navbar .nav-link {
+    color: rgba(59, 42, 30, 0.74) !important;
+}
+
+.dashboard-home-body .app-navbar .primary-nav-link {
+    background: rgba(255, 255, 255, 0.78);
+    border: 1px solid rgba(200, 155, 60, 0.14);
+    color: var(--home-text) !important;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.65);
+}
+
+.dashboard-home-body .app-navbar .primary-nav-link:hover,
+.dashboard-home-body .app-navbar .primary-nav-link.active {
+    background: linear-gradient(180deg, #F5EACB 0%, #E8D39C 100%);
+    border-color: rgba(200, 155, 60, 0.34);
+    color: var(--home-text) !important;
+    box-shadow: 0 8px 18px rgba(200, 155, 60, 0.16);
+}
+
+.dashboard-home-body .avatar-circle {
+    background: linear-gradient(135deg, #E8D39C 0%, #C89B3C 100%);
+    color: #FFFFFF;
+    box-shadow: 0 6px 14px rgba(200, 155, 60, 0.18);
+}
+
+.dashboard-home-body .glass-dropdown {
+    background: rgba(255, 252, 247, 0.98) !important;
+    border-color: rgba(200, 155, 60, 0.14) !important;
+    box-shadow: 0 20px 40px rgba(93, 69, 31, 0.10) !important;
+}
+
+.dashboard-home-body .glass-dropdown .dropdown-item {
+    color: var(--home-text);
+}
+
+.dashboard-home-body .glass-dropdown .dropdown-item:hover {
+    background: rgba(200, 155, 60, 0.10);
+}
+
+.dashboard-home-body .app-footer {
+    background: transparent;
+    border-top: 1px solid rgba(200, 155, 60, 0.10);
+}
+
+.premium-home {
+    width: min(100%, 1440px);
+    margin: 0 auto;
+    padding: 0 clamp(0.85rem, 2vw, 1.3rem);
+}
+
+.premium-card {
+    background: var(--home-surface);
+    border: 1px solid var(--home-border);
+    border-radius: var(--home-radius-md);
+    box-shadow: var(--home-shadow-soft);
+}
+
+.section-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+}
+
+.section-heading h2 {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 800;
+    color: var(--home-text);
+}
+
+.section-heading span {
+    font-size: 0.82rem;
+    color: var(--home-text-soft);
+}
+
+.hero-banner {
+    position: relative;
+    min-height: clamp(320px, 42vw, 490px);
+    aspect-ratio: 16 / 6;
+    overflow: hidden;
+    border-radius: var(--home-radius-lg);
+    border: 1px solid rgba(255, 255, 255, 0.65);
+    box-shadow: var(--home-shadow);
+    background: #EFE9DF;
+}
+
+.hero-banner img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center center;
+    display: block;
+}
+
+.hero-banner::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.16) 0%, rgba(255, 255, 255, 0.08) 100%),
+        radial-gradient(circle at center, rgba(255, 255, 255, 0.08), transparent 40%);
+    pointer-events: none;
+}
+
+.hero-copy {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    text-align: center;
+}
+
+.hero-copy-inner {
+    width: min(100%, clamp(320px, 44vw, 560px));
+    transform: translateY(-12px);
+}
+
+.hero-kicker {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.45rem 1rem;
+    margin-bottom: 0.9rem;
+    border-radius: 999px;
+    background: rgba(255, 252, 245, 0.76);
+    border: 1px solid rgba(200, 155, 60, 0.18);
+    color: var(--home-accent-deep);
+    font-size: 0.82rem;
+    font-weight: 700;
+    box-shadow: 0 10px 22px rgba(200, 155, 60, 0.08);
+}
+
+.hero-title {
+    margin: 0;
+    font-size: clamp(2rem, 4vw, 3.4rem);
+    font-weight: 900;
+    letter-spacing: 0;
+    color: #7E5A20;
+    text-shadow:
+        0 1px 0 rgba(255, 255, 255, 0.92),
+        0 10px 30px rgba(200, 155, 60, 0.16);
+}
+
+.hero-subtitle {
+    margin: 0.95rem auto 0;
+    max-width: 470px;
+    font-size: 1rem;
+    line-height: 1.9;
+    color: #6A513F;
+}
+
+.hero-meta {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    margin-top: 1.35rem;
+}
+
+.hero-meta span {
+    padding: 0.42rem 0.9rem;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.72);
+    border: 1px solid rgba(200, 155, 60, 0.14);
+    color: var(--home-text);
+    font-size: 0.8rem;
+    font-weight: 700;
+}
+
+.overview-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1.2rem;
+    margin-top: 1.35rem;
+}
+
+.objectives-card,
+.message-card,
+.quote-card {
+    padding: 1.35rem;
+}
+
+.card-title {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    margin-bottom: 1rem;
+    color: var(--home-text);
+    font-size: 1rem;
+    font-weight: 800;
+}
+
+.card-title i {
+    color: var(--home-accent);
+    font-size: 1rem;
+}
+
+.objectives-list {
+    display: grid;
+    gap: 0.85rem;
+}
+
+.objectives-item {
+    display: flex;
+    gap: 0.7rem;
+    align-items: flex-start;
+    padding-bottom: 0.8rem;
+    border-bottom: 1px solid rgba(200, 155, 60, 0.10);
+}
+
+.objectives-item:last-child {
+    border-bottom: 0;
+    padding-bottom: 0;
+}
+
+.objectives-item i {
+    color: var(--home-accent);
+    font-size: 0.95rem;
+    margin-top: 0.15rem;
+}
+
+.objectives-item span {
+    color: var(--home-text-soft);
+    font-size: 0.9rem;
+    line-height: 1.7;
+}
+
+.objectives-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    margin-top: 1rem;
+    color: var(--home-accent-deep);
+    font-size: 0.86rem;
+    font-weight: 700;
+}
+
+.message-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    text-align: center;
+}
+
+.message-portrait-label {
+    display: inline-block;
+    padding: 0.35rem 0.9rem;
+    border-radius: 999px;
+    background: rgba(200, 155, 60, 0.10);
+    border: 1px solid rgba(200, 155, 60, 0.18);
+    color: var(--home-accent-deep);
+    font-size: 0.78rem;
+    font-weight: 800;
+    letter-spacing: 0.02em;
+}
+
+.message-portrait-card {
+    flex: 0 0 auto;
+    width: clamp(220px, 20vw, 280px);
+    margin: 0 auto;
+    padding: 0.8rem 0.8rem 0.95rem;
+    background: #FFFFFF;
+    border: 1px solid rgba(200, 155, 60, 0.16);
+    border-radius: 12px;
+    box-shadow: 0 20px 40px rgba(87, 63, 22, 0.16);
+}
+
+.message-portrait-card img {
+    width: 100%;
+    aspect-ratio: 3 / 4;
+    display: block;
+    object-fit: cover;
+    object-position: center top;
+    border: 1px solid rgba(59, 42, 30, 0.08);
+    border-radius: 3px;
+}
+
+.message-portrait-caption {
+    padding-top: 0.7rem;
+    text-align: center;
+    color: #1A1A1A;
+    line-height: 1.35;
+}
+
+.message-portrait-name {
+    display: block;
+    font-size: 0.88rem;
+    font-weight: 800;
+    color: #1A1A1A;
+}
+
+.message-portrait-role {
+    display: block;
+    margin-top: 0.2rem;
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: rgba(26, 26, 26, 0.66);
+}
+
+.message-portrait-divider {
+    display: block;
+    width: 46px;
+    height: 1px;
+    margin: 0.55rem auto;
+    background: rgba(26, 26, 26, 0.18);
+}
+
+.message-portrait-name-en {
+    display: block;
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    color: #1A1A1A;
+}
+
+.message-portrait-role-en {
+    display: block;
+    margin-top: 0.15rem;
+    font-size: 0.6rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    color: rgba(26, 26, 26, 0.62);
+}
+
+.message-portrait-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    color: var(--home-accent-deep);
+    font-size: 0.86rem;
+    font-weight: 800;
+}
+
+.message-portrait-link:hover {
+    color: var(--home-accent);
+}
+
+.quote-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: 100%;
+    background:
+        linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(255, 251, 243, 0.96) 100%),
+        #FFFFFF;
+}
+
+.quote-mark {
+    color: rgba(200, 155, 60, 0.55);
+    font-size: 4rem;
+    line-height: 1;
+    margin-bottom: 0.25rem;
+    font-family: Georgia, serif;
+}
+
+.quote-text {
+    margin: 0;
+    font-size: clamp(1.25rem, 2vw, 1.9rem);
+    font-weight: 800;
+    line-height: 1.85;
+    color: var(--home-text);
+}
+
+.quote-caption {
+    margin-top: 0.8rem;
+    color: var(--home-text-soft);
+    font-size: 0.88rem;
+}
+
+.closing-banner {
+    margin-top: 1.2rem;
+    padding: 1rem 1.4rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    background: linear-gradient(180deg, rgba(255, 253, 248, 0.96) 0%, rgba(249, 242, 226, 0.94) 100%);
+}
+
+.closing-banner p {
+    margin: 0;
+    color: var(--home-text);
+    font-size: 1.02rem;
+    font-weight: 800;
+}
+
+@media (max-width: 1280px) {
+    .overview-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 1100px) {
+    .quote-card {
+        grid-column: 1 / -1;
+    }
+}
+
+@media (max-width: 768px) {
+    .premium-home {
+        padding: 0 0.85rem;
+    }
+
+    .hero-banner {
+        min-height: clamp(300px, 62vw, 420px);
+        border-radius: 24px;
+        aspect-ratio: 4 / 3;
+    }
+
+    .hero-banner img {
+        object-position: center;
+    }
+
+    .hero-copy {
+        padding: 1.25rem;
+    }
+
+    .hero-title {
+        font-size: clamp(1.7rem, 7vw, 2.35rem);
+    }
+
+    .hero-subtitle {
+        font-size: 0.92rem;
+        line-height: 1.75;
+    }
+
+    .overview-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .message-portrait-card {
+        width: min(240px, 80%);
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+{% set completion = averages.completion|default(86)|round|int %}
+{% set circumference = 163.36 %}
+{% set offset = circumference - (circumference * completion / 100) %}
+
+<div class="premium-home">
+    <section class="hero-banner" aria-label="الاستراتيجية العسكرية">
+        <img src="{{ url_for('static', filename='img/strategy-hero-light.png') }}" alt="خلفية الاستراتيجية العسكرية">
+        <div class="hero-copy">
+            <div class="hero-copy-inner">
+                <div class="hero-kicker">لوحة تنفيذية متكاملة</div>
+                <h1 class="hero-title">الاستراتيجية العسكرية</h1>
+                <p class="hero-subtitle">منصة قيادة استراتيجية تجمع البر والبحر والجو والفضاء والتقنيات المستقبلية ضمن رؤية وطنية موحدة تدعم الأمن والتنمية والاستدامة.</p>
+                <div class="hero-meta" aria-label="محاور الاستراتيجية">
+                    <span>البر</span>
+                    <span>البحر</span>
+                    <span>الجو</span>
+                    <span>الفضاء</span>
+                    <span>الذكاء الاصطناعي</span>
+                    <span>اللوجستيات</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="overview-grid" aria-label="نظرة تنفيذية">
+        <article class="premium-card objectives-card">
+            <div class="card-title"><i class="bi bi-bullseye"></i><span>الأهداف الاستراتيجية</span></div>
+            <div class="objectives-list">
+                <div class="objectives-item">
+                    <i class="bi bi-shield-check"></i>
+                    <span>تعزيز أمن الدولة ورفع الجاهزية الاستراتيجية عبر منظومة متكاملة ومرنة.</span>
+                </div>
+                <div class="objectives-item">
+                    <i class="bi bi-diagram-3"></i>
+                    <span>مواءمة القدرات العسكرية مع الأولويات الوطنية والبنية المؤسسية الحديثة.</span>
+                </div>
+                <div class="objectives-item">
+                    <i class="bi bi-cpu"></i>
+                    <span>تمكين الابتكار والذكاء الاصطناعي والقدرات السيبرانية ضمن إطار تشغيل مستدام.</span>
+                </div>
+                <div class="objectives-item">
+                    <i class="bi bi-people"></i>
+                    <span>تنمية الكفاءات الوطنية وتوسيع الشراكات الدولية لدعم التفوق العملياتي.</span>
+                </div>
+            </div>
+            <a class="objectives-link" href="{{ url_for('dashboard.strategy_booklet') }}">عرض جميع الأهداف <i class="bi bi-arrow-left"></i></a>
+        </article>
+
+        <article class="premium-card message-card">
+            <div class="message-portrait-label">المُديرُ العامّ</div>
+            <figure class="message-portrait-card">
+                <img src="{{ url_for('static', filename='img/manager-portrait.png') }}" alt="صورة المدير العام">
+                <figcaption class="message-portrait-caption">
+                    <span class="message-portrait-name">اسمُ المُديرِ هُنا</span>
+                    <span class="message-portrait-role">مَنْصِبُهُ أو صِفَتُهُ التَّعريفِيَّة</span>
+                    <span class="message-portrait-divider" aria-hidden="true"></span>
+                    <span class="message-portrait-name-en">MANAGER NAME HERE</span>
+                    <span class="message-portrait-role-en">POSITION OR TITLE</span>
+                </figcaption>
+            </figure>
+            <a class="message-portrait-link" href="{{ url_for('dashboard.quarterly_performance') }}">قراءة المزيد <i class="bi bi-arrow-left"></i></a>
+        </article>
+
+        <article class="premium-card quote-card">
+            <div class="quote-mark">“</div>
+            <p class="quote-text">قوة تحمي، واستراتيجية تبني، ورؤية تقود نحو مستقبل أكثر أمناً ومرونة وازدهاراً لدولة الإمارات.</p>
+            <div class="quote-caption">مبادئ توجيهية للجاهزية الوطنية والتكامل بين القدرات الدفاعية والتنموية.</div>
+        </article>
+    </section>
+
+    <section class="premium-card closing-banner" aria-label="رسالة ختامية">
+        <p>نعمل اليوم برؤية موحدة لبناء غد أكثر أمناً واستقراراً وكفاءة لدولة الإمارات.</p>
+    </section>
+</div>
+{% endblock %}
