@@ -1,16 +1,45 @@
 {% extends "base.html" %}
 
 {% block title %}تفاصيل: {{ dept.name }} — {{ app_name }}{% endblock %}
+{% block body_class %}app-body dashboard-home-body{% endblock %}
 
 {% block extra_css %}
 <style>
+    :root {
+        --page-bg: #F8F6F1;
+        --page-surface: #FFFFFF;
+        --page-surface-soft: #FFFCF7;
+        --page-accent: #C89B3C;
+        --page-accent-deep: #A67C23;
+        --page-text: #3B2A1E;
+        --page-text-soft: #705544;
+        --page-border: rgba(200, 155, 60, 0.18);
+        --page-shadow: 0 14px 32px rgba(103, 76, 27, 0.08);
+    }
+
+    .dashboard-home-body {
+        background:
+            radial-gradient(circle at top right, rgba(200, 155, 60, 0.08), transparent 26rem),
+            linear-gradient(180deg, #FCFBF8 0%, var(--page-bg) 100%);
+        color: var(--page-text);
+    }
+
+    .department-page {
+        min-height: calc(100vh - var(--navbar-height));
+        padding: 2rem 0 3rem;
+        background:
+            radial-gradient(circle at top right, rgba(200, 155, 60, 0.08), transparent 22rem),
+            linear-gradient(180deg, rgba(255, 255, 255, 0.76), rgba(255, 249, 240, 0.90)),
+            var(--page-bg);
+    }
+
     .dept-header {
-        background: radial-gradient(circle at top right, #FFFFFF, #FDF9F3);
-        border-radius: 20px;
+        background: radial-gradient(circle at top right, #FFFFFF, #FFF9EE);
+        border-radius: 28px;
         padding: 2rem;
         margin-bottom: 2rem;
-        border: 1px solid var(--border-color, #DDD0B8);
-        box-shadow: 0 10px 30px rgba(80, 40, 10, 0.05);
+        border: 1px solid var(--page-border);
+        box-shadow: var(--page-shadow);
         position: relative;
         overflow: hidden;
     }
@@ -22,7 +51,7 @@
         right: 0;
         width: 120px;
         height: 100%;
-        background: var(--primary, #C97C5D);
+        background: var(--page-accent);
         opacity: 0.1;
         clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 100%);
     }
@@ -31,33 +60,34 @@
         width: 80px;
         height: 80px;
         border-radius: 50%;
-        background: rgba(201, 124, 93, 0.1);
+        background: rgba(200, 155, 60, 0.12);
         display: flex;
         align-items: center;
         justify-content: center;
         font-size: 2.5rem;
-        color: var(--primary, #C97C5D);
-        border: 2px solid var(--primary, #C97C5D);
+        color: var(--page-accent);
+        border: 2px solid var(--page-accent);
     }
 
     .task-card {
-        background: #FFFFFF;
-        border-radius: 16px;
-        border: 1px solid var(--border-color, #DDD0B8);
+        background: linear-gradient(180deg, #FFFFFF 0%, #FFF9EE 100%);
+        border-radius: 22px;
+        border: 1px solid var(--page-border);
         padding: 1.5rem;
         margin-bottom: 1.5rem;
         transition: transform 0.3s ease, box-shadow 0.3s ease;
         position: relative;
+        box-shadow: 0 10px 22px rgba(103, 76, 27, 0.05);
     }
 
     .task-card:hover {
         transform: translateY(-5px);
         box-shadow: 0 15px 35px rgba(80, 40, 10, 0.08);
-        border-color: var(--primary, #C97C5D);
+        border-color: var(--page-accent);
     }
 
     .task-number-badge {
-        background: var(--primary, #C97C5D);
+        background: linear-gradient(180deg, #E7D29A 0%, #C89B3C 100%);
         color: #FFFFFF;
         padding: 0.4rem 1rem;
         border-radius: 30px;
@@ -93,10 +123,9 @@
     }
 
     .department-tag {
-        background: rgba(194, 146, 64, 0.15);
-        /* Secondary amber */
-        color: #2E2010;
-        border: 1px solid rgba(194, 146, 64, 0.3);
+        background: rgba(200, 155, 60, 0.12);
+        color: var(--page-text);
+        border: 1px solid rgba(200, 155, 60, 0.22);
         padding: 0.2rem 0.8rem;
         border-radius: 20px;
         font-size: 0.8rem;
@@ -113,8 +142,8 @@
         padding: 0.5rem 1.2rem;
         border-radius: 50px;
         background: #fff;
-        border: 2px solid #E5DBC6; /* Thicker border to stand out */
-        color: #8F6B4E;
+        border: 2px solid rgba(200, 155, 60, 0.18);
+        color: var(--page-text-soft);
         box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08); /* Stronger shadow */
         z-index: 10;
         font-weight: 700;
@@ -133,7 +162,8 @@
 {% endblock %}
 
 {% block content %}
-<div class="container py-5 mt-5">
+<div class="department-page">
+<div class="container py-4 mt-4">
 
     <!-- Header Section (Wrapped for positioning) -->
     <div class="position-relative mb-4">
@@ -160,10 +190,10 @@
         {% endif %}
 
         <div class="flex-grow-1 text-center">
-            <h1 class="h2 fw-bold mb-2" style="color: #2E2010;">{{ dept.name }}</h1>
+            <h1 class="h2 fw-bold mb-2" style="color: var(--page-text);">{{ dept.name }}</h1>
 
             {% if dept.description %}
-            <p class="mt-3 mb-0 mx-auto fw-bold" style="color: #6B4E36; max-width: 800px; font-size: 1.2rem;">
+            <p class="mt-3 mb-0 mx-auto fw-bold" style="color: var(--page-text-soft); max-width: 800px; font-size: 1.2rem;">
                 <span style="font-size: 1.8rem; vertical-align: middle;">(</span>
                 ----- {{ dept.description }} -----
                 <span style="font-size: 1.8rem; vertical-align: middle;">)</span>
@@ -171,7 +201,7 @@
             {% endif %}
         </div>
         <div class="text-md-end mt-3 mt-md-0">
-            <a href="{{ url_for('dashboard.director') }}" class="btn btn-outline-secondary rounded-pill pe-4 ps-4">
+            <a href="{{ url_for('dashboard.index') }}" class="btn btn-outline-secondary rounded-pill pe-4 ps-4">
                 <i class="bi bi-arrow-right me-2"></i>العودة للرئيسية
             </a>
 
@@ -187,8 +217,8 @@
     </div>
 
     <!-- Tasks List Section -->
-    <h3 class="h4 fw-bold mb-4" style="color: #2E2010;">
-        <i class="bi bi-list-task me-2" style="color: var(--primary);"></i>
+    <h3 class="h4 fw-bold mb-4" style="color: var(--page-text);">
+        <i class="bi bi-list-task me-2" style="color: var(--page-accent);"></i>
         عدد الواجبات الرئيسية ({{ tasks|length }})
     </h3>
 
@@ -267,6 +297,7 @@
         {% endfor %}
     </div>
     {% endif %}
+</div>
 </div>
 
 <!-- Modal: Add Task -->

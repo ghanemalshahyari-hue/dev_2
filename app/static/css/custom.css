@@ -43,12 +43,12 @@
   /* desert sky blue */
   --muted: #9A7A60;
 
-  /* Navigation — deep espresso (dark anchor) */
-  --nav-bg: #3B2A1E;
-  --nav-border: rgba(194, 146, 64, 0.28);
-  --nav-text: #F2E4C8;
-  --nav-text-muted: rgba(242, 228, 200, 0.60);
-  --nav-hover-bg: rgba(194, 146, 64, 0.18);
+  /* Navigation — premium light executive shell */
+  --nav-bg: rgba(255, 251, 244, 0.94);
+  --nav-border: rgba(200, 155, 60, 0.18);
+  --nav-text: #3B2A1E;
+  --nav-text-muted: rgba(59, 42, 30, 0.74);
+  --nav-hover-bg: rgba(200, 155, 60, 0.10);
 
   /* Text — warm, readable, not harsh black */
   --text-primary: #2E2010;
@@ -58,8 +58,8 @@
   /* Shadows — warm caramel tones */
   --shadow-card: 0 1px 3px rgba(80, 40, 10, 0.07), 0 4px 14px rgba(80, 40, 10, 0.06);
   --shadow-hover: 0 6px 24px rgba(80, 40, 10, 0.12);
-  --shadow-nav: 0 2px 10px rgba(0, 0, 0, 0.24);
-  --shadow-glow: 0 0 20px rgba(201, 124, 93, 0.24);
+  --shadow-nav: 0 12px 30px rgba(80, 56, 22, 0.08);
+  --shadow-glow: 0 0 20px rgba(200, 155, 60, 0.18);
 
   /* Shape */
   --radius-sm: 6px;
@@ -166,11 +166,13 @@ code {
   top: 0;
   z-index: 1030;
   padding-block: 0.45rem;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
 }
 
 .app-navbar .navbar-brand {
   font-size: 1rem;
-  font-weight: 700;
+  font-weight: 800;
   color: var(--nav-text) !important;
   letter-spacing: -0.01em;
   min-height: 40px;
@@ -198,15 +200,15 @@ code {
   align-items: center;
   justify-content: center;
   gap: 0.35rem;
-  background: rgba(81, 48, 34, 0.78);
-  border: 1px solid rgba(239, 224, 202, 0.22);
-  color: #F7E7C8 !important;
+  background: rgba(255, 255, 255, 0.78);
+  border: 1px solid rgba(200, 155, 60, 0.14);
+  color: var(--nav-text) !important;
   border-radius: 8px;
   font-weight: 800;
   font-size: 0.8rem;
   text-align: center;
   line-height: 1.35;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.65);
 }
 
 .app-navbar .nav-link:hover,
@@ -217,15 +219,15 @@ code {
 
 .app-navbar .primary-nav-link:hover,
 .app-navbar .primary-nav-link.active {
-  background: #6A422E;
-  border-color: rgba(247, 231, 200, 0.48);
-  color: #FFFFFF !important;
-  box-shadow: 0 5px 16px rgba(0, 0, 0, 0.16);
+  background: linear-gradient(180deg, #F5EACB 0%, #E8D39C 100%);
+  border-color: rgba(200, 155, 60, 0.34);
+  color: var(--nav-text) !important;
+  box-shadow: 0 8px 18px rgba(200, 155, 60, 0.16);
 }
 
 .text-primary-glow {
   color: var(--accent);
-  filter: drop-shadow(0 0 6px rgba(194, 146, 64, 0.50));
+  filter: none;
 }
 
 @media (min-width: 992px) {
@@ -250,21 +252,21 @@ code {
 
 /* ─── Dropdowns ─────────────────────────────────────────────────── */
 .glass-dropdown {
-  background: var(--bg-surface) !important;
-  border: 1px solid var(--border-color) !important;
+  background: rgba(255, 252, 247, 0.98) !important;
+  border: 1px solid rgba(200, 155, 60, 0.14) !important;
   border-radius: var(--radius-md) !important;
-  box-shadow: 0 8px 32px rgba(80, 40, 10, 0.14) !important;
+  box-shadow: 0 20px 40px rgba(93, 69, 31, 0.10) !important;
 }
 
 .glass-dropdown .dropdown-item {
-  color: var(--text-secondary);
+  color: var(--text-primary);
   transition: all var(--transition);
   font-size: 0.9rem;
   padding: 0.5rem 1rem;
 }
 
 .glass-dropdown .dropdown-item:hover {
-  background: var(--primary-subtle);
+  background: rgba(200, 155, 60, 0.10);
   color: var(--text-primary);
 }
 
@@ -280,8 +282,8 @@ code {
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  background: var(--primary-subtle);
-  color: var(--primary);
+  background: linear-gradient(135deg, #E8D39C 0%, #C89B3C 100%);
+  color: #FFFFFF;
   font-weight: 700;
   font-size: 13px;
   flex-shrink: 0;

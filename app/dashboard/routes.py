@@ -37,48 +37,195 @@ def index():
 @dashboard_bp.route('/org-structure')
 @login_required
 def org_structure():
-    """Organizational structure entry page."""
+    """Organizational structure — tree view driven by Department + MainTask data."""
+    from app.models.main_task import MainTask
+
     departments = get_overview_metrics()
+    central_department = next((d for d in departments if d.get('is_central')), None)
+    report_departments = [d for d in departments if not d.get('is_central')] or departments
+
+    # For each concept dept, aggregate unique "concerned parties" (الجهات المعنية)
+    # from the secondary_departments_list JSON across its main tasks.
+    stakeholders_by_dept = {}
+    for dept in report_departments:
+        tasks = MainTask.query.filter_by(primary_department_id=dept['id']).all()
+        seen = []
+        for t in tasks:
+            for name in t.secondary_departments_parsed:
+                name = (name or '').strip()
+                if name and name not in seen:
+                    seen.append(name)
+        stakeholders_by_dept[dept['id']] = seen
+
     return render_template(
-        'dashboard/simple_page.html',
+        'dashboard/org_structure.html',
         departments=departments,
+        central_department=central_department,
+        report_departments=report_departments,
+        stakeholders_by_dept=stakeholders_by_dept,
         page_title='الهيكل التنظيمي',
-        page_icon='bi-diagram-3',
-        page_description='مساحة مخصصة لعرض الهيكل التنظيمي، المجموعات، والمسؤوليات المرتبطة بكل جهة.',
-        action_url=url_for('dashboard.quarterly_performance'),
-        action_label='عرض تقرير الأداء',
     )
 
 
 @dashboard_bp.route('/agenda')
 @login_required
 def agenda():
-    """Agenda entry page."""
-    departments = get_overview_metrics()
+    """Year-2026 agenda calendar — months grid with events, holidays, weekends."""
+    from app.dashboard.agenda_service import build_year_calendar
+    calendar_data = build_year_calendar(2026)
     return render_template(
-        'dashboard/simple_page.html',
-        departments=departments,
-        page_title='الأجندة',
-        page_icon='bi-calendar3',
-        page_description='واجهة تمهيدية للأجندة والاجتماعات والمحطات المهمة ضمن الخطة العسكرية.',
-        action_url=url_for('dashboard.quarterly_performance'),
-        action_label='فتح التقرير الربع سنوي',
+        'dashboard/agenda.html',
+        calendar=calendar_data,
+        page_title='الأجندة السنوية',
+    )
+
+
+@dashboard_bp.route('/commitments')
+@login_required
+def commitments():
+    """Commitments indicator — tree of report categories + duty tables per node."""
+    # Placeholder duties — replace with DB-driven content later by mapping
+    # each category `key` to a duties query (e.g., MainTask filtered by tag).
+    def _placeholder_duties(n=2):
+        return [{'num': i + 1, 'text': f'الواجب رقم 1.{i + 2}'} for i in range(n)]
+
+    commitments_tree = {
+        'top_boss': {
+            'name': 'رئيس الفريق',
+            'subname': '(المدير)',
+            'theme': 'cyan',
+        },
+        'reports_row': [
+            {
+                'key': 'org_report',
+                'name': 'تقرير المؤسسة',
+                'subname': 'مكتب الإدارة',
+                'theme': 'orange',
+                'duties': _placeholder_duties(2),
+            },
+            {
+                'key': 'commitments_report',
+                'name': 'تقرير الالتزامات',
+                'subname': 'رئيس الفريق',
+                'theme': 'gray',
+                'is_central': True,
+                'duties': [],
+            },
+            {
+                'key': 'dev_report',
+                'name': 'تقرير تطوير',
+                'subname': 'هيئة تطوير',
+                'theme': 'purple',
+                'duties': _placeholder_duties(2),
+            },
+        ],
+        'indicators_row': [
+            {
+                'key': 'monitoring_report',
+                'name': 'تقرير المراقبة والبحث',
+                'subname': 'هيئة البحث والتقييم',
+                'theme': 'red',
+                'duties': _placeholder_duties(6),
+                'two_columns': True,
+            },
+            {
+                'key': 'readiness',
+                'name': 'مؤشر الجاهزية',
+                'subname': '',
+                'theme': 'cyan',
+                'duties': _placeholder_duties(2),
+            },
+            {
+                'key': 'participations',
+                'name': 'مؤشر المشاركات',
+                'subname': '',
+                'theme': 'cyan',
+                'duties': _placeholder_duties(1),
+            },
+            {
+                'key': 'tasks',
+                'name': 'مؤشر المهام',
+                'subname': '',
+                'theme': 'cyan',
+                'duties': _placeholder_duties(2),
+            },
+            {
+                'key': 'plans',
+                'name': 'مؤشر الخطط',
+                'subname': '',
+                'theme': 'cyan',
+                'duties': _placeholder_duties(2),
+            },
+        ],
+    }
+    return render_template(
+        'dashboard/commitments.html',
+        tree=commitments_tree,
+        page_title='مؤشر الالتزامات',
     )
 
 
 @dashboard_bp.route('/military-strategy-booklet')
 @login_required
 def strategy_booklet():
-    """Military strategy booklet entry page."""
-    departments = get_overview_metrics()
+    """Military strategy booklet — PDF-style viewer with print-to-PDF download."""
+    booklet = {
+        'title':    'كراسة الاستراتيجية العسكرية',
+        'subtitle': 'الإصدار الأول · 2026',
+        'edition':  '2026',
+        'foreword': (
+            'تمثل هذه الكراسة الإطار المرجعي للاستراتيجية العسكرية الوطنية، '
+            'وتجمع بين رؤية القيادة، والأهداف التشغيلية، والمحاور الخمسة '
+            'التي تحدد مسار التطوير والجاهزية للمنظومة الدفاعية لدولة الإمارات.'
+        ),
+        'objectives': [
+            'تعزيز أمن الدولة ورفع الجاهزية الاستراتيجية عبر منظومة متكاملة ومرنة.',
+            'مواءمة القدرات العسكرية مع الأولويات الوطنية والبنية المؤسسية الحديثة.',
+            'تمكين الابتكار والذكاء الاصطناعي والقدرات السيبرانية ضمن إطار تشغيل مستدام.',
+            'تنمية الكفاءات الوطنية وتوسيع الشراكات الدولية لدعم التفوق العملياتي.',
+            'بناء قاعدة صناعية دفاعية وطنية قادرة على الابتكار والتصدير.',
+        ],
+        'axes': [
+            {
+                'title': 'البر',
+                'icon':  'bi-shield-fill',
+                'desc':  'تعزيز القدرات البرية ورفع الجاهزية الميدانية مع تركيز على المرونة، سرعة الاستجابة، وكفاءة الانتشار التشغيلي.',
+                'pillars': ['الجاهزية الميدانية', 'سرعة الانتشار', 'المرونة العملياتية'],
+            },
+            {
+                'title': 'البحر',
+                'icon':  'bi-water',
+                'desc':  'حماية المصالح البحرية والمسارات الحيوية عبر قدرات مراقبة وسيطرة واستجابة متقدمة ومتكاملة مع شركاء الأمن البحري.',
+                'pillars': ['الأمن البحري', 'مراقبة المسارات', 'السيطرة والاستجابة'],
+            },
+            {
+                'title': 'الجو',
+                'icon':  'bi-airplane-fill',
+                'desc':  'تطوير منظومات التفوق الجوي والدفاع الجوي بما يدعم السيطرة والردع والعمليات المشتركة الحديثة.',
+                'pillars': ['التفوق الجوي', 'الدفاع الجوي', 'العمليات المشتركة'],
+            },
+            {
+                'title': 'الفضاء',
+                'icon':  'bi-globe2',
+                'desc':  'تمكين الاتصالات والاستشعار والمراقبة الفضائية لدعم القرار ورفع دقة الوعي بالمجال العملياتي.',
+                'pillars': ['الرصد والاستشعار', 'الاتصالات', 'الوعي العملياتي'],
+            },
+            {
+                'title': 'التقنيات المستقبلية',
+                'icon':  'bi-cpu',
+                'desc':  'دمج الذكاء الاصطناعي والقدرات السيبرانية والأنظمة غير المأهولة واللوجستيات الذكية ضمن بيئة تشغيلية متطورة.',
+                'pillars': ['الذكاء الاصطناعي', 'الأمن السيبراني', 'الأنظمة غير المأهولة'],
+            },
+        ],
+        'closing': (
+            'نعمل اليوم برؤية موحدة لبناء غدٍ أكثر أمناً واستقراراً وكفاءة لدولة الإمارات. '
+            'تلتقي في هذه الكراسة المبادئ التوجيهية، والخطط التنفيذية، والمعايير الأساسية للجاهزية والتفوق.'
+        ),
+    }
     return render_template(
-        'dashboard/simple_page.html',
-        departments=departments,
+        'dashboard/strategy_booklet.html',
+        booklet=booklet,
         page_title='كراسة الاستراتيجية العسكرية',
-        page_icon='bi-journal-bookmark',
-        page_description='مكان مخصص لكراسة الاستراتيجية العسكرية والملخصات التنفيذية والوثائق المرجعية.',
-        action_url=url_for('dashboard.quarterly_performance'),
-        action_label='استعراض الأداء الربع سنوي',
     )
 
 

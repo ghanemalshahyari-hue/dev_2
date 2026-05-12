@@ -1,0 +1,721 @@
+{% extends "base.html" %}
+
+{% block title %}{{ page_title }} — {{ app_name }}{% endblock %}
+{% block body_class %}app-body dashboard-home-body{% endblock %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --ag-bg:           #F8F6F1;
+        --ag-surface:      #FFFFFF;
+        --ag-surface-soft: #FFFCF7;
+        --ag-accent:       #C89B3C;
+        --ag-accent-soft:  #F4E9C8;
+        --ag-accent-deep:  #A67C23;
+        --ag-accent-dark:  #7E5A20;
+        --ag-text:         #3B2A1E;
+        --ag-text-soft:    #705544;
+        --ag-text-muted:   rgba(59, 42, 30, 0.45);
+        --ag-border:       rgba(200, 155, 60, 0.20);
+        --ag-border-soft:  rgba(200, 155, 60, 0.10);
+        --ag-shadow:       0 16px 36px rgba(103, 76, 27, 0.08);
+        --ag-shadow-soft:  0 8px 22px rgba(103, 76, 27, 0.06);
+        --ag-radius-lg:    24px;
+        --ag-radius-md:    16px;
+        --ag-radius-sm:    10px;
+
+        --ag-weekend-bg:   rgba(200, 155, 60, 0.07);
+        --ag-weekend-text: rgba(59, 42, 30, 0.55);
+        --ag-holiday-bg:   #FCE9E0;
+        --ag-holiday-border: #E2A089;
+        --ag-holiday-text: #8B3A1F;
+
+        --ag-today-bg:     #1F2A38;
+        --ag-today-text:   #FFFFFF;
+    }
+
+    .dashboard-home-body {
+        background:
+            radial-gradient(circle at top right, rgba(200, 155, 60, 0.07), transparent 26rem),
+            linear-gradient(180deg, #FCFBF8 0%, var(--ag-bg) 100%);
+        color: var(--ag-text);
+    }
+
+    .ag-page {
+        padding: 1.25rem clamp(0.85rem, 2vw, 1.5rem) 2.75rem;
+    }
+
+    .ag-shell {
+        max-width: 1440px;
+        margin: 0 auto;
+        display: grid;
+        gap: 1.1rem;
+    }
+
+    /* ── Header ───────────────────────────────────────────── */
+    .ag-header {
+        background: var(--ag-surface);
+        border: 1px solid var(--ag-border);
+        border-radius: var(--ag-radius-lg);
+        padding: 1.2rem 1.4rem;
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        align-items: center;
+        gap: 1.25rem;
+        box-shadow: var(--ag-shadow);
+    }
+
+    .ag-header-info {
+        display: flex;
+        align-items: center;
+        gap: 0.95rem;
+        min-width: 0;
+    }
+
+    .ag-header-icon {
+        width: 54px;
+        height: 54px;
+        border-radius: 18px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(180deg, #FFF7E2 0%, #F2E3B8 100%);
+        color: var(--ag-accent);
+        font-size: 1.55rem;
+        flex: 0 0 auto;
+        border: 1px solid rgba(200, 155, 60, 0.18);
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.65);
+    }
+
+    .ag-header-title {
+        margin: 0;
+        font-size: clamp(1.35rem, 2.2vw, 1.85rem);
+        font-weight: 900;
+        color: var(--ag-text);
+    }
+
+    .ag-header-meta {
+        margin: 0.3rem 0 0;
+        color: var(--ag-text-soft);
+        font-size: 0.92rem;
+        line-height: 1.65;
+    }
+
+    .ag-header-actions {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.55rem;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+    }
+
+    .ag-year-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.45rem;
+        padding: 0.55rem 1rem;
+        border-radius: 999px;
+        background: linear-gradient(180deg, #FFFCF3 0%, #F4E2B0 100%);
+        border: 1px solid rgba(200, 155, 60, 0.32);
+        color: var(--ag-accent-dark);
+        font-weight: 900;
+        font-size: 0.95rem;
+    }
+
+    /* ── Legend ───────────────────────────────────────────── */
+    .ag-legend {
+        background: var(--ag-surface);
+        border: 1px solid var(--ag-border);
+        border-radius: var(--ag-radius-lg);
+        padding: 1.1rem 1.3rem;
+        box-shadow: var(--ag-shadow-soft);
+    }
+
+    .ag-legend-head {
+        display: flex;
+        align-items: center;
+        gap: 0.55rem;
+        margin-bottom: 0.85rem;
+    }
+
+    .ag-legend-head h2 {
+        margin: 0;
+        font-size: 1rem;
+        font-weight: 900;
+        color: var(--ag-text);
+    }
+
+    .ag-legend-head i {
+        color: var(--ag-accent);
+    }
+
+    .ag-legend-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 0.65rem;
+    }
+
+    .ag-legend-item {
+        display: flex;
+        align-items: center;
+        gap: 0.65rem;
+        padding: 0.6rem 0.75rem;
+        border: 1px solid var(--ag-border-soft);
+        border-radius: 12px;
+        background: var(--ag-surface-soft);
+    }
+
+    .ag-legend-swatch {
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        flex: 0 0 auto;
+        box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.04);
+    }
+
+    .ag-legend-swatch.is-block {
+        border-radius: 6px;
+    }
+
+    .ag-legend-text {
+        display: grid;
+        gap: 0.1rem;
+        min-width: 0;
+    }
+
+    .ag-legend-label {
+        font-size: 0.85rem;
+        font-weight: 800;
+        color: var(--ag-text);
+        line-height: 1.3;
+    }
+
+    .ag-legend-sub {
+        font-size: 0.74rem;
+        color: var(--ag-text-soft);
+    }
+
+    /* ── Months grid ──────────────────────────────────────── */
+    .ag-months {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 0.95rem;
+    }
+
+    .ag-month {
+        background: var(--ag-surface);
+        border: 1px solid var(--ag-border);
+        border-radius: var(--ag-radius-lg);
+        box-shadow: var(--ag-shadow-soft);
+        padding: 0.95rem 0.95rem 1.05rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.65rem;
+    }
+
+    .ag-month-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.5rem;
+        padding-bottom: 0.55rem;
+        border-bottom: 1px solid var(--ag-border-soft);
+    }
+
+    .ag-month-name {
+        margin: 0;
+        font-size: 1.02rem;
+        font-weight: 900;
+        color: var(--ag-text);
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+    }
+
+    .ag-month-num {
+        display: inline-flex;
+        width: 24px;
+        height: 24px;
+        align-items: center;
+        justify-content: center;
+        border-radius: 7px;
+        background: linear-gradient(180deg, #FFF7E2 0%, #F3E4BB 100%);
+        color: var(--ag-accent-deep);
+        font-size: 0.72rem;
+        font-weight: 900;
+        border: 1px solid rgba(200, 155, 60, 0.18);
+    }
+
+    .ag-month-count {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.3rem;
+        padding: 0.18rem 0.5rem;
+        border-radius: 999px;
+        background: rgba(200, 155, 60, 0.10);
+        color: var(--ag-accent-deep);
+        border: 1px solid rgba(200, 155, 60, 0.18);
+        font-size: 0.7rem;
+        font-weight: 800;
+    }
+
+    /* Day-of-week header row */
+    .ag-dow {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 3px;
+        font-size: 0.66rem;
+        font-weight: 800;
+        color: var(--ag-text-soft);
+        text-align: center;
+        padding: 0 1px;
+    }
+
+    .ag-dow span {
+        padding: 0.25rem 0;
+        letter-spacing: 0.02em;
+    }
+
+    .ag-dow span.is-weekend {
+        color: var(--ag-accent-deep);
+    }
+
+    /* Days grid */
+    .ag-grid {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 3px;
+    }
+
+    .ag-day {
+        position: relative;
+        aspect-ratio: 1 / 1;
+        min-height: 36px;
+        border-radius: var(--ag-radius-sm);
+        background: var(--ag-surface-soft);
+        border: 1px solid transparent;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start;
+        padding: 4px 3px 3px;
+        font-size: 0.78rem;
+        font-weight: 700;
+        color: var(--ag-text);
+        transition: transform 0.15s ease, box-shadow 0.15s ease;
+        overflow: hidden;
+    }
+
+    .ag-day-num {
+        line-height: 1;
+        font-weight: 800;
+    }
+
+    .ag-day.is-outside {
+        background: transparent;
+        color: var(--ag-text-muted);
+        font-weight: 600;
+    }
+
+    .ag-day.is-weekend {
+        background: var(--ag-weekend-bg);
+        color: var(--ag-weekend-text);
+    }
+
+    .ag-day.is-weekend .ag-day-num {
+        font-weight: 800;
+    }
+
+    .ag-day.is-holiday {
+        background: var(--ag-holiday-bg);
+        border-color: var(--ag-holiday-border);
+        color: var(--ag-holiday-text);
+    }
+
+    .ag-day.is-today {
+        background: var(--ag-today-bg);
+        color: var(--ag-today-text);
+        box-shadow: 0 6px 14px rgba(31, 42, 56, 0.20);
+    }
+
+    .ag-day.is-event {
+        background: color-mix(in srgb, var(--primary-event-color, var(--ag-accent)) 16%, #FFFFFF);
+        border-color: color-mix(in srgb, var(--primary-event-color, var(--ag-accent)) 42%, transparent);
+        box-shadow: 0 4px 10px rgba(103, 76, 27, 0.06);
+        padding-top: 7px;
+    }
+
+    .ag-day.is-event .ag-day-num {
+        color: color-mix(in srgb, var(--primary-event-color, var(--ag-accent)) 78%, #1F1106);
+    }
+
+    /* Top color stripe — one segment per event (max 4) */
+    .ag-day-stripes {
+        position: absolute;
+        top: 0;
+        inset-inline-start: 0;
+        inset-inline-end: 0;
+        display: flex;
+        height: 4px;
+        gap: 1px;
+        z-index: 1;
+        pointer-events: none;
+    }
+
+    .ag-day-stripes i {
+        flex: 1;
+        display: block;
+        height: 100%;
+        background: var(--seg-color, var(--ag-accent));
+    }
+
+    .ag-day-stripes i:first-child {
+        border-top-left-radius: var(--ag-radius-sm);
+        border-top-right-radius: var(--ag-radius-sm);
+    }
+
+    .ag-day-stripes i:last-child {
+        border-top-left-radius: var(--ag-radius-sm);
+        border-top-right-radius: var(--ag-radius-sm);
+    }
+
+    .ag-day-stripes i:not(:first-child):not(:last-child) {
+        border-radius: 0;
+    }
+
+    .ag-day.has-events:hover {
+        transform: translateY(-1px);
+        z-index: 2;
+        box-shadow: 0 8px 18px color-mix(in srgb, var(--primary-event-color, var(--ag-accent)) 28%, transparent);
+    }
+
+    /* Holiday tiny corner mark */
+    .ag-day.is-holiday::after {
+        content: "★";
+        position: absolute;
+        top: 2px;
+        inset-inline-end: 4px;
+        font-size: 0.6rem;
+        color: var(--ag-holiday-text);
+        opacity: 0.85;
+    }
+
+    /* Today corner dot */
+    .ag-day.is-today::after {
+        content: "";
+        position: absolute;
+        top: 4px;
+        inset-inline-end: 5px;
+        width: 5px;
+        height: 5px;
+        border-radius: 50%;
+        background: #fff;
+        opacity: 0.85;
+    }
+
+    /* Event dots row */
+    .ag-day-events {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 2px;
+        margin-top: auto;
+        padding-top: 2px;
+        flex-wrap: wrap;
+        max-width: 100%;
+    }
+
+    .ag-day-dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: var(--dot-color, var(--ag-accent));
+        box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.04);
+    }
+
+    .ag-day-dot.is-more {
+        background: transparent;
+        color: var(--ag-text-soft);
+        font-size: 0.6rem;
+        font-weight: 800;
+        width: auto;
+        box-shadow: none;
+        line-height: 1;
+    }
+
+    /* Holidays summary panel */
+    .ag-holidays-panel {
+        background: var(--ag-surface);
+        border: 1px solid var(--ag-border);
+        border-radius: var(--ag-radius-lg);
+        box-shadow: var(--ag-shadow-soft);
+        padding: 1.1rem 1.3rem;
+    }
+
+    .ag-holidays-head {
+        display: flex;
+        align-items: center;
+        gap: 0.55rem;
+        margin-bottom: 0.75rem;
+    }
+
+    .ag-holidays-head h2 {
+        margin: 0;
+        font-size: 1rem;
+        font-weight: 900;
+        color: var(--ag-text);
+    }
+
+    .ag-holidays-head i {
+        color: var(--ag-accent);
+    }
+
+    .ag-holidays-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 0.55rem;
+    }
+
+    .ag-holiday-pill {
+        display: flex;
+        align-items: center;
+        gap: 0.55rem;
+        padding: 0.55rem 0.75rem;
+        border-radius: 12px;
+        background: var(--ag-holiday-bg);
+        border: 1px solid var(--ag-holiday-border);
+        color: var(--ag-holiday-text);
+        font-size: 0.82rem;
+        font-weight: 700;
+    }
+
+    .ag-holiday-pill .ag-h-date {
+        font-size: 0.72rem;
+        font-weight: 800;
+        background: rgba(255, 255, 255, 0.55);
+        border-radius: 6px;
+        padding: 0.18rem 0.45rem;
+        white-space: nowrap;
+    }
+
+    /* Tooltip via title attribute is native — but enhance focus */
+    .ag-day:focus-visible {
+        outline: 2px solid var(--ag-accent);
+        outline-offset: 1px;
+    }
+
+    /* ── Responsive ───────────────────────────────────────── */
+    @media (max-width: 900px) {
+        .ag-header {
+            grid-template-columns: 1fr;
+        }
+
+        .ag-header-actions {
+            justify-content: flex-start;
+        }
+
+        .ag-months {
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        }
+    }
+
+    @media (max-width: 520px) {
+        .ag-page {
+            padding: 1rem 0.75rem 2rem;
+        }
+
+        .ag-month {
+            padding: 0.8rem;
+        }
+
+        .ag-day {
+            min-height: 32px;
+            font-size: 0.72rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="ag-page">
+    <div class="ag-shell">
+
+        <!-- ── Header ────────────────────────────────────── -->
+        <header class="ag-header">
+            <div class="ag-header-info">
+                <span class="ag-header-icon"><i class="bi bi-calendar3"></i></span>
+                <div>
+                    <h1 class="ag-header-title">{{ page_title }}</h1>
+                    <p class="ag-header-meta">عرض شامل لجميع أشهر السنة مع المحطات والاجتماعات والتقارير الدورية، بالإضافة إلى إجازات نهاية الأسبوع والعطل الرسمية.</p>
+                </div>
+            </div>
+            <div class="ag-header-actions">
+                <span class="ag-year-chip"><i class="bi bi-calendar-event"></i><span>{{ calendar.year }}</span></span>
+            </div>
+        </header>
+
+        <!-- ── Legend ────────────────────────────────────── -->
+        <section class="ag-legend" aria-label="مفتاح الأجندة">
+            <div class="ag-legend-head">
+                <i class="bi bi-info-circle"></i>
+                <h2>مفتاح الأجندة</h2>
+            </div>
+            <div class="ag-legend-grid">
+                {% for item in calendar.legend %}
+                <div class="ag-legend-item">
+                    <span class="ag-legend-swatch" style="background: {{ item.color }};"></span>
+                    <div class="ag-legend-text">
+                        <span class="ag-legend-label">{{ item.label }}</span>
+                    </div>
+                </div>
+                {% endfor %}
+                <div class="ag-legend-item">
+                    <span class="ag-legend-swatch is-block" style="background: var(--ag-weekend-bg); border: 1px solid var(--ag-border-soft);"></span>
+                    <div class="ag-legend-text">
+                        <span class="ag-legend-label">نهاية الأسبوع (السبت/الأحد)</span>
+                    </div>
+                </div>
+                <div class="ag-legend-item">
+                    <span class="ag-legend-swatch is-block" style="background: var(--ag-holiday-bg); border: 1px solid var(--ag-holiday-border);"></span>
+                    <div class="ag-legend-text">
+                        <span class="ag-legend-label">إجازة رسمية</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ── Months grid ───────────────────────────────── -->
+        <section class="ag-months" aria-label="أشهر السنة">
+            {% for month in calendar.months %}
+            <article class="ag-month">
+                <header class="ag-month-head">
+                    <h3 class="ag-month-name">
+                        <span class="ag-month-num">{{ month.number }}</span>
+                        <span>{{ month.name }}</span>
+                    </h3>
+                    {% if month.event_count %}
+                    <span class="ag-month-count" title="عدد الأحداث في هذا الشهر">
+                        <i class="bi bi-clipboard-check"></i>{{ month.event_count }}
+                    </span>
+                    {% endif %}
+                </header>
+
+                <div class="ag-dow" aria-hidden="true">
+                    {% for d in calendar.day_headers %}
+                    <span class="{% if loop.index0 == 5 or loop.index0 == 6 %}is-weekend{% endif %}">{{ d }}</span>
+                    {% endfor %}
+                </div>
+
+                <div class="ag-grid">
+                    {% for week in month.weeks %}
+                        {% for day in week %}
+                            {% set has_events = day.events|length > 0 %}
+                            {% set is_holiday = day.holiday is not none and day.holiday %}
+                            {% set day_classes = [] %}
+                            {% if not day.in_month %}{% set _ = day_classes.append('is-outside') %}{% endif %}
+                            {% if day.in_month and is_holiday %}{% set _ = day_classes.append('is-holiday') %}{% endif %}
+                            {% if day.in_month and not is_holiday and day.is_weekend %}{% set _ = day_classes.append('is-weekend') %}{% endif %}
+                            {% if day.in_month and has_events %}{% set _ = day_classes.append('is-event') %}{% set _ = day_classes.append('has-events') %}{% endif %}
+                            {% set tooltip_parts = [] %}
+                            {% if is_holiday %}{% set _ = tooltip_parts.append(day.holiday) %}{% endif %}
+                            {% for k in day.events %}{% set _ = tooltip_parts.append(calendar.legend_map[k].label) %}{% endfor %}
+                            {% set primary_color = calendar.legend_map[day.events[0]].color if has_events else '' %}
+                            <div
+                                class="ag-day {{ day_classes|join(' ') }}"
+                                {% if day.in_month and has_events %}style="--primary-event-color: {{ primary_color }};"{% endif %}
+                                {% if day.in_month %}
+                                title="{{ tooltip_parts|join(' · ') }}"
+                                tabindex="0"
+                                {% endif %}
+                            >
+                                {% if day.in_month and has_events %}
+                                <span class="ag-day-stripes" aria-hidden="true">
+                                    {% set max_segs = 4 %}
+                                    {% for ekey in day.events[:max_segs] %}
+                                        <i style="--seg-color: {{ calendar.legend_map[ekey].color }}; background: {{ calendar.legend_map[ekey].color }};"></i>
+                                    {% endfor %}
+                                </span>
+                                {% endif %}
+                                <span class="ag-day-num">{{ day.day }}</span>
+                                {% if day.in_month and has_events and day.events|length > 1 %}
+                                <span class="ag-day-events">
+                                    {% set max_dots = 4 %}
+                                    {% for ekey in day.events[:max_dots] %}
+                                        <span class="ag-day-dot" style="--dot-color: {{ calendar.legend_map[ekey].color }};"></span>
+                                    {% endfor %}
+                                    {% if day.events|length > max_dots %}
+                                    <span class="ag-day-dot is-more">+{{ day.events|length - max_dots }}</span>
+                                    {% endif %}
+                                </span>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                    {% endfor %}
+                </div>
+            </article>
+            {% endfor %}
+        </section>
+
+        <!-- ── Holidays summary ──────────────────────────── -->
+        {% if calendar.holidays %}
+        <section class="ag-holidays-panel" aria-label="العطل الرسمية">
+            <div class="ag-holidays-head">
+                <i class="bi bi-stars"></i>
+                <h2>العطل الرسمية {{ calendar.year }}</h2>
+            </div>
+            <div class="ag-holidays-grid">
+                {% for h in calendar.holidays %}
+                <div class="ag-holiday-pill">
+                    <span class="ag-h-date">{{ h.date }}</span>
+                    <span>{{ h.name }}</span>
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+(function () {
+    // Mark today's date if it falls within the rendered year.
+    const today = new Date();
+    const iso = today.toISOString().slice(0, 10);
+    const todayBtn = document.querySelector(`[title*="${iso}"]`);
+    // Use a more reliable selector: data attribute would be cleaner — fallback: check via day cells
+    document.querySelectorAll('.ag-day').forEach(el => {
+        // We can detect today by matching day number + month order, but simplest:
+        // server doesn't tag today, so do it client-side using the data we have.
+    });
+
+    // Simplified client-side today marker by iterating known structure:
+    // Each .ag-day inside .ag-month corresponds to a calendar date that we know
+    // by looking at the parent month index + the day number, accounting for outside cells.
+    const months = document.querySelectorAll('.ag-month');
+    const year = parseInt(document.querySelector('.ag-year-chip span:last-child')?.textContent || '0', 10);
+    if (!year) return;
+
+    months.forEach(monthEl => {
+        const numEl = monthEl.querySelector('.ag-month-num');
+        if (!numEl) return;
+        const monthNum = parseInt(numEl.textContent, 10);
+        if (!monthNum) return;
+        const cells = monthEl.querySelectorAll('.ag-day');
+        cells.forEach(cell => {
+            if (cell.classList.contains('is-outside')) return;
+            const dayNum = parseInt(cell.querySelector('.ag-day-num')?.textContent || '0', 10);
+            if (!dayNum) return;
+            if (
+                today.getFullYear() === year &&
+                today.getMonth() + 1 === monthNum &&
+                today.getDate() === dayNum
+            ) {
+                cell.classList.add('is-today');
+            }
+        });
+    });
+})();
+</script>
+{% endblock %}

@@ -1,0 +1,768 @@
+{% extends "base.html" %}
+
+{% block title %}{{ page_title }} — {{ app_name }}{% endblock %}
+{% block body_class %}app-body dashboard-home-body{% endblock %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --sb-bg:           #EDE7DC;
+        --sb-paper:        #FFFFFF;
+        --sb-paper-soft:   #FFFCF6;
+        --sb-accent:       #C89B3C;
+        --sb-accent-deep:  #A67C23;
+        --sb-accent-dark:  #7E5A20;
+        --sb-text:         #2B1F12;
+        --sb-text-soft:    #5A4A3A;
+        --sb-border:       rgba(200, 155, 60, 0.30);
+        --sb-border-soft:  rgba(200, 155, 60, 0.14);
+        --sb-shadow:       0 24px 48px rgba(31, 22, 8, 0.16);
+        --sb-shadow-soft:  0 14px 28px rgba(31, 22, 8, 0.10);
+    }
+
+    .dashboard-home-body {
+        background:
+            radial-gradient(circle at top right, rgba(200, 155, 60, 0.10), transparent 30rem),
+            linear-gradient(180deg, #F3EEDF 0%, var(--sb-bg) 100%);
+        color: var(--sb-text);
+    }
+
+    .sb-page-wrap {
+        padding: 1.25rem clamp(0.85rem, 2vw, 1.5rem) 3rem;
+    }
+
+    .sb-shell {
+        max-width: 1080px;
+        margin: 0 auto;
+        display: grid;
+        gap: 1.25rem;
+    }
+
+    /* ── Toolbar ──────────────────────────────────────────── */
+    .sb-toolbar {
+        background: #FFFFFF;
+        border: 1px solid var(--sb-border);
+        border-radius: 22px;
+        padding: 1rem 1.25rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        flex-wrap: wrap;
+        box-shadow: var(--sb-shadow-soft);
+    }
+
+    .sb-toolbar-info {
+        display: flex;
+        align-items: center;
+        gap: 0.85rem;
+        min-width: 0;
+    }
+
+    .sb-toolbar-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 16px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(180deg, #FFF7E2 0%, #F2E3B8 100%);
+        color: var(--sb-accent);
+        font-size: 1.4rem;
+        flex: 0 0 auto;
+        border: 1px solid rgba(200, 155, 60, 0.18);
+    }
+
+    .sb-toolbar h1 {
+        margin: 0;
+        font-size: clamp(1.2rem, 2vw, 1.55rem);
+        font-weight: 900;
+        color: var(--sb-text);
+    }
+
+    .sb-toolbar p {
+        margin: 0.15rem 0 0;
+        color: var(--sb-text-soft);
+        font-size: 0.85rem;
+    }
+
+    .sb-toolbar-actions {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.55rem;
+        flex-wrap: wrap;
+    }
+
+    .sb-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.45rem;
+        padding: 0.65rem 1.15rem;
+        border-radius: 999px;
+        font-weight: 800;
+        font-size: 0.88rem;
+        border: 1px solid transparent;
+        background: #FFFFFF;
+        color: var(--sb-text);
+        cursor: pointer;
+        text-decoration: none;
+        transition: transform 0.18s ease, box-shadow 0.18s ease;
+        line-height: 1;
+    }
+
+    .sb-btn-primary {
+        background: linear-gradient(180deg, #E7D29A 0%, #C89B3C 100%);
+        color: #FFFFFF;
+        border-color: rgba(200, 155, 60, 0.45);
+        box-shadow: 0 10px 22px rgba(200, 155, 60, 0.28);
+    }
+
+    .sb-btn-primary:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 14px 26px rgba(200, 155, 60, 0.32);
+        color: #FFFFFF;
+    }
+
+    .sb-btn-ghost {
+        background: #FFFCF3;
+        border-color: var(--sb-border);
+        color: var(--sb-accent-deep);
+    }
+
+    .sb-btn-ghost:hover {
+        background: #FFF6E1;
+        transform: translateY(-1px);
+        color: var(--sb-accent-dark);
+    }
+
+    /* ── Pages stack (the booklet) ─────────────────────────── */
+    .sb-booklet {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 1.25rem;
+    }
+
+    .sb-page {
+        position: relative;
+        background: var(--sb-paper);
+        color: var(--sb-text);
+        width: min(100%, 920px);
+        aspect-ratio: 210 / 297;          /* A4 portrait */
+        border-radius: 12px;
+        box-shadow: var(--sb-shadow);
+        overflow: hidden;
+        border: 1px solid var(--sb-border-soft);
+        display: grid;
+        grid-template-rows: auto 1fr auto;
+        padding: clamp(2.2rem, 5vw, 3.4rem) clamp(1.85rem, 4vw, 3rem);
+    }
+
+    /* Gold double-border decoration on every page */
+    .sb-page::before {
+        content: "";
+        position: absolute;
+        inset: 14px;
+        border: 1px solid var(--sb-border);
+        border-radius: 6px;
+        pointer-events: none;
+    }
+
+    .sb-page::after {
+        content: "";
+        position: absolute;
+        inset: 20px;
+        border: 1px dashed rgba(200, 155, 60, 0.20);
+        border-radius: 4px;
+        pointer-events: none;
+    }
+
+    .sb-page-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.75rem;
+        padding-bottom: 0.85rem;
+        border-bottom: 1px solid var(--sb-border-soft);
+        color: var(--sb-text-soft);
+        font-size: 0.82rem;
+        font-weight: 700;
+        position: relative;
+        z-index: 1;
+    }
+
+    .sb-page-header-brand {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.45rem;
+        color: var(--sb-accent-deep);
+    }
+
+    .sb-page-header-brand i {
+        color: var(--sb-accent);
+    }
+
+    .sb-page-body {
+        position: relative;
+        z-index: 1;
+        padding: 1.6rem 0;
+        display: flex;
+        flex-direction: column;
+        gap: 1.2rem;
+        overflow: hidden;
+    }
+
+    .sb-page-footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.75rem;
+        padding-top: 0.85rem;
+        border-top: 1px solid var(--sb-border-soft);
+        color: var(--sb-text-soft);
+        font-size: 0.78rem;
+        font-weight: 700;
+        position: relative;
+        z-index: 1;
+    }
+
+    .sb-page-num {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 28px;
+        height: 28px;
+        padding: 0 0.55rem;
+        border-radius: 999px;
+        background: linear-gradient(180deg, #FFF7E2 0%, #F2E3B8 100%);
+        border: 1px solid var(--sb-border);
+        color: var(--sb-accent-dark);
+        font-weight: 900;
+        font-size: 0.76rem;
+    }
+
+    /* ── Cover page ───────────────────────────────────────── */
+    .sb-page.is-cover {
+        background:
+            radial-gradient(circle at top right, rgba(200, 155, 60, 0.16), transparent 22rem),
+            radial-gradient(circle at bottom left, rgba(126, 90, 32, 0.10), transparent 24rem),
+            linear-gradient(180deg, #FFFCF3 0%, #FBEFC9 100%);
+    }
+
+    .sb-cover-inner {
+        position: relative;
+        z-index: 1;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        gap: 1.35rem;
+        padding: 1rem;
+    }
+
+    .sb-cover-emblem {
+        width: clamp(86px, 12vw, 130px);
+        height: clamp(86px, 12vw, 130px);
+        border-radius: 50%;
+        background: linear-gradient(135deg, #FFF7E2 0%, #E8C97A 100%);
+        border: 2px solid var(--sb-border);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--sb-accent-dark);
+        font-size: clamp(2.6rem, 4vw, 3.6rem);
+        box-shadow: 0 18px 40px rgba(126, 90, 32, 0.22);
+    }
+
+    .sb-cover-kicker {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.45rem;
+        padding: 0.5rem 1.1rem;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.65);
+        border: 1px solid var(--sb-border);
+        color: var(--sb-accent-deep);
+        font-weight: 800;
+        font-size: 0.85rem;
+        backdrop-filter: blur(4px);
+    }
+
+    .sb-cover-title {
+        margin: 0;
+        font-size: clamp(2rem, 4.5vw, 3.4rem);
+        font-weight: 900;
+        line-height: 1.15;
+        color: var(--sb-accent-dark);
+        text-shadow: 0 2px 0 rgba(255, 255, 255, 0.6);
+        letter-spacing: -0.005em;
+    }
+
+    .sb-cover-subtitle {
+        margin: 0;
+        max-width: 540px;
+        color: var(--sb-text-soft);
+        font-size: clamp(0.95rem, 1.4vw, 1.05rem);
+        line-height: 1.85;
+    }
+
+    .sb-cover-divider {
+        width: 80px;
+        height: 2px;
+        background: linear-gradient(90deg, transparent, var(--sb-accent), transparent);
+        border-radius: 999px;
+    }
+
+    .sb-cover-meta {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        color: var(--sb-accent-deep);
+        font-weight: 800;
+        font-size: 0.95rem;
+    }
+
+    /* ── Generic content typography ───────────────────────── */
+    .sb-section-kicker {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        padding: 0.32rem 0.85rem;
+        border-radius: 999px;
+        background: linear-gradient(180deg, #FFF7E2 0%, #F2E3B8 100%);
+        border: 1px solid var(--sb-border);
+        color: var(--sb-accent-deep);
+        font-weight: 800;
+        font-size: 0.76rem;
+        align-self: flex-start;
+    }
+
+    .sb-section-title {
+        margin: 0;
+        font-size: clamp(1.5rem, 2.6vw, 2rem);
+        font-weight: 900;
+        color: var(--sb-text);
+        line-height: 1.2;
+    }
+
+    .sb-section-lead {
+        margin: 0;
+        color: var(--sb-text-soft);
+        font-size: 1rem;
+        line-height: 1.95;
+        max-width: 760px;
+    }
+
+    .sb-rule {
+        height: 2px;
+        width: 60px;
+        background: linear-gradient(90deg, var(--sb-accent), transparent);
+        border-radius: 999px;
+    }
+
+    /* Objectives list */
+    .sb-list {
+        display: grid;
+        gap: 0.85rem;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+    }
+
+    .sb-list li {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.75rem;
+        background: var(--sb-paper-soft);
+        border: 1px solid var(--sb-border-soft);
+        border-radius: 12px;
+        padding: 0.85rem 1rem;
+        color: var(--sb-text);
+        font-size: 0.95rem;
+        line-height: 1.85;
+    }
+
+    .sb-list li .sb-num {
+        flex: 0 0 auto;
+        width: 28px;
+        height: 28px;
+        border-radius: 8px;
+        background: linear-gradient(180deg, #FFF7E2 0%, #F2E3B8 100%);
+        border: 1px solid var(--sb-border);
+        color: var(--sb-accent-dark);
+        font-weight: 900;
+        font-size: 0.82rem;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        margin-top: 1px;
+    }
+
+    /* Axes grid */
+    .sb-axes-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 0.85rem;
+    }
+
+    .sb-axis {
+        background: var(--sb-paper-soft);
+        border: 1px solid var(--sb-border-soft);
+        border-radius: 14px;
+        padding: 0.95rem 1rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.55rem;
+    }
+
+    .sb-axis-head {
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+    }
+
+    .sb-axis-icon {
+        width: 38px;
+        height: 38px;
+        border-radius: 12px;
+        background: linear-gradient(180deg, #FFF7E2 0%, #F2E3B8 100%);
+        border: 1px solid var(--sb-border);
+        color: var(--sb-accent);
+        font-size: 1.05rem;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        flex: 0 0 auto;
+    }
+
+    .sb-axis-title {
+        margin: 0;
+        font-size: 1rem;
+        font-weight: 900;
+        color: var(--sb-text);
+    }
+
+    .sb-axis-desc {
+        margin: 0;
+        color: var(--sb-text-soft);
+        font-size: 0.86rem;
+        line-height: 1.75;
+    }
+
+    .sb-pills {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.3rem;
+        margin-top: 0.25rem;
+    }
+
+    .sb-pill {
+        padding: 0.25rem 0.65rem;
+        border-radius: 999px;
+        background: #FFFFFF;
+        border: 1px solid var(--sb-border-soft);
+        color: var(--sb-accent-deep);
+        font-size: 0.72rem;
+        font-weight: 800;
+    }
+
+    /* Closing page */
+    .sb-closing-block {
+        margin-top: auto;
+        margin-bottom: auto;
+        text-align: center;
+        display: grid;
+        gap: 1.2rem;
+        justify-items: center;
+    }
+
+    .sb-closing-quote {
+        font-size: clamp(1.2rem, 2.4vw, 1.7rem);
+        font-weight: 900;
+        line-height: 1.85;
+        color: var(--sb-text);
+        max-width: 640px;
+    }
+
+    .sb-closing-quote::before { content: "“"; color: var(--sb-accent); font-size: 1.8em; line-height: 0; vertical-align: -0.3em; margin-inline-end: 0.2em; }
+    .sb-closing-quote::after  { content: "”"; color: var(--sb-accent); font-size: 1.8em; line-height: 0; vertical-align: -0.3em; margin-inline-start: 0.2em; }
+
+    .sb-closing-meta {
+        color: var(--sb-text-soft);
+        font-size: 0.92rem;
+    }
+
+    .sb-closing-divider {
+        width: 120px;
+        height: 2px;
+        background: linear-gradient(90deg, transparent, var(--sb-accent), transparent);
+    }
+
+    /* ── Responsive ───────────────────────────────────────── */
+    @media (max-width: 720px) {
+        .sb-page {
+            aspect-ratio: auto;
+            min-height: 70vh;
+            padding: 1.6rem 1.2rem;
+        }
+
+        .sb-axes-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    /* ── Print rules (Save as PDF) ────────────────────────── */
+    @media print {
+        @page {
+            size: A4 portrait;
+            margin: 0;
+        }
+
+        html, body {
+            background: #FFFFFF !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+
+        .app-navbar,
+        .app-footer,
+        .sb-toolbar,
+        nav,
+        footer {
+            display: none !important;
+        }
+
+        .main-content,
+        .sb-page-wrap {
+            padding: 0 !important;
+            margin: 0 !important;
+        }
+
+        .sb-shell {
+            max-width: none !important;
+            gap: 0 !important;
+        }
+
+        .sb-booklet {
+            gap: 0 !important;
+        }
+
+        .sb-page {
+            width: 100% !important;
+            height: 100vh !important;
+            min-height: 100vh !important;
+            aspect-ratio: auto !important;
+            page-break-after: always;
+            box-shadow: none !important;
+            border-radius: 0 !important;
+            border: 0 !important;
+            margin: 0 !important;
+        }
+
+        .sb-page:last-child {
+            page-break-after: auto;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="sb-page-wrap">
+    <div class="sb-shell">
+
+        <!-- ── Toolbar ────────────────────────────────────── -->
+        <header class="sb-toolbar">
+            <div class="sb-toolbar-info">
+                <span class="sb-toolbar-icon"><i class="bi bi-journal-bookmark"></i></span>
+                <div>
+                    <h1>{{ booklet.title }}</h1>
+                    <p>{{ booklet.subtitle }}</p>
+                </div>
+            </div>
+            <div class="sb-toolbar-actions">
+                <button type="button" class="sb-btn sb-btn-ghost" id="sbZoomOut" title="تصغير العرض">
+                    <i class="bi bi-zoom-out"></i><span>تصغير</span>
+                </button>
+                <button type="button" class="sb-btn sb-btn-ghost" id="sbZoomIn" title="تكبير العرض">
+                    <i class="bi bi-zoom-in"></i><span>تكبير</span>
+                </button>
+                <button type="button" class="sb-btn sb-btn-primary" id="sbDownload" title="تنزيل نسخة PDF">
+                    <i class="bi bi-file-earmark-arrow-down"></i><span>تنزيل PDF</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- ── Booklet pages ──────────────────────────────── -->
+        <div class="sb-booklet" id="sbBooklet">
+
+            <!-- Page 1: Cover -->
+            <article class="sb-page is-cover" data-page="1">
+                <div class="sb-cover-inner">
+                    <span class="sb-cover-emblem"><i class="bi bi-shield-shaded"></i></span>
+                    <span class="sb-cover-kicker"><i class="bi bi-stars"></i>كراسة مرجعية</span>
+                    <h2 class="sb-cover-title">{{ booklet.title }}</h2>
+                    <span class="sb-cover-divider"></span>
+                    <p class="sb-cover-subtitle">{{ booklet.foreword }}</p>
+                    <span class="sb-cover-meta"><i class="bi bi-calendar3"></i><span>{{ booklet.subtitle }}</span></span>
+                </div>
+            </article>
+
+            <!-- Page 2: Foreword -->
+            <article class="sb-page" data-page="2">
+                <div class="sb-page-header">
+                    <span class="sb-page-header-brand"><i class="bi bi-bookmark-star-fill"></i><span>{{ booklet.title }}</span></span>
+                    <span>تقديم</span>
+                </div>
+                <div class="sb-page-body">
+                    <span class="sb-section-kicker"><i class="bi bi-bookmark-fill"></i>تقديم</span>
+                    <h3 class="sb-section-title">رؤية موحّدة لمنظومة دفاعية متقدمة</h3>
+                    <span class="sb-rule"></span>
+                    <p class="sb-section-lead">{{ booklet.foreword }}</p>
+                    <p class="sb-section-lead">
+                        تستند هذه الكراسة إلى مبادئ الجاهزية، والابتكار، والتكامل بين المحاور الخمسة الرئيسية،
+                        لتضمن استدامة الأداء التشغيلي وكفاءة استثمار القدرات الوطنية لخدمة الأمن والتنمية المستدامة.
+                    </p>
+                </div>
+                <div class="sb-page-footer">
+                    <span>{{ booklet.title }}</span>
+                    <span class="sb-page-num">2</span>
+                </div>
+            </article>
+
+            <!-- Page 3: Objectives -->
+            <article class="sb-page" data-page="3">
+                <div class="sb-page-header">
+                    <span class="sb-page-header-brand"><i class="bi bi-bullseye"></i><span>{{ booklet.title }}</span></span>
+                    <span>الأهداف الاستراتيجية</span>
+                </div>
+                <div class="sb-page-body">
+                    <span class="sb-section-kicker"><i class="bi bi-bullseye"></i>الأهداف</span>
+                    <h3 class="sb-section-title">الأهداف الاستراتيجية الكبرى</h3>
+                    <span class="sb-rule"></span>
+                    <ol class="sb-list">
+                        {% for obj in booklet.objectives %}
+                        <li>
+                            <span class="sb-num">{{ loop.index }}</span>
+                            <span>{{ obj }}</span>
+                        </li>
+                        {% endfor %}
+                    </ol>
+                </div>
+                <div class="sb-page-footer">
+                    <span>{{ booklet.title }}</span>
+                    <span class="sb-page-num">3</span>
+                </div>
+            </article>
+
+            <!-- Page 4: Axes -->
+            <article class="sb-page" data-page="4">
+                <div class="sb-page-header">
+                    <span class="sb-page-header-brand"><i class="bi bi-diagram-3-fill"></i><span>{{ booklet.title }}</span></span>
+                    <span>المحاور الاستراتيجية</span>
+                </div>
+                <div class="sb-page-body">
+                    <span class="sb-section-kicker"><i class="bi bi-diagram-3-fill"></i>المحاور</span>
+                    <h3 class="sb-section-title">المحاور الخمسة</h3>
+                    <span class="sb-rule"></span>
+                    <div class="sb-axes-grid">
+                        {% for ax in booklet.axes %}
+                        <article class="sb-axis">
+                            <header class="sb-axis-head">
+                                <span class="sb-axis-icon"><i class="bi {{ ax.icon }}"></i></span>
+                                <h4 class="sb-axis-title">{{ ax.title }}</h4>
+                            </header>
+                            <p class="sb-axis-desc">{{ ax.desc }}</p>
+                            {% if ax.pillars %}
+                            <div class="sb-pills">
+                                {% for p in ax.pillars %}
+                                <span class="sb-pill">{{ p }}</span>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                        </article>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="sb-page-footer">
+                    <span>{{ booklet.title }}</span>
+                    <span class="sb-page-num">4</span>
+                </div>
+            </article>
+
+            <!-- Page 5: Closing -->
+            <article class="sb-page" data-page="5">
+                <div class="sb-page-header">
+                    <span class="sb-page-header-brand"><i class="bi bi-flag-fill"></i><span>{{ booklet.title }}</span></span>
+                    <span>خاتمة</span>
+                </div>
+                <div class="sb-page-body">
+                    <div class="sb-closing-block">
+                        <span class="sb-section-kicker"><i class="bi bi-flag-fill"></i>خاتمة</span>
+                        <p class="sb-closing-quote">{{ booklet.closing }}</p>
+                        <span class="sb-closing-divider"></span>
+                        <p class="sb-closing-meta">{{ booklet.subtitle }} · {{ app_name }}</p>
+                    </div>
+                </div>
+                <div class="sb-page-footer">
+                    <span>{{ booklet.title }}</span>
+                    <span class="sb-page-num">5</span>
+                </div>
+            </article>
+
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+(function () {
+    // ── Download (Save as PDF) — uses native print dialog ───────────────
+    const downloadBtn = document.getElementById('sbDownload');
+    if (downloadBtn) {
+        downloadBtn.addEventListener('click', () => window.print());
+    }
+
+    // ── Zoom controls (screen only) ─────────────────────────────────────
+    const booklet  = document.getElementById('sbBooklet');
+    const zoomIn   = document.getElementById('sbZoomIn');
+    const zoomOut  = document.getElementById('sbZoomOut');
+    if (!booklet || !zoomIn || !zoomOut) return;
+
+    let scale = 1.0;
+    const MIN = 0.6;
+    const MAX = 1.4;
+    const STEP = 0.1;
+
+    function apply() {
+        document.querySelectorAll('.sb-page').forEach(p => {
+            p.style.transform = `scale(${scale})`;
+            p.style.transformOrigin = 'top center';
+            // Add margin so scaled pages don't overlap
+            const extra = (scale - 1) * 200;
+            p.style.marginBottom = extra > 0 ? `${extra}px` : '';
+            p.style.marginTop = extra < 0 ? `${extra}px` : '';
+        });
+    }
+
+    zoomIn.addEventListener('click', () => {
+        scale = Math.min(MAX, +(scale + STEP).toFixed(2));
+        apply();
+    });
+
+    zoomOut.addEventListener('click', () => {
+        scale = Math.max(MIN, +(scale - STEP).toFixed(2));
+        apply();
+    });
+
+    // Keyboard shortcut: Ctrl/Cmd + P → native print
+    document.addEventListener('keydown', e => {
+        if ((e.ctrlKey || e.metaKey) && (e.key === 'p' || e.key === 'P')) {
+            // Let the browser handle it — print rules will hide UI chrome
+        }
+    });
+})();
+</script>
+{% endblock %}
