@@ -72,8 +72,8 @@
 
 .hero-banner {
     position: relative;
-    min-height: clamp(320px, 42vw, 490px);
-    aspect-ratio: 16 / 6;
+    min-height: clamp(380px, 52vw, 600px);
+    aspect-ratio: 15 / 8;
     overflow: hidden;
     border-radius: var(--home-radius-lg);
     border: 1px solid rgba(255, 255, 255, 0.65);
@@ -110,8 +110,12 @@
 }
 
 .hero-copy-inner {
-    width: min(100%, clamp(560px, 78vw, 980px));
-    transform: translateY(-8px);
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .hero-kicker {
@@ -130,32 +134,66 @@
 }
 
 .hero-title {
+    /* يُستخدم فقط لعرض الخريطة في المركز */
     margin: 0;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: clamp(0.6rem, 1.6vw, 1.3rem);
-    flex-wrap: nowrap;
-    font-size: clamp(1.8rem, 3.6vw, 3rem);
-    font-weight: 900;
-    letter-spacing: 0;
-    line-height: 1;
+    pointer-events: none;
 }
 
+/* الصندوق — موضع مطلق على طرف البانر */
 .hero-title-word {
-    display: inline-block;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem rem;
+    background: linear-gradient(135deg,
+        rgba(255, 253, 242, 0.96) 0%,
+        rgba(255, 246, 210, 0.92) 100%
+    );
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    color: #4A2E08;
     white-space: nowrap;
-    flex: 0 0 auto;
-    position: relative;
-    z-index: 3;
-    color: #5C3F12;
-    text-shadow:
-        0 1px 0 #FFFFFF,
-        -1px 0 0 rgba(255, 255, 255, 0.9),
-        1px 0 0 rgba(255, 255, 255, 0.9),
-        0 0 12px rgba(255, 253, 240, 1),
-        0 0 24px rgba(255, 250, 220, 0.85),
-        0 4px 10px rgba(126, 90, 32, 0.25);
+    z-index: 5;
+    font-size: clamp(1.2rem, 2.2vw, 1.9rem);
+    font-weight: 900;
+    letter-spacing: 0.04em;
+    text-shadow: 0 1px 0 rgba(255,255,255,0.9);
+    box-shadow:
+        0 0 0 2px rgba(194, 146, 64, 0.85),
+        0 8px 32px rgba(126, 90, 32, 0.30),
+        inset 0 1px 0 rgba(255,255,255,0.85);
+}
+
+/* الصندوق الأيمن — قريب من الحافة اليمنى للبانر (عند الطائرة) */
+.hero-title-word:first-child {
+    right: clamp(1.5rem, 5vw, 5rem);
+    clip-path: polygon(0 0, calc(100% - 18px) 0, 100% 50%, calc(100% - 18px) 100%, 0 100%);
+    padding-left: 1.4rem;
+    padding-right: 2.2rem;
+}
+
+/* الصندوق الأيسر — قريب من الحافة اليسرى للبانر (عند المدينة) */
+.hero-title-word:last-child {
+    left: clamp(1.5rem, 5vw, 5rem);
+    clip-path: polygon(18px 0, 100% 0, 100% 100%, 18px 100%, 0 50%);
+    padding-right: 1.4rem;
+    padding-left: 2.2rem;
+}
+
+/* لا خطوط رابطة — الصناديق ملاصقة للدائرة مباشرة */
+.hero-title-word::after {
+    display: none;
+}
+
+/* جناح الخط — عناصر منفصلة للخط الطويل */
+.hero-title-wing {
+    display: none;
 }
 
 .hero-title-map {
@@ -487,13 +525,7 @@
     <section class="hero-banner" aria-label="الاستراتيجية العسكرية">
         <img class="hero-bg" src="{{ url_for('static', filename='img/strategy-hero-light.png') }}" alt="خلفية الاستراتيجية العسكرية">
         <div class="hero-copy">
-            <div class="hero-copy-inner">
-                <h1 class="hero-title">
-                    <span class="hero-title-word">الاستراتيجية</span>
-                    <img class="hero-title-map" src="{{ url_for('static', filename='img/uae-map.png') }}" alt="خريطة الإمارات">
-                    <span class="hero-title-word">العسكرية</span>
-                </h1>
-            </div>
+            <div class="hero-copy-inner"></div>
         </div>
     </section>
 
