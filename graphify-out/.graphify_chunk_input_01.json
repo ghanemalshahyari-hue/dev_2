@@ -1,0 +1,29 @@
+{
+  "files": [
+    "C:\\Users\\ADMIN\\Desktop\\dev_2\\PROJECT_RULES.md",
+    "C:\\Users\\ADMIN\\Desktop\\dev_2\\README.md",
+    "C:\\Users\\ADMIN\\Desktop\\dev_2\\SESSION_NOTES.md",
+    "C:\\Users\\ADMIN\\Desktop\\dev_2\\SESSION_STATE.md",
+    "C:\\Users\\ADMIN\\Desktop\\dev_2\\_dev_scripts\\chat_session_2026_02_26.txt",
+    "C:\\Users\\ADMIN\\Desktop\\dev_2\\app\\templates\\access\\my_requests.html",
+    "C:\\Users\\ADMIN\\Desktop\\dev_2\\app\\templates\\access\\new_request.html",
+    "C:\\Users\\ADMIN\\Desktop\\dev_2\\app\\templates\\access\\pending.html",
+    "C:\\Users\\ADMIN\\Desktop\\dev_2\\app\\templates\\access\\pending_approvals.html",
+    "C:\\Users\\ADMIN\\Desktop\\dev_2\\app\\templates\\access\\request.html",
+    "C:\\Users\\ADMIN\\Desktop\\dev_2\\app\\templates\\admin\\audit_log.html",
+    "C:\\Users\\ADMIN\\Desktop\\dev_2\\app\\templates\\admin\\departments.html",
+    "C:\\Users\\ADMIN\\Desktop\\dev_2\\app\\templates\\admin\\index.html",
+    "C:\\Users\\ADMIN\\Desktop\\dev_2\\app\\templates\\admin\\role_form.html",
+    "C:\\Users\\ADMIN\\Desktop\\dev_2\\app\\templates\\admin\\roles.html",
+    "C:\\Users\\ADMIN\\Desktop\\dev_2\\app\\templates\\admin\\users.html",
+    "C:\\Users\\ADMIN\\Desktop\\dev_2\\app\\templates\\auth\\login.html",
+    "C:\\Users\\ADMIN\\Desktop\\dev_2\\app\\templates\\base.html",
+    "C:\\Users\\ADMIN\\Desktop\\dev_2\\app\\templates\\dashboard\\agenda.html",
+    "C:\\Users\\ADMIN\\Desktop\\dev_2\\app\\templates\\dashboard\\ceo.html",
+    "C:\\Users\\ADMIN\\Desktop\\dev_2\\app\\templates\\dashboard\\commitments.html",
+    "C:\\Users\\ADMIN\\Desktop\\dev_2\\app\\templates\\dashboard\\concept_operations.html"
+  ],
+  "chunk_num": 1,
+  "total_chunks": 5,
+  "is_image_chunk": false
+}

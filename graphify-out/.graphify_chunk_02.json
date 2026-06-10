@@ -1,0 +1,156 @@
+{
+  "nodes": [
+    {"id": "tpl_dashboard_department", "label": "Dashboard / Department Template", "type": "template", "source_files": ["app/templates/dashboard/department.html"], "source_location": "app/templates/dashboard/department.html:1", "confidence": "EXTRACTED", "description": "English-labeled department dashboard with metrics (competence, completion), data entries, teams, users, and an Update Metrics modal."},
+    {"id": "comp_update_metrics_modal", "label": "Update Metrics Modal", "type": "component", "source_files": ["app/templates/dashboard/department.html"], "source_location": "app/templates/dashboard/department.html:194", "confidence": "EXTRACTED", "description": "Modal form for updating department competence, completion, data entries and quality score; submits JSON to /api/dashboard/metrics."},
+    {"id": "route_api_dashboard_metrics", "label": "POST /api/dashboard/metrics", "type": "route", "source_files": ["app/templates/dashboard/department.html"], "source_location": "app/templates/dashboard/department.html:282", "confidence": "EXTRACTED", "description": "API endpoint called by Update Metrics form to persist department metrics."},
+
+    {"id": "tpl_dashboard_department_detail", "label": "Dashboard / Department Detail Template", "type": "template", "source_files": ["app/templates/dashboard/department_detail.html"], "source_location": "app/templates/dashboard/department_detail.html:1", "confidence": "EXTRACTED", "description": "Arabic per-department page (tasks list with completion bars, overdue badge for >5 years, and an add-task modal posting to api.create_main_task)."},
+    {"id": "comp_add_task_modal", "label": "Add Main Task Modal", "type": "component", "source_files": ["app/templates/dashboard/department_detail.html"], "source_location": "app/templates/dashboard/department_detail.html:304", "confidence": "EXTRACTED", "description": "Modal collecting task number, description, expected_end_date, completion_pct, and a comma-separated secondary department list."},
+    {"id": "route_api_create_main_task", "label": "api.create_main_task", "type": "route", "source_files": ["app/templates/dashboard/department_detail.html"], "source_location": "app/templates/dashboard/department_detail.html:403", "confidence": "EXTRACTED", "description": "Flask URL endpoint referenced via url_for to persist a new primary task for a department."},
+
+    {"id": "tpl_dashboard_deputy", "label": "Dashboard / Deputy Template", "type": "template", "source_files": ["app/templates/dashboard/deputy.html"], "source_location": "app/templates/dashboard/deputy.html:1", "confidence": "EXTRACTED", "description": "لوحة نائب المدير — deputy director dashboard with averages, departments overview cards, and pending-requests shortcuts."},
+
+    {"id": "tpl_dashboard_developer", "label": "Dashboard / Developer Template", "type": "template", "source_files": ["app/templates/dashboard/developer.html"], "source_location": "app/templates/dashboard/developer.html:1", "confidence": "EXTRACTED", "description": "Developer-mode dashboard exposing quick access to all role dashboards (director, secretary, deputy, group_admin, admin, audit log) and a recent permission requests table."},
+
+    {"id": "tpl_dashboard_director", "label": "Dashboard / Director Template", "type": "template", "source_files": ["app/templates/dashboard/director.html"], "source_location": "app/templates/dashboard/director.html:1", "confidence": "EXTRACTED", "description": "لوحة المدير — radial spider-web layout where a central strategic hub (UAE map) is surrounded by satellite group cards positioned by JS."},
+    {"id": "comp_spider_web_layout", "label": "Spider Web Layout", "type": "component", "source_files": ["app/templates/dashboard/director.html"], "source_location": "app/templates/dashboard/director.html:392", "confidence": "EXTRACTED", "description": "Radial visualization: SVG spokes + central hub + satellite cards, positioned by initSpiderLayout JS that draws an orbit circle and per-department spoke lines."},
+    {"id": "comp_director_notes_panel", "label": "Director Notes Panel", "type": "component", "source_files": ["app/templates/dashboard/director.html"], "source_location": "app/templates/dashboard/director.html:478", "confidence": "EXTRACTED", "description": "Per-department notes panel toggled from a satellite card; saves via POST /api/departments/<id>/notes."},
+    {"id": "route_api_dept_notes", "label": "POST /api/departments/<id>/notes", "type": "route", "source_files": ["app/templates/dashboard/director.html"], "source_location": "app/templates/dashboard/director.html:641", "confidence": "EXTRACTED", "description": "Persists director notes for a department."},
+    {"id": "route_api_dept_set_central", "label": "POST /api/departments/<id>/set-central", "type": "route", "source_files": ["app/templates/dashboard/director.html"], "source_location": "app/templates/dashboard/director.html:678", "confidence": "EXTRACTED", "description": "Marks a department as the central strategic group (used by the secretary)."},
+    {"id": "route_api_dashboard_overview", "label": "GET /api/dashboard/overview", "type": "route", "source_files": ["app/templates/dashboard/director.html"], "source_location": "app/templates/dashboard/director.html:711", "confidence": "EXTRACTED", "description": "Polled every 60s to refresh averages (competence, completion) and updated_at timestamp."},
+    {"id": "route_dashboard_department_detail", "label": "dashboard.department_detail", "type": "route", "source_files": ["app/templates/dashboard/director.html", "app/templates/dashboard/org_structure.html", "app/templates/dashboard/quarterly_report.html"], "source_location": "app/templates/dashboard/director.html:429", "confidence": "EXTRACTED", "description": "Flask route linked from satellite cards / org tree / quarterly report nodes to open a department's detail page."},
+
+    {"id": "tpl_dashboard_group_admin", "label": "Dashboard / Group Admin Template", "type": "template", "source_files": ["app/templates/dashboard/group_admin.html"], "source_location": "app/templates/dashboard/group_admin.html:1", "confidence": "EXTRACTED", "description": "لوحة مدير المجموعة — manages each owned department: shows current metrics and submits a form to admin.update_metrics."},
+    {"id": "route_admin_update_metrics", "label": "admin.update_metrics", "type": "route", "source_files": ["app/templates/dashboard/group_admin.html"], "source_location": "app/templates/dashboard/group_admin.html:67", "confidence": "EXTRACTED", "description": "Endpoint that accepts competence_pct, completion_pct and notes for a department from the group-admin form."},
+
+    {"id": "tpl_dashboard_group_dashboard", "label": "Dashboard / Group Dashboard Template", "type": "template", "source_files": ["app/templates/dashboard/group_dashboard.html"], "source_location": "app/templates/dashboard/group_dashboard.html:1", "confidence": "EXTRACTED", "description": "Per-group landing page with header stats (readiness/completion), duties list, directives, and team members sidebar."},
+    {"id": "route_duties_duty_detail", "label": "duties.duty_detail", "type": "route", "source_files": ["app/templates/dashboard/group_dashboard.html"], "source_location": "app/templates/dashboard/group_dashboard.html:614", "confidence": "EXTRACTED", "description": "Route opened when clicking a duty row in the group dashboard duties list."},
+
+    {"id": "tpl_dashboard_home", "label": "Dashboard / Home Template", "type": "template", "source_files": ["app/templates/dashboard/home.html"], "source_location": "app/templates/dashboard/home.html:1", "confidence": "EXTRACTED", "description": "الرئيسية — premium hero (military strategy + UAE map), objectives card, president-portrait message card, quote card, and closing banner."},
+    {"id": "comp_president_portrait_card", "label": "President Portrait Message Card", "type": "component", "source_files": ["app/templates/dashboard/home.html"], "source_files_note": "uses static/img/president-portrait.jpg", "source_location": "app/templates/dashboard/home.html:535", "confidence": "EXTRACTED", "description": "Portrait card for Sheikh Mohamed bin Zayed Al Nahyan with bilingual caption and link to the quarterly performance page."},
+    {"id": "route_dashboard_strategy_booklet", "label": "dashboard.strategy_booklet", "type": "route", "source_files": ["app/templates/dashboard/home.html"], "source_location": "app/templates/dashboard/home.html:532", "confidence": "EXTRACTED", "description": "Route to the strategic objectives booklet linked from the objectives card."},
+    {"id": "route_dashboard_quarterly_performance", "label": "dashboard.quarterly_performance", "type": "route", "source_files": ["app/templates/dashboard/home.html"], "source_location": "app/templates/dashboard/home.html:548", "confidence": "EXTRACTED", "description": "Route reached from the president-portrait 'read more' link."},
+
+    {"id": "tpl_dashboard_org_structure", "label": "Dashboard / Org Structure Template", "type": "template", "source_files": ["app/templates/dashboard/org_structure.html"], "source_location": "app/templates/dashboard/org_structure.html:1", "confidence": "EXTRACTED", "description": "الشجرة التنظيمية — org chart with two boss tiers connected by SVG bezier curves to branch columns (one per concept), each with metrics and stakeholders."},
+    {"id": "concept_central_department", "label": "Central Department (المحور الاستراتيجي)", "type": "concept", "source_files": ["app/templates/dashboard/org_structure.html", "app/templates/dashboard/director.html", "app/templates/dashboard/quarterly_report.html"], "source_location": "app/templates/dashboard/org_structure.html:751", "confidence": "EXTRACTED", "description": "The strategic hub department flagged is_central; renders at the top of the org tree, the center of the spider web, and the center of the quarterly network."},
+    {"id": "concept_mafhoum_mushtarak", "label": "المفهوم المشترك (Shared Operational Concept)", "type": "concept", "source_files": ["app/templates/dashboard/org_structure.html", "app/templates/dashboard/quarterly_report.html", "app/templates/dashboard/director.html"], "source_location": "app/templates/dashboard/org_structure.html:797", "confidence": "EXTRACTED", "description": "Numbered shared concept that each branch/satellite department represents; carries duties_count, completion_pct and competence_pct."},
+
+    {"id": "tpl_dashboard_quarterly_report", "label": "Dashboard / Quarterly Report Template", "type": "template", "source_files": ["app/templates/dashboard/quarterly_report.html"], "source_location": "app/templates/dashboard/quarterly_report.html:1", "confidence": "EXTRACTED", "description": "Quarterly performance report with an elliptical network layout (center = strategic axis, nodes = concepts) and a people-photos section."},
+    {"id": "comp_quarterly_network", "label": "Quarterly Network Stage", "type": "component", "source_files": ["app/templates/dashboard/quarterly_report.html"], "source_location": "app/templates/dashboard/quarterly_report.html:622", "confidence": "EXTRACTED", "description": "Elliptical orbit visualization with one node per concept and SVG lines from the central hub; collapses to a stacked list under 860px."},
+
+    {"id": "tpl_dashboard_secretary", "label": "Dashboard / Secretary Template", "type": "template", "source_files": ["app/templates/dashboard/secretary.html"], "source_location": "app/templates/dashboard/secretary.html:1", "confidence": "EXTRACTED", "description": "لوحة السكرتير — averages, group status table with competence/completion progress bars and badges, plus quick action cards."},
+
+    {"id": "tpl_dashboard_simple_page", "label": "Dashboard / Simple Page Template", "type": "template", "source_files": ["app/templates/dashboard/simple_page.html"], "source_location": "app/templates/dashboard/simple_page.html:1", "confidence": "EXTRACTED", "description": "Generic Arabic page wrapper driven by page_title/page_icon/page_description and a list of related departments."},
+
+    {"id": "tpl_dashboard_strategy_booklet", "label": "Dashboard / Strategy Booklet Template", "type": "template", "source_files": ["app/templates/dashboard/strategy_booklet.html"], "source_location": "app/templates/dashboard/strategy_booklet.html:1", "confidence": "EXTRACTED", "description": "Printable 5-page booklet: cover, foreword, objectives, five strategic axes, and closing — with zoom controls and Save-as-PDF via window.print()."},
+    {"id": "concept_five_strategic_axes", "label": "Five Strategic Axes", "type": "concept", "source_files": ["app/templates/dashboard/strategy_booklet.html"], "source_location": "app/templates/dashboard/strategy_booklet.html:660", "confidence": "EXTRACTED", "description": "Page-4 axes grid rendering booklet.axes (icon, title, desc, pillars) — the strategy's main pillars."},
+
+    {"id": "tpl_dashboard_unified", "label": "Dashboard / Unified Template", "type": "template", "source_files": ["app/templates/dashboard/unified.html"], "source_location": "app/templates/dashboard/unified.html:1", "confidence": "EXTRACTED", "description": "Permission-gated unified dashboard with a circular center layout (department nodes around a strategic hub) flanked by side panels for alerts/plans/directives/approvals/workshops."},
+    {"id": "comp_circular_dashboard", "label": "Circular Dashboard", "type": "component", "source_files": ["app/templates/dashboard/unified.html"], "source_location": "app/templates/dashboard/unified.html:731", "confidence": "EXTRACTED", "description": "Center hub showing strategy completion plus radial dept-node cards that link to dashboard.group_dashboard for each department."},
+    {"id": "route_dashboard_group_dashboard", "label": "dashboard.group_dashboard", "type": "route", "source_files": ["app/templates/dashboard/unified.html"], "source_location": "app/templates/dashboard/unified.html:743", "confidence": "EXTRACTED", "description": "Per-group dashboard page navigated to from the unified circular layout."},
+
+    {"id": "tpl_dashboard_user", "label": "Dashboard / User Template", "type": "template", "source_files": ["app/templates/dashboard/user.html"], "source_location": "app/templates/dashboard/user.html:1", "confidence": "EXTRACTED", "description": "Personal user dashboard: request-new-access card, my info table (role, department), and recent access requests with status badges."},
+    {"id": "route_access_new_request", "label": "access.new_request", "type": "route", "source_files": ["app/templates/dashboard/user.html"], "source_location": "app/templates/dashboard/user.html:22", "confidence": "EXTRACTED", "description": "Endpoint to submit a new permission/role access request."},
+
+    {"id": "tpl_duties_index", "label": "Duties / Index Template", "type": "template", "source_files": ["app/templates/duties/index.html"], "source_location": "app/templates/duties/index.html:1", "confidence": "EXTRACTED", "description": "الواجبات والمشاريع — duty/project/activity workspace with department selector, list/Gantt/Kanban views, status columns, and add-duty modal."},
+    {"id": "comp_gantt_view", "label": "Gantt 5-Year View", "type": "component", "source_files": ["app/templates/duties/index.html"], "source_location": "app/templates/duties/index.html:1069", "confidence": "EXTRACTED", "description": "Timeline view spanning current_year..+5, rendering one bar per activity from timeline_data (start_offset, width, completion-color)."},
+    {"id": "comp_kanban_view", "label": "Kanban Activity Board", "type": "component", "source_files": ["app/templates/duties/index.html"], "source_location": "app/templates/duties/index.html:1106", "confidence": "EXTRACTED", "description": "Four-column board (not started / in progress / delayed / completed) populated from activities_by_status."},
+
+    {"id": "tpl_error_401", "label": "Errors / 401 Template", "type": "template", "source_files": ["app/templates/errors/401.html"], "source_location": "app/templates/errors/401.html:1", "confidence": "EXTRACTED", "description": "Unauthorized error page prompting the user to log in via auth.login."},
+    {"id": "tpl_error_403", "label": "Errors / 403 Template", "type": "template", "source_files": ["app/templates/errors/403.html"], "source_location": "app/templates/errors/403.html:1", "confidence": "EXTRACTED", "description": "Forbidden error page linking back to dashboard.index."},
+    {"id": "tpl_error_404", "label": "Errors / 404 Template", "type": "template", "source_files": ["app/templates/errors/404.html"], "source_location": "app/templates/errors/404.html:1", "confidence": "EXTRACTED", "description": "Not-Found error page linking back to dashboard.index."},
+    {"id": "tpl_error_500", "label": "Errors / 500 Template", "type": "template", "source_files": ["app/templates/errors/500.html"], "source_location": "app/templates/errors/500.html:1", "confidence": "EXTRACTED", "description": "Server error page linking back to dashboard.index."},
+
+    {"id": "tpl_base_layout", "label": "base.html Layout", "type": "template", "source_files": ["app/templates/dashboard/department.html"], "source_location": "app/templates/dashboard/department.html:1", "confidence": "INFERRED", "description": "Parent layout extended by every dashboard, duties, and error template (provides title, content, extra_css, extra_js blocks)."},
+    {"id": "route_dashboard_index", "label": "dashboard.index", "type": "route", "source_files": ["app/templates/dashboard/department.html", "app/templates/dashboard/department_detail.html", "app/templates/dashboard/group_dashboard.html"], "source_location": "app/templates/dashboard/department.html:10", "confidence": "EXTRACTED", "description": "Root dashboard endpoint linked from breadcrumbs, back links, and error pages."},
+
+    {"id": "file_image_base64", "label": "image_base64.txt", "type": "concept", "source_files": ["image_base64.txt"], "source_location": "image_base64.txt:1", "confidence": "EXTRACTED", "description": "Loose base64-encoded image data file checked into the repo root (likely a one-off encoding artifact, not referenced by templates)."},
+
+    {"id": "deps_requirements", "label": "Python Requirements", "type": "module", "source_files": ["requirements.txt"], "source_location": "requirements.txt:1", "confidence": "EXTRACTED", "description": "Pinned dependencies for the Flask app: flask 3.0, flask-sqlalchemy, flask-login, flask-wtf, flask-talisman, ldap3, argon2-cffi, gunicorn, flask-migrate."},
+    {"id": "tech_flask_stack", "label": "Flask + SQLAlchemy + Login Stack", "type": "concept", "source_files": ["requirements.txt"], "source_location": "requirements.txt:13", "confidence": "EXTRACTED", "description": "Core web stack: Flask 3.0.0, SQLAlchemy 2.0.23, Flask-Login, Flask-Session, served behind Gunicorn 21.2.0."},
+    {"id": "tech_security_stack", "label": "Security & Auth Stack", "type": "concept", "source_files": ["requirements.txt"], "source_location": "requirements.txt:26", "confidence": "EXTRACTED", "description": "Security packages: Flask-WTF, WTForms, Flask-Talisman, Argon2-CFFI for hashing, ldap3 for LDAP integration."}
+  ],
+  "edges": [
+    {"source": "tpl_dashboard_department", "target": "tpl_base_layout", "type": "extends", "confidence": "EXTRACTED", "source_location": "app/templates/dashboard/department.html:1"},
+    {"source": "tpl_dashboard_department", "target": "comp_update_metrics_modal", "type": "contains", "confidence": "EXTRACTED", "source_location": "app/templates/dashboard/department.html:194"},
+    {"source": "comp_update_metrics_modal", "target": "route_api_dashboard_metrics", "type": "calls", "confidence": "EXTRACTED", "source_location": "app/templates/dashboard/department.html:282"},
+    {"source": "tpl_dashboard_department", "target": "route_dashboard_index", "type": "references", "confidence": "EXTRACTED", "source_location": "app/templates/dashboard/department.html:10"},
+
+    {"source": "tpl_dashboard_department_detail", "target": "tpl_base_layout", "type": "extends", "confidence": "EXTRACTED", "source_location": "app/templates/dashboard/department_detail.html:1"},
+    {"source": "tpl_dashboard_department_detail", "target": "comp_add_task_modal", "type": "contains", "confidence": "EXTRACTED", "source_location": "app/templates/dashboard/department_detail.html:304"},
+    {"source": "comp_add_task_modal", "target": "route_api_create_main_task", "type": "calls", "confidence": "EXTRACTED", "source_location": "app/templates/dashboard/department_detail.html:403"},
+    {"source": "tpl_dashboard_department_detail", "target": "route_dashboard_index", "type": "references", "confidence": "EXTRACTED", "source_location": "app/templates/dashboard/department_detail.html:204"},
+
+    {"source": "tpl_dashboard_deputy", "target": "tpl_base_layout", "type": "extends", "confidence": "EXTRACTED", "source_location": "app/templates/dashboard/deputy.html:1"},
+
+    {"source": "tpl_dashboard_developer", "target": "tpl_base_layout", "type": "extends", "confidence": "EXTRACTED", "source_location": "app/templates/dashboard/developer.html:1"},
+    {"source": "tpl_dashboard_developer", "target": "tpl_dashboard_director", "type": "references", "confidence": "EXTRACTED", "source_location": "app/templates/dashboard/developer.html:55"},
+    {"source": "tpl_dashboard_developer", "target": "tpl_dashboard_secretary", "type": "references", "confidence": "EXTRACTED", "source_location": "app/templates/dashboard/developer.html:62"},
+    {"source": "tpl_dashboard_developer", "target": "tpl_dashboard_deputy", "type": "references", "confidence": "EXTRACTED", "source_location": "app/templates/dashboard/developer.html:69"},
+    {"source": "tpl_dashboard_developer", "target": "tpl_dashboard_group_admin", "type": "references", "confidence": "EXTRACTED", "source_location": "app/templates/dashboard/developer.html:76"},
+
+    {"source": "tpl_dashboard_director", "target": "tpl_base_layout", "type": "extends", "confidence": "EXTRACTED", "source_location": "app/templates/dashboard/director.html:1"},
+    {"source": "tpl_dashboard_director", "target": "comp_spider_web_layout", "type": "contains", "confidence": "EXTRACTED", "source_location": "app/templates/dashboard/director.html:392"},
+    {"source": "tpl_dashboard_director", "target": "comp_director_notes_panel", "type": "contains", "confidence": "EXTRACTED", "source_location": "app/templates/dashboard/director.html:478"},
+    {"source": "comp_director_notes_panel", "target": "route_api_dept_notes", "type": "calls", "confidence": "EXTRACTED", "source_location": "app/templates/dashboard/director.html:641"},
+    {"source": "tpl_dashboard_director", "target": "route_api_dept_set_central", "type": "calls", "confidence": "EXTRACTED", "source_location": "app/templates/dashboard/director.html:678"},
+    {"source": "tpl_dashboard_director", "target": "route_api_dashboard_overview", "type": "calls", "confidence": "EXTRACTED", "source_location": "app/templates/dashboard/director.html:711"},
+    {"source": "comp_spider_web_layout", "target": "route_dashboard_department_detail", "type": "references", "confidence": "EXTRACTED", "source_location": "app/templates/dashboard/director.html:429"},
+    {"source": "comp_spider_web_layout", "target": "concept_central_department", "type": "describes", "confidence": "EXTRACTED", "source_location": "app/templates/dashboard/director.html:403"},
+
+    {"source": "tpl_dashboard_group_admin", "target": "tpl_base_layout", "type": "extends", "confidence": "EXTRACTED", "source_location": "app/templates/dashboard/group_admin.html:1"},
+    {"source": "tpl_dashboard_group_admin", "target": "route_admin_update_metrics", "type": "calls", "confidence": "EXTRACTED", "source_location": "app/templates/dashboard/group_admin.html:67"},
+
+    {"source": "tpl_dashboard_group_dashboard", "target": "tpl_base_layout", "type": "extends", "confidence": "EXTRACTED", "source_location": "app/templates/dashboard/group_dashboard.html:1"},
+    {"source": "tpl_dashboard_group_dashboard", "target": "route_duties_duty_detail", "type": "references", "confidence": "EXTRACTED", "source_location": "app/templates/dashboard/group_dashboard.html:614"},
+    {"source": "tpl_dashboard_group_dashboard", "target": "route_dashboard_index", "type": "references", "confidence": "EXTRACTED", "source_location": "app/templates/dashboard/group_dashboard.html:524"},
+
+    {"source": "tpl_dashboard_home", "target": "tpl_base_layout", "type": "extends", "confidence": "EXTRACTED", "source_location": "app/templates/dashboard/home.html:1"},
+    {"source": "tpl_dashboard_home", "target": "comp_president_portrait_card", "type": "contains", "confidence": "EXTRACTED", "source_location": "app/templates/dashboard/home.html:535"},
+    {"source": "tpl_dashboard_home", "target": "route_dashboard_strategy_booklet", "type": "references", "confidence": "EXTRACTED", "source_location": "app/templates/dashboard/home.html:532"},
+    {"source": "comp_president_portrait_card", "target": "route_dashboard_quarterly_performance", "type": "references", "confidence": "EXTRACTED", "source_location": "app/templates/dashboard/home.html:548"},
+
+    {"source": "tpl_dashboard_org_structure", "target": "tpl_base_layout", "type": "extends", "confidence": "EXTRACTED", "source_location": "app/templates/dashboard/org_structure.html:1"},
+    {"source": "tpl_dashboard_org_structure", "target": "concept_central_department", "type": "describes", "confidence": "EXTRACTED", "source_location": "app/templates/dashboard/org_structure.html:751"},
+    {"source": "tpl_dashboard_org_structure", "target": "concept_mafhoum_mushtarak", "type": "describes", "confidence": "EXTRACTED", "source_location": "app/templates/dashboard/org_structure.html:797"},
+    {"source": "tpl_dashboard_org_structure", "target": "route_dashboard_department_detail", "type": "references", "confidence": "EXTRACTED", "source_location": "app/templates/dashboard/org_structure.html:788"},
+
+    {"source": "tpl_dashboard_quarterly_report", "target": "tpl_base_layout", "type": "extends", "confidence": "EXTRACTED", "source_location": "app/templates/dashboard/quarterly_report.html:1"},
+    {"source": "tpl_dashboard_quarterly_report", "target": "comp_quarterly_network", "type": "contains", "confidence": "EXTRACTED", "source_location": "app/templates/dashboard/quarterly_report.html:622"},
+    {"source": "comp_quarterly_network", "target": "concept_central_department", "type": "describes", "confidence": "EXTRACTED", "source_location": "app/templates/dashboard/quarterly_report.html:626"},
+    {"source": "comp_quarterly_network", "target": "concept_mafhoum_mushtarak", "type": "describes", "confidence": "EXTRACTED", "source_location": "app/templates/dashboard/quarterly_report.html:645"},
+    {"source": "tpl_dashboard_quarterly_report", "target": "route_dashboard_department_detail", "type": "references", "confidence": "EXTRACTED", "source_location": "app/templates/dashboard/quarterly_report.html:637"},
+
+    {"source": "tpl_dashboard_secretary", "target": "tpl_base_layout", "type": "extends", "confidence": "EXTRACTED", "source_location": "app/templates/dashboard/secretary.html:1"},
+
+    {"source": "tpl_dashboard_simple_page", "target": "tpl_base_layout", "type": "extends", "confidence": "EXTRACTED", "source_location": "app/templates/dashboard/simple_page.html:1"},
+
+    {"source": "tpl_dashboard_strategy_booklet", "target": "tpl_base_layout", "type": "extends", "confidence": "EXTRACTED", "source_location": "app/templates/dashboard/strategy_booklet.html:1"},
+    {"source": "tpl_dashboard_strategy_booklet", "target": "concept_five_strategic_axes", "type": "contains", "confidence": "EXTRACTED", "source_location": "app/templates/dashboard/strategy_booklet.html:660"},
+
+    {"source": "tpl_dashboard_unified", "target": "tpl_base_layout", "type": "extends", "confidence": "EXTRACTED", "source_location": "app/templates/dashboard/unified.html:1"},
+    {"source": "tpl_dashboard_unified", "target": "comp_circular_dashboard", "type": "contains", "confidence": "EXTRACTED", "source_location": "app/templates/dashboard/unified.html:731"},
+    {"source": "comp_circular_dashboard", "target": "route_dashboard_group_dashboard", "type": "references", "confidence": "EXTRACTED", "source_location": "app/templates/dashboard/unified.html:743"},
+
+    {"source": "tpl_dashboard_user", "target": "tpl_base_layout", "type": "extends", "confidence": "EXTRACTED", "source_location": "app/templates/dashboard/user.html:1"},
+    {"source": "tpl_dashboard_user", "target": "route_access_new_request", "type": "references", "confidence": "EXTRACTED", "source_location": "app/templates/dashboard/user.html:22"},
+
+    {"source": "tpl_duties_index", "target": "tpl_base_layout", "type": "extends", "confidence": "EXTRACTED", "source_location": "app/templates/duties/index.html:1"},
+    {"source": "tpl_duties_index", "target": "comp_gantt_view", "type": "contains", "confidence": "EXTRACTED", "source_location": "app/templates/duties/index.html:1069"},
+    {"source": "tpl_duties_index", "target": "comp_kanban_view", "type": "contains", "confidence": "EXTRACTED", "source_location": "app/templates/duties/index.html:1106"},
+
+    {"source": "tpl_error_401", "target": "tpl_base_layout", "type": "extends", "confidence": "EXTRACTED", "source_location": "app/templates/errors/401.html:1"},
+    {"source": "tpl_error_403", "target": "tpl_base_layout", "type": "extends", "confidence": "EXTRACTED", "source_location": "app/templates/errors/403.html:1"},
+    {"source": "tpl_error_404", "target": "tpl_base_layout", "type": "extends", "confidence": "EXTRACTED", "source_location": "app/templates/errors/404.html:1"},
+    {"source": "tpl_error_500", "target": "tpl_base_layout", "type": "extends", "confidence": "EXTRACTED", "source_location": "app/templates/errors/500.html:1"},
+    {"source": "tpl_error_403", "target": "route_dashboard_index", "type": "references", "confidence": "EXTRACTED", "source_location": "app/templates/errors/403.html:9"},
+    {"source": "tpl_error_404", "target": "route_dashboard_index", "type": "references", "confidence": "EXTRACTED", "source_location": "app/templates/errors/404.html:9"},
+    {"source": "tpl_error_500", "target": "route_dashboard_index", "type": "references", "confidence": "EXTRACTED", "source_location": "app/templates/errors/500.html:9"},
+
+    {"source": "deps_requirements", "target": "tech_flask_stack", "type": "describes", "confidence": "EXTRACTED", "source_location": "requirements.txt:13"},
+    {"source": "deps_requirements", "target": "tech_security_stack", "type": "describes", "confidence": "EXTRACTED", "source_location": "requirements.txt:26"}
+  ],
+  "hyperedges": [],
+  "input_tokens": 0,
+  "output_tokens": 0
+}

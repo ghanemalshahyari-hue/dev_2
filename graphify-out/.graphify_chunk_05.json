@@ -1,0 +1,21 @@
+{
+  "nodes": [
+    {"id": "img_strategy_hero_light", "label": "Strategy Hero Light", "type": "hero", "source_files": ["app/static/img/strategy-hero-light.png"], "confidence": "EXTRACTED", "description": "Hero banner image showing UAE national symbols: Dubai skyline with Burj Khalifa, UAE flag, mosque, high-speed train, solar panels, satellite dish, drone, fighter jet, and naval warship. Central circular glowing frame likely used as a logo/portrait placeholder. Represents UAE strategic capabilities across civil and military domains."},
+    {"id": "img_strategy_hero_light_alt", "label": "Strategy Hero Light (Variant)", "type": "hero", "source_files": ["app/static/img/strategy-hero-light11.png"], "confidence": "EXTRACTED", "description": "Alternate variant of the strategy hero banner with the same UAE-themed composition (skyline, flag, train, solar panels, drone, fighter jet, warship) and a central glowing ring. Lighter/brighter rendering of the same scene."},
+    {"id": "img_uae_map", "label": "UAE Map (Flag-Filled 3D)", "type": "map", "source_files": ["app/static/img/uae-map.png"], "confidence": "EXTRACTED", "description": "3D stylized map of the United Arab Emirates filled with the UAE national flag colors (red, white, black, green) and outlined in gold on a dark background. Used as a national identity visual in the dashboard."},
+    {"id": "img_uae_map_silhouette", "label": "UAE Map Silhouette (Gold)", "type": "map", "source_files": ["app/static/img/uae-map11.png"], "confidence": "EXTRACTED", "description": "Solid gold silhouette of the UAE country outline on a transparent background. Likely used as a decorative or overlay element."},
+    {"id": "concept_uae_country", "label": "United Arab Emirates", "type": "asset", "source_files": [], "confidence": "INFERRED", "description": "The United Arab Emirates as a national entity referenced by the dashboard's visual assets."},
+    {"id": "concept_uae_strategy", "label": "UAE National Strategy", "type": "asset", "source_files": [], "confidence": "INFERRED", "description": "Conceptual theme of UAE's national strategy spanning military, technology, infrastructure, and civic domains depicted in the hero banner."}
+  ],
+  "edges": [
+    {"source": "img_strategy_hero_light", "target": "concept_uae_strategy", "type": "illustrates", "confidence": "INFERRED"},
+    {"source": "img_strategy_hero_light_alt", "target": "concept_uae_strategy", "type": "illustrates", "confidence": "INFERRED"},
+    {"source": "img_strategy_hero_light", "target": "concept_uae_country", "type": "references", "confidence": "INFERRED"},
+    {"source": "img_strategy_hero_light_alt", "target": "concept_uae_country", "type": "references", "confidence": "INFERRED"},
+    {"source": "img_uae_map", "target": "concept_uae_country", "type": "depicts", "confidence": "EXTRACTED"},
+    {"source": "img_uae_map_silhouette", "target": "concept_uae_country", "type": "depicts", "confidence": "EXTRACTED"}
+  ],
+  "hyperedges": [],
+  "input_tokens": 0,
+  "output_tokens": 0
+}

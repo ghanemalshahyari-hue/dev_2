@@ -1,0 +1,131 @@
+{
+  "nodes": [
+    {"id": "doc_project_rules", "label": "PROJECT_RULES.md", "type": "concept", "source_files": ["PROJECT_RULES.md"], "source_location": "PROJECT_RULES.md:1", "confidence": "EXTRACTED", "description": "Source-of-truth document for development standards, security, schema, folder structure, and coding conventions."},
+    {"id": "concept_enterprise_dashboard_system", "label": "Enterprise Dashboard System", "type": "concept", "source_files": ["PROJECT_RULES.md", "SESSION_STATE.md"], "source_location": "PROJECT_RULES.md:10", "confidence": "EXTRACTED", "description": "CEO-level visibility platform with LDAP auth for an air-gapped private server, 10+ year lifespan target."},
+    {"id": "concept_tech_stack", "label": "Mandatory Tech Stack", "type": "concept", "source_files": ["PROJECT_RULES.md"], "source_location": "PROJECT_RULES.md:24", "confidence": "EXTRACTED", "description": "Flask 3.x, SQLAlchemy 2.x, ldap3, Argon2 backend with Bootstrap 5.3, Chart.js, Vanilla JS frontend - all offline/bundled."},
+    {"id": "concept_role_hierarchy", "label": "5-Level Role Hierarchy", "type": "concept", "source_files": ["PROJECT_RULES.md"], "source_location": "PROJECT_RULES.md:103", "confidence": "EXTRACTED", "description": "Director(100), Secretary(90), Deputy(80), Group Admin(60), User(20) - permission levels driving RBAC."},
+    {"id": "concept_seven_departments", "label": "7 Default Departments", "type": "concept", "source_files": ["PROJECT_RULES.md"], "source_location": "PROJECT_RULES.md:253", "confidence": "EXTRACTED", "description": "HR, Finance, IT, Operations, Marketing, R&D, QA - each with color and icon for the circular CEO dashboard."},
+    {"id": "concept_db_schema", "label": "Core Database Schema", "type": "concept", "source_files": ["PROJECT_RULES.md"], "source_location": "PROJECT_RULES.md:160", "confidence": "EXTRACTED", "description": "Tables: users, roles, departments, teams, access_requests, access_approvals, audit_log, department_metrics."},
+
+    {"id": "doc_readme", "label": "README.md", "type": "concept", "source_files": ["README.md"], "source_location": "README.md:1", "confidence": "EXTRACTED", "description": "Minimal project README (dev_2 placeholder)."},
+
+    {"id": "doc_session_notes", "label": "Session Notes (Feb 24)", "type": "concept", "source_files": ["SESSION_NOTES.md"], "source_location": "SESSION_NOTES.md:1", "confidence": "EXTRACTED", "description": "Documents Duties CRUD with contextual add buttons and Arabic translation of access/error pages."},
+    {"id": "concept_duties_hierarchy", "label": "Duties Hierarchy", "type": "concept", "source_files": ["SESSION_NOTES.md"], "source_location": "SESSION_NOTES.md:49", "confidence": "EXTRACTED", "description": "Department > Entity > Duty > Objective > Project > Activity nested structure."},
+    {"id": "concept_user_dept_permission", "label": "UserDepartmentPermission", "type": "model", "source_files": ["SESSION_NOTES.md"], "source_location": "SESSION_NOTES.md:53", "confidence": "EXTRACTED", "description": "Permission model with PermissionType enum (NONE/READ/WRITE/FULL) granting cross-group access."},
+
+    {"id": "doc_session_state", "label": "Session State", "type": "concept", "source_files": ["SESSION_STATE.md"], "source_location": "SESSION_STATE.md:1", "confidence": "EXTRACTED", "description": "Snapshot of completed tasks: app factory, models, LDAP simulation, login, CEO dashboard, all blueprints."},
+    {"id": "concept_ldap_sim_mode", "label": "LDAP Simulation Mode", "type": "concept", "source_files": ["SESSION_STATE.md", "app/templates/auth/login.html"], "source_location": "SESSION_STATE.md:32", "confidence": "EXTRACTED", "description": "Offline development auth mode with seeded test credentials (admin, manager, groupadmin, lead, user)."},
+
+    {"id": "doc_chat_2026_02_26", "label": "Chat Session 2026-02-26", "type": "concept", "source_files": ["_dev_scripts/chat_session_2026_02_26.txt"], "source_location": "_dev_scripts/chat_session_2026_02_26.txt:1", "confidence": "EXTRACTED", "description": "Reset to 5 groups (first = 'المفهوم العملياتي المشترك رقم 2'); created reset_departments.py and concept_operations.html."},
+
+    {"id": "tpl_my_requests", "label": "access/my_requests.html", "type": "template", "source_files": ["app/templates/access/my_requests.html"], "source_location": "app/templates/access/my_requests.html:1", "confidence": "EXTRACTED", "description": "User's own access requests list with status badges (pending/approved/rejected) and rejection reasons."},
+    {"id": "tpl_new_request", "label": "access/new_request.html", "type": "template", "source_files": ["app/templates/access/new_request.html"], "source_location": "app/templates/access/new_request.html:1", "confidence": "EXTRACTED", "description": "Form to submit a new permission request with permission type, scope, and justification fields."},
+    {"id": "tpl_pending", "label": "access/pending.html", "type": "template", "source_files": ["app/templates/access/pending.html"], "source_location": "app/templates/access/pending.html:1", "confidence": "EXTRACTED", "description": "Approver view of pending requests with approve/reject actions and mandatory rejection reason modal."},
+    {"id": "tpl_pending_approvals", "label": "access/pending_approvals.html", "type": "template", "source_files": ["app/templates/access/pending_approvals.html"], "source_location": "app/templates/access/pending_approvals.html:1", "confidence": "EXTRACTED", "description": "Alternate pending approvals page with detail link and per-request rejection modal."},
+    {"id": "tpl_request", "label": "access/request.html", "type": "template", "source_files": ["app/templates/access/request.html"], "source_location": "app/templates/access/request.html:1", "confidence": "EXTRACTED", "description": "Permission request form with role/department selectors and visual approval-chain diagram."},
+    {"id": "concept_approval_chain", "label": "Multi-level Approval Chain", "type": "concept", "source_files": ["app/templates/access/request.html", "app/templates/access/new_request.html"], "source_location": "app/templates/access/request.html:48", "confidence": "EXTRACTED", "description": "Workflow: Requester -> Group Admin -> Deputy -> Secretary -> Director; any level may reject with reason."},
+
+    {"id": "tpl_audit_log", "label": "admin/audit_log.html", "type": "template", "source_files": ["app/templates/admin/audit_log.html"], "source_location": "app/templates/admin/audit_log.html:1", "confidence": "EXTRACTED", "description": "Paginated audit log table with action filtering and color-coded action codes."},
+    {"id": "tpl_departments", "label": "admin/departments.html", "type": "template", "source_files": ["app/templates/admin/departments.html"], "source_location": "app/templates/admin/departments.html:1", "confidence": "EXTRACTED", "description": "Department management cards with add/edit modals, logo cropper integration, color/icon/concept_number editing."},
+    {"id": "component_logo_cropper", "label": "Logo Cropper Modal", "type": "component", "source_files": ["app/templates/admin/departments.html"], "source_location": "app/templates/admin/departments.html:298", "confidence": "EXTRACTED", "description": "CropperJS-powered modal that crops department logos to 300x300 PNG base64 before form submission."},
+    {"id": "tpl_admin_index", "label": "admin/index.html", "type": "template", "source_files": ["app/templates/admin/index.html"], "source_location": "app/templates/admin/index.html:1", "confidence": "EXTRACTED", "description": "Admin landing page with cards for User Management, Audit Log, and System Settings (permission-gated)."},
+    {"id": "tpl_role_form", "label": "admin/role_form.html", "type": "template", "source_files": ["app/templates/admin/role_form.html"], "source_location": "app/templates/admin/role_form.html:1", "confidence": "EXTRACTED", "description": "Create/edit role form with permission level slider, color/icon picker, and live preview card."},
+    {"id": "tpl_roles", "label": "admin/roles.html", "type": "template", "source_files": ["app/templates/admin/roles.html"], "source_location": "app/templates/admin/roles.html:1", "confidence": "EXTRACTED", "description": "Roles table with permission level legend and edit modal; permission_level editable only by DEVELOPER role."},
+    {"id": "tpl_admin_users", "label": "admin/users.html", "type": "template", "source_files": ["app/templates/admin/users.html"], "source_location": "app/templates/admin/users.html:1", "confidence": "EXTRACTED", "description": "Unified admin tabs: Users (with edit modal for role/department/active) and Roles (read-mostly)."},
+
+    {"id": "tpl_login", "label": "auth/login.html", "type": "template", "source_files": ["app/templates/auth/login.html"], "source_location": "app/templates/auth/login.html:1", "confidence": "EXTRACTED", "description": "Arabic RTL login page with animated particle background, LDAP connection status, password visibility toggle."},
+
+    {"id": "tpl_base", "label": "base.html", "type": "template", "source_files": ["app/templates/base.html"], "source_location": "app/templates/base.html:1", "confidence": "EXTRACTED", "description": "Root RTL Arabic layout: top nav (Home, Org Structure, Agenda, Strategy Booklet, Quarterly Performance, Commitments), flash messages, user dropdown, footer."},
+    {"id": "component_main_nav", "label": "Main Navigation Bar", "type": "component", "source_files": ["app/templates/base.html"], "source_location": "app/templates/base.html:25", "confidence": "EXTRACTED", "description": "Primary navigation linking to dashboard.index, org_structure, agenda, strategy_booklet, quarterly_performance, commitments, and admin (gated)."},
+
+    {"id": "tpl_agenda", "label": "dashboard/agenda.html", "type": "template", "source_files": ["app/templates/dashboard/agenda.html"], "source_location": "app/templates/dashboard/agenda.html:1", "confidence": "EXTRACTED", "description": "Annual calendar view with 12-month grid, legend, official holidays panel, weekend shading and event stripes."},
+    {"id": "tpl_ceo", "label": "dashboard/ceo.html", "type": "template", "source_files": ["app/templates/dashboard/ceo.html"], "source_location": "app/templates/dashboard/ceo.html:1", "confidence": "EXTRACTED", "description": "Circular dashboard with department nodes arranged on a ring, SVG progress rings for competence/completion, and center company stats."},
+    {"id": "component_circular_dashboard", "label": "Circular Department Dashboard", "type": "component", "source_files": ["app/templates/dashboard/ceo.html"], "source_location": "app/templates/dashboard/ceo.html:336", "confidence": "EXTRACTED", "description": "JS-positioned nodes around a center pivot, drawing SVG connection lines and dual progress rings (competence + completion)."},
+
+    {"id": "tpl_commitments", "label": "dashboard/commitments.html", "type": "template", "source_files": ["app/templates/dashboard/commitments.html"], "source_location": "app/templates/dashboard/commitments.html:1", "confidence": "EXTRACTED", "description": "Commitments tree view with top boss, 3 reports row, 5 indicators row; each node renders a duties table with optional two-column layout."},
+    {"id": "concept_commitments_indicator", "label": "مؤشر الالتزامات", "type": "concept", "source_files": ["app/templates/dashboard/commitments.html", "app/templates/base.html"], "source_location": "app/templates/base.html:75", "confidence": "EXTRACTED", "description": "Commitments Indicator - tree structure linking duties to reports and operational indicators with color-coded categories."},
+
+    {"id": "tpl_concept_operations", "label": "dashboard/concept_operations.html", "type": "template", "source_files": ["app/templates/dashboard/concept_operations.html"], "source_location": "app/templates/dashboard/concept_operations.html:1", "confidence": "EXTRACTED", "description": "Group/concept screen showing department name, responsible unit, main duty 5.1 with description, responsible unit, percentage and expected end date."},
+    {"id": "concept_mafhoom_mushtarak", "label": "المفهوم العملياتي المشترك", "type": "concept", "source_files": ["app/templates/dashboard/concept_operations.html", "app/templates/admin/departments.html", "_dev_scripts/chat_session_2026_02_26.txt"], "source_location": "app/templates/admin/departments.html:280", "confidence": "EXTRACTED", "description": "Shared Operational Concept - numbered grouping unit (concept_number) used as the primary department abstraction in the dashboard."},
+
+    {"id": "route_dashboard_index", "label": "dashboard.index", "type": "route", "source_files": ["app/templates/base.html"], "source_location": "app/templates/base.html:45", "confidence": "EXTRACTED", "description": "Home dashboard route referenced from base navigation and login redirect."},
+    {"id": "route_access_new_request", "label": "access.new_request", "type": "route", "source_files": ["app/templates/access/my_requests.html", "app/templates/access/request.html"], "source_location": "app/templates/access/my_requests.html:7", "confidence": "EXTRACTED", "description": "Create-new-permission-request endpoint."},
+    {"id": "route_access_my_requests", "label": "access.my_requests", "type": "route", "source_files": ["app/templates/access/new_request.html", "app/templates/base.html"], "source_location": "app/templates/access/new_request.html:64", "confidence": "EXTRACTED", "description": "Current user's request list endpoint."},
+    {"id": "route_access_approve", "label": "access.approve / approve_request", "type": "route", "source_files": ["app/templates/access/pending.html", "app/templates/access/pending_approvals.html"], "source_location": "app/templates/access/pending.html:60", "confidence": "AMBIGUOUS", "description": "Approve endpoint - referenced as access.approve in pending.html and access.approve_request in pending_approvals.html."},
+    {"id": "route_access_reject", "label": "access reject endpoint", "type": "route", "source_files": ["app/templates/access/pending.html", "app/templates/access/pending_approvals.html"], "source_location": "app/templates/access/pending_approvals.html:90", "confidence": "EXTRACTED", "description": "Reject request endpoint requiring a rejection_reason of >=10 chars."},
+    {"id": "route_admin_users", "label": "admin.users", "type": "route", "source_files": ["app/templates/admin/index.html", "app/templates/base.html"], "source_location": "app/templates/admin/index.html:17", "confidence": "EXTRACTED", "description": "User management page (also entry point of unified admin tabs)."},
+    {"id": "route_admin_departments_crud", "label": "admin department CRUD", "type": "route", "source_files": ["app/templates/admin/departments.html"], "source_location": "app/templates/admin/departments.html:141", "confidence": "EXTRACTED", "description": "Routes: admin.add_department, admin.toggle_department, admin.delete_department, /admin/departments/<id>/update."},
+    {"id": "route_admin_audit_log", "label": "admin.audit_log", "type": "route", "source_files": ["app/templates/admin/audit_log.html", "app/templates/admin/index.html"], "source_location": "app/templates/admin/index.html:29", "confidence": "EXTRACTED", "description": "Audit log viewing route with pagination and action filter."},
+    {"id": "route_auth_login", "label": "auth.login", "type": "route", "source_files": ["app/templates/auth/login.html"], "source_location": "app/templates/auth/login.html:56", "confidence": "EXTRACTED", "description": "LDAP login POST endpoint."},
+    {"id": "route_auth_logout", "label": "auth.logout", "type": "route", "source_files": ["app/templates/base.html"], "source_location": "app/templates/base.html:111", "confidence": "EXTRACTED", "description": "Logout POST endpoint reached from the user dropdown."}
+  ],
+  "edges": [
+    {"source": "doc_project_rules", "target": "concept_enterprise_dashboard_system", "type": "describes", "confidence": "EXTRACTED", "source_location": "PROJECT_RULES.md:10"},
+    {"source": "doc_project_rules", "target": "concept_tech_stack", "type": "describes", "confidence": "EXTRACTED", "source_location": "PROJECT_RULES.md:24"},
+    {"source": "doc_project_rules", "target": "concept_role_hierarchy", "type": "describes", "confidence": "EXTRACTED", "source_location": "PROJECT_RULES.md:103"},
+    {"source": "doc_project_rules", "target": "concept_seven_departments", "type": "describes", "confidence": "EXTRACTED", "source_location": "PROJECT_RULES.md:253"},
+    {"source": "doc_project_rules", "target": "concept_db_schema", "type": "describes", "confidence": "EXTRACTED", "source_location": "PROJECT_RULES.md:160"},
+
+    {"source": "doc_session_notes", "target": "concept_duties_hierarchy", "type": "describes", "confidence": "EXTRACTED", "source_location": "SESSION_NOTES.md:49"},
+    {"source": "doc_session_notes", "target": "concept_user_dept_permission", "type": "describes", "confidence": "EXTRACTED", "source_location": "SESSION_NOTES.md:53"},
+
+    {"source": "doc_session_state", "target": "concept_enterprise_dashboard_system", "type": "describes", "confidence": "EXTRACTED", "source_location": "SESSION_STATE.md:4"},
+    {"source": "doc_session_state", "target": "concept_ldap_sim_mode", "type": "describes", "confidence": "EXTRACTED", "source_location": "SESSION_STATE.md:32"},
+
+    {"source": "doc_chat_2026_02_26", "target": "tpl_concept_operations", "type": "references", "confidence": "EXTRACTED", "source_location": "_dev_scripts/chat_session_2026_02_26.txt:7"},
+    {"source": "doc_chat_2026_02_26", "target": "concept_mafhoom_mushtarak", "type": "describes", "confidence": "EXTRACTED", "source_location": "_dev_scripts/chat_session_2026_02_26.txt:4"},
+
+    {"source": "tpl_my_requests", "target": "tpl_base", "type": "extends", "confidence": "EXTRACTED", "source_location": "app/templates/access/my_requests.html:1"},
+    {"source": "tpl_new_request", "target": "tpl_base", "type": "extends", "confidence": "EXTRACTED", "source_location": "app/templates/access/new_request.html:1"},
+    {"source": "tpl_pending", "target": "tpl_base", "type": "extends", "confidence": "EXTRACTED", "source_location": "app/templates/access/pending.html:1"},
+    {"source": "tpl_pending_approvals", "target": "tpl_base", "type": "extends", "confidence": "EXTRACTED", "source_location": "app/templates/access/pending_approvals.html:1"},
+    {"source": "tpl_request", "target": "tpl_base", "type": "extends", "confidence": "EXTRACTED", "source_location": "app/templates/access/request.html:1"},
+    {"source": "tpl_audit_log", "target": "tpl_base", "type": "extends", "confidence": "EXTRACTED", "source_location": "app/templates/admin/audit_log.html:1"},
+    {"source": "tpl_departments", "target": "tpl_base", "type": "extends", "confidence": "EXTRACTED", "source_location": "app/templates/admin/departments.html:1"},
+    {"source": "tpl_admin_index", "target": "tpl_base", "type": "extends", "confidence": "EXTRACTED", "source_location": "app/templates/admin/index.html:1"},
+    {"source": "tpl_role_form", "target": "tpl_base", "type": "extends", "confidence": "EXTRACTED", "source_location": "app/templates/admin/role_form.html:1"},
+    {"source": "tpl_roles", "target": "tpl_base", "type": "extends", "confidence": "EXTRACTED", "source_location": "app/templates/admin/roles.html:1"},
+    {"source": "tpl_admin_users", "target": "tpl_base", "type": "extends", "confidence": "EXTRACTED", "source_location": "app/templates/admin/users.html:1"},
+    {"source": "tpl_login", "target": "tpl_base", "type": "extends", "confidence": "EXTRACTED", "source_location": "app/templates/auth/login.html:1"},
+    {"source": "tpl_agenda", "target": "tpl_base", "type": "extends", "confidence": "EXTRACTED", "source_location": "app/templates/dashboard/agenda.html:1"},
+    {"source": "tpl_ceo", "target": "tpl_base", "type": "extends", "confidence": "EXTRACTED", "source_location": "app/templates/dashboard/ceo.html:1"},
+    {"source": "tpl_commitments", "target": "tpl_base", "type": "extends", "confidence": "EXTRACTED", "source_location": "app/templates/dashboard/commitments.html:1"},
+    {"source": "tpl_concept_operations", "target": "tpl_base", "type": "extends", "confidence": "EXTRACTED", "source_location": "app/templates/dashboard/concept_operations.html:1"},
+
+    {"source": "tpl_base", "target": "component_main_nav", "type": "contains", "confidence": "EXTRACTED", "source_location": "app/templates/base.html:25"},
+    {"source": "component_main_nav", "target": "route_dashboard_index", "type": "references", "confidence": "EXTRACTED", "source_location": "app/templates/base.html:45"},
+    {"source": "component_main_nav", "target": "route_admin_users", "type": "references", "confidence": "EXTRACTED", "source_location": "app/templates/base.html:85"},
+    {"source": "component_main_nav", "target": "route_auth_logout", "type": "references", "confidence": "EXTRACTED", "source_location": "app/templates/base.html:111"},
+    {"source": "component_main_nav", "target": "route_access_my_requests", "type": "references", "confidence": "EXTRACTED", "source_location": "app/templates/base.html:105"},
+
+    {"source": "tpl_my_requests", "target": "route_access_new_request", "type": "references", "confidence": "EXTRACTED", "source_location": "app/templates/access/my_requests.html:7"},
+    {"source": "tpl_new_request", "target": "route_access_my_requests", "type": "references", "confidence": "EXTRACTED", "source_location": "app/templates/access/new_request.html:64"},
+    {"source": "tpl_request", "target": "route_access_new_request", "type": "references", "confidence": "EXTRACTED", "source_location": "app/templates/access/request.html:14"},
+    {"source": "tpl_request", "target": "concept_approval_chain", "type": "describes", "confidence": "EXTRACTED", "source_location": "app/templates/access/request.html:48"},
+    {"source": "tpl_new_request", "target": "concept_approval_chain", "type": "describes", "confidence": "EXTRACTED", "source_location": "app/templates/access/new_request.html:50"},
+
+    {"source": "tpl_pending", "target": "route_access_approve", "type": "references", "confidence": "EXTRACTED", "source_location": "app/templates/access/pending.html:60"},
+    {"source": "tpl_pending", "target": "route_access_reject", "type": "references", "confidence": "EXTRACTED", "source_location": "app/templates/access/pending.html:121"},
+    {"source": "tpl_pending_approvals", "target": "route_access_approve", "type": "references", "confidence": "EXTRACTED", "source_location": "app/templates/access/pending_approvals.html:60"},
+    {"source": "tpl_pending_approvals", "target": "route_access_reject", "type": "references", "confidence": "EXTRACTED", "source_location": "app/templates/access/pending_approvals.html:90"},
+
+    {"source": "tpl_admin_index", "target": "route_admin_users", "type": "references", "confidence": "EXTRACTED", "source_location": "app/templates/admin/index.html:17"},
+    {"source": "tpl_admin_index", "target": "route_admin_audit_log", "type": "references", "confidence": "EXTRACTED", "source_location": "app/templates/admin/index.html:29"},
+    {"source": "tpl_departments", "target": "route_admin_departments_crud", "type": "references", "confidence": "EXTRACTED", "source_location": "app/templates/admin/departments.html:141"},
+    {"source": "tpl_departments", "target": "component_logo_cropper", "type": "contains", "confidence": "EXTRACTED", "source_location": "app/templates/admin/departments.html:298"},
+    {"source": "tpl_departments", "target": "concept_mafhoom_mushtarak", "type": "references", "confidence": "EXTRACTED", "source_location": "app/templates/admin/departments.html:280"},
+    {"source": "tpl_audit_log", "target": "route_admin_audit_log", "type": "references", "confidence": "INFERRED", "source_location": "app/templates/admin/audit_log.html:8"},
+
+    {"source": "tpl_login", "target": "route_auth_login", "type": "references", "confidence": "EXTRACTED", "source_location": "app/templates/auth/login.html:56"},
+    {"source": "tpl_login", "target": "concept_ldap_sim_mode", "type": "references", "confidence": "EXTRACTED", "source_location": "app/templates/auth/login.html:35"},
+
+    {"source": "tpl_ceo", "target": "component_circular_dashboard", "type": "contains", "confidence": "EXTRACTED", "source_location": "app/templates/dashboard/ceo.html:336"},
+    {"source": "component_circular_dashboard", "target": "concept_seven_departments", "type": "references", "confidence": "INFERRED", "source_location": "app/templates/dashboard/ceo.html:350"},
+
+    {"source": "tpl_commitments", "target": "concept_commitments_indicator", "type": "describes", "confidence": "EXTRACTED", "source_location": "app/templates/dashboard/commitments.html:520"},
+    {"source": "tpl_concept_operations", "target": "concept_mafhoom_mushtarak", "type": "describes", "confidence": "EXTRACTED", "source_location": "app/templates/dashboard/concept_operations.html:7"}
+  ],
+  "hyperedges": [],
+  "input_tokens": 0,
+  "output_tokens": 0
+}

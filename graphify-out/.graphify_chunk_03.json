@@ -1,0 +1,18 @@
+{
+  "nodes": [
+    {"id": "department_emblem_189a5fc3", "label": "UAE Emblem (Department Logo 1)", "type": "logo", "source_files": ["app/static/img/departments/189a5fc3471f46e4bf55a5d556d09478.png"], "confidence": "EXTRACTED", "description": "UAE national emblem (golden falcon with shield bearing UAE flag and red banner with Arabic text 'United Arab Emirates'). Used as a department logo/identity asset in the dashboard."},
+    {"id": "department_emblem_4fa9632a", "label": "UAE Emblem with English Caption (Department Logo 2)", "type": "logo", "source_files": ["app/static/img/departments/4fa9632ac5414a588049001798dd8b1d.png"], "confidence": "EXTRACTED", "description": "UAE national emblem (golden falcon with shield) including 'United Arab Emirates' English caption below. Used as a department logo asset in the dashboard."},
+    {"id": "department_emblem_6fa5cc59", "label": "UAE Emblem (Department Logo 3)", "type": "logo", "source_files": ["app/static/img/departments/6fa5cc593c2f4835a97353894ffecc61.png"], "confidence": "EXTRACTED", "description": "UAE national emblem (golden falcon with shield bearing UAE flag and red banner with Arabic text). Used as a department logo/identity asset."},
+    {"id": "department_emblem_e3d4d4b9", "label": "UAE Emblem (Department Logo 4)", "type": "logo", "source_files": ["app/static/img/departments/e3d4d4b9abed4095b69bef6a07269b47.png"], "confidence": "EXTRACTED", "description": "UAE national emblem (golden falcon with shield bearing UAE flag and red banner with Arabic text). Used as a department logo/identity asset."},
+    {"id": "uae_national_emblem_concept", "label": "UAE National Emblem", "type": "asset", "source_files": [], "confidence": "INFERRED", "description": "Official national emblem of the United Arab Emirates — a golden falcon (Hawk of Quraish) with a disk featuring the UAE flag at its center and a red banner inscribed with 'Al-Imarat Al-Arabiyyah Al-Muttahidah'. Represents national identity and is used to mark UAE government departments."}
+  ],
+  "edges": [
+    {"source": "department_emblem_189a5fc3", "target": "uae_national_emblem_concept", "type": "depicts", "confidence": "EXTRACTED"},
+    {"source": "department_emblem_4fa9632a", "target": "uae_national_emblem_concept", "type": "depicts", "confidence": "EXTRACTED"},
+    {"source": "department_emblem_6fa5cc59", "target": "uae_national_emblem_concept", "type": "depicts", "confidence": "EXTRACTED"},
+    {"source": "department_emblem_e3d4d4b9", "target": "uae_national_emblem_concept", "type": "depicts", "confidence": "EXTRACTED"}
+  ],
+  "hyperedges": [],
+  "input_tokens": 0,
+  "output_tokens": 0
+}

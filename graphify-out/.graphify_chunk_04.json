@@ -1,0 +1,60 @@
+{
+  "nodes": [
+    {
+      "id": "img_home_hero",
+      "label": "Home Hero Background",
+      "type": "hero",
+      "source_files": ["app/static/img/home-hero.png"],
+      "confidence": "EXTRACTED",
+      "description": "Cinematic golden-toned hero image showing UAE national symbols: a stylized golden map of the UAE inside a circular frame, surrounded by Dubai skyline (Burj Khalifa), a mosque, the UAE flag, a high-speed train, solar panels, a satellite dish, a satellite, a drone, a fighter jet, and a naval warship. Represents UAE national power, technology, defense, and modernization for the dashboard's landing/home page."
+    },
+    {
+      "id": "concept_uae_map",
+      "label": "UAE Country Map",
+      "type": "map",
+      "source_files": ["app/static/img/home-hero.png"],
+      "confidence": "EXTRACTED",
+      "description": "Golden silhouette of the United Arab Emirates geographic outline, central focal point of the hero composition."
+    },
+    {
+      "id": "img_logo_svg",
+      "label": "Placeholder Logo (L)",
+      "type": "logo",
+      "source_files": ["app/static/img/logo.svg"],
+      "confidence": "EXTRACTED",
+      "description": "Simple SVG logo: a white circle with blue (#4F8EF7) stroke containing the letter 'L'. Placeholder branding asset for the application."
+    },
+    {
+      "id": "img_manager_portrait",
+      "label": "Manager Portrait",
+      "type": "portrait",
+      "source_files": ["app/static/img/manager-portrait.png"],
+      "confidence": "EXTRACTED",
+      "description": "Professional studio portrait of an older man with white hair and beard wearing a dark navy suit, arms crossed, against a dark backdrop. Represents the manager/executive figure in the dashboard."
+    },
+    {
+      "id": "img_president_portrait",
+      "label": "President Portrait",
+      "type": "portrait",
+      "source_files": ["app/static/img/president-portrait.jpg"],
+      "confidence": "EXTRACTED",
+      "description": "Official portrait of a man in traditional Emirati attire (white kandura, bisht, and ghutra with black agal) against a deep red background with the UAE flag at left. Depicts the UAE President (Sheikh Mohamed bin Zayed Al Nahyan) for the dashboard."
+    },
+    {
+      "id": "concept_uae_president",
+      "label": "UAE President",
+      "type": "image",
+      "source_files": ["app/static/img/president-portrait.jpg"],
+      "confidence": "INFERRED",
+      "description": "The President of the United Arab Emirates, depicted in the official portrait asset used in the dashboard."
+    }
+  ],
+  "edges": [
+    {"source": "img_home_hero", "target": "concept_uae_map", "type": "depicts", "confidence": "EXTRACTED"},
+    {"source": "img_home_hero", "target": "concept_uae_map", "type": "illustrates", "confidence": "EXTRACTED"},
+    {"source": "img_president_portrait", "target": "concept_uae_president", "type": "depicts", "confidence": "INFERRED"}
+  ],
+  "hyperedges": [],
+  "input_tokens": 0,
+  "output_tokens": 0
+}

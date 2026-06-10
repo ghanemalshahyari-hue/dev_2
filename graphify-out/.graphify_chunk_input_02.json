@@ -1,0 +1,29 @@
+{
+  "files": [
+    "C:\\Users\\ADMIN\\Desktop\\dev_2\\app\\templates\\dashboard\\department.html",
+    "C:\\Users\\ADMIN\\Desktop\\dev_2\\app\\templates\\dashboard\\department_detail.html",
+    "C:\\Users\\ADMIN\\Desktop\\dev_2\\app\\templates\\dashboard\\deputy.html",
+    "C:\\Users\\ADMIN\\Desktop\\dev_2\\app\\templates\\dashboard\\developer.html",
+    "C:\\Users\\ADMIN\\Desktop\\dev_2\\app\\templates\\dashboard\\director.html",
+    "C:\\Users\\ADMIN\\Desktop\\dev_2\\app\\templates\\dashboard\\group_admin.html",
+    "C:\\Users\\ADMIN\\Desktop\\dev_2\\app\\templates\\dashboard\\group_dashboard.html",
+    "C:\\Users\\ADMIN\\Desktop\\dev_2\\app\\templates\\dashboard\\home.html",
+    "C:\\Users\\ADMIN\\Desktop\\dev_2\\app\\templates\\dashboard\\org_structure.html",
+    "C:\\Users\\ADMIN\\Desktop\\dev_2\\app\\templates\\dashboard\\quarterly_report.html",
+    "C:\\Users\\ADMIN\\Desktop\\dev_2\\app\\templates\\dashboard\\secretary.html",
+    "C:\\Users\\ADMIN\\Desktop\\dev_2\\app\\templates\\dashboard\\simple_page.html",
+    "C:\\Users\\ADMIN\\Desktop\\dev_2\\app\\templates\\dashboard\\strategy_booklet.html",
+    "C:\\Users\\ADMIN\\Desktop\\dev_2\\app\\templates\\dashboard\\unified.html",
+    "C:\\Users\\ADMIN\\Desktop\\dev_2\\app\\templates\\dashboard\\user.html",
+    "C:\\Users\\ADMIN\\Desktop\\dev_2\\app\\templates\\duties\\index.html",
+    "C:\\Users\\ADMIN\\Desktop\\dev_2\\app\\templates\\errors\\401.html",
+    "C:\\Users\\ADMIN\\Desktop\\dev_2\\app\\templates\\errors\\403.html",
+    "C:\\Users\\ADMIN\\Desktop\\dev_2\\app\\templates\\errors\\404.html",
+    "C:\\Users\\ADMIN\\Desktop\\dev_2\\app\\templates\\errors\\500.html",
+    "C:\\Users\\ADMIN\\Desktop\\dev_2\\image_base64.txt",
+    "C:\\Users\\ADMIN\\Desktop\\dev_2\\requirements.txt"
+  ],
+  "chunk_num": 2,
+  "total_chunks": 5,
+  "is_image_chunk": false
+}
