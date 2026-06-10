@@ -2,7 +2,8 @@
   "permissions": {
     "allow": [
       "Bash(python -X utf8 -c ' *)",
-      "Bash(git add *)"
+      "Bash(git add *)",
+      "Bash(git checkout *)"
     ]
   }
 }
