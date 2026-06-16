@@ -79,136 +79,28 @@
     border: 1px solid rgba(146, 114, 42, 0.18);
     box-shadow: var(--home-shadow);
     background: #FFFAF0;
+    aspect-ratio: 716 / 373;
 }
 
 .hero-banner .hero-bg {
     width: 100%;
-    height: auto;
+    height: 100%;
     display: block;
+    object-fit: cover;
+    object-position: center center;
 }
 
-.hero-banner::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background:
-        linear-gradient(180deg, rgba(255, 255, 255, 0.16) 0%, rgba(255, 255, 255, 0.08) 100%),
-        radial-gradient(circle at center, rgba(255, 255, 255, 0.08), transparent 40%);
-    pointer-events: none;
-}
-
-.hero-copy {
-    position: absolute;
-    inset: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 2rem;
-    text-align: center;
-}
-
-.hero-copy-inner {
-    width: min(100%, clamp(320px, 36vw, 460px));
-}
-
-.hero-kicker {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0.45rem 1rem;
-    margin-bottom: 0.9rem;
-    border-radius: 999px;
-    background: rgba(255, 252, 245, 0.76);
-    border: 1px solid rgba(200, 155, 60, 0.18);
-    color: var(--home-accent-deep);
-    font-size: 0.82rem;
-    font-weight: 700;
-    box-shadow: 0 10px 22px rgba(200, 155, 60, 0.08);
-}
-
-.hero-emblem {
-    margin: 0 auto;
-    position: relative;
-    display: block;
-    width: 100%;
-    aspect-ratio: 1 / 1;
-    line-height: 1;
-}
-
-.hero-emblem-logo {
-    position: absolute;
-    top: 7%;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 18%;
-    max-width: 95px;
-    height: auto;
-    z-index: 5;
-    filter:
-        drop-shadow(0 4px 10px rgba(0, 0, 0, 0.20))
-        drop-shadow(0 1px 2px rgba(255, 255, 255, 0.45));
-}
-
-.hero-emblem-map {
-    position: absolute;
-    top: 28%;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 48%;
-    max-width: 240px;
-    height: auto;
-    z-index: 2;
-    filter:
-        drop-shadow(0 6px 14px rgba(126, 90, 32, 0.30))
-        drop-shadow(0 2px 4px rgba(255, 255, 255, 0.50));
-}
-
-.hero-emblem-text {
-    position: absolute;
-    bottom: 10%;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 4;
-    white-space: nowrap;
-    color: #2B1F12;
-    font-weight: 900;
-    font-size: clamp(20px, 2.4vw, 34px);
-    letter-spacing: 0.5px;
-    line-height: 1.1;
-    text-shadow:
-        0 1px 0 #FFFFFF,
-        -1px 0 0 rgba(255, 255, 255, 0.9),
-        1px 0 0 rgba(255, 255, 255, 0.9),
-        0 0 10px rgba(255, 252, 236, 0.95),
-        0 0 22px rgba(255, 248, 220, 0.75),
-        0 3px 8px rgba(126, 90, 32, 0.25);
-}
-
-.hero-subtitle {
-    margin: 0.95rem auto 0;
-    max-width: 470px;
-    font-size: 1rem;
-    line-height: 1.9;
-    color: #6A513F;
-}
-
+.hero-banner::after,
+.hero-copy,
+.hero-copy-inner,
+.hero-kicker,
+.hero-emblem,
+.hero-emblem-logo,
+.hero-emblem-map,
+.hero-emblem-text,
+.hero-subtitle,
 .hero-meta {
-    display: inline-flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: center;
-    gap: 0.6rem;
-    margin-top: 1.35rem;
-}
-
-.hero-meta span {
-    padding: 0.42rem 0.9rem;
-    border-radius: 999px;
-    background: rgba(255, 255, 255, 0.72);
-    border: 1px solid rgba(200, 155, 60, 0.14);
-    color: var(--home-text);
-    font-size: 0.8rem;
-    font-weight: 700;
+    display: none;
 }
 
 .overview-grid {
@@ -459,32 +351,9 @@
     }
 
     .hero-banner {
-        min-height: clamp(300px, 62vw, 420px);
+        margin-top: 16px;
         border-radius: 24px;
         aspect-ratio: 4 / 3;
-    }
-
-
-    .hero-copy {
-        padding: 1.25rem;
-    }
-
-    .hero-banner {
-        margin-top: 16px;
-    }
-
-    .hero-copy-inner {
-        width: 60vw;
-        max-width: 340px;
-    }
-
-    .hero-emblem-text {
-        font-size: clamp(18px, 4.5vw, 28px);
-    }
-
-    .hero-subtitle {
-        font-size: 0.92rem;
-        line-height: 1.75;
     }
 
     .overview-grid {
@@ -504,17 +373,8 @@
 {% set offset = circumference - (circumference * completion / 100) %}
 
 <div class="premium-home">
-    <section class="hero-banner" aria-label="الاستراتيجية العسكرية">
-        <img class="hero-bg" src="{{ url_for('static', filename='img/strategy-hero-light11.png') }}" alt="خلفية الاستراتيجية العسكرية">
-        <div class="hero-copy">
-            <div class="hero-copy-inner">
-                <h1 class="hero-emblem" aria-label="الاستراتيجية العسكرية">
-                    <img class="hero-emblem-logo" src="{{ url_for('static', filename='img/MOD_logo.png') }}" alt="">
-                    <img class="hero-emblem-map" src="{{ url_for('static', filename='img/uae-map.png') }}" alt="">
-                    <span class="hero-emblem-text" dir="rtl">الاستراتيجية العسكرية</span>
-                </h1>
-            </div>
-        </div>
+    <section class="hero-banner hero-banner-image-only" aria-label="الاستراتيجية العسكرية">
+        <img class="hero-bg" src="{{ url_for('static', filename='img/main-hero-strategy.png') }}" alt="الاستراتيجية العسكرية">
     </section>
 
     <section class="overview-grid" aria-label="نظرة تنفيذية">
