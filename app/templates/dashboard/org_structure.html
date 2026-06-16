@@ -684,7 +684,7 @@
                 <span class="org-header-icon"><i class="bi bi-diagram-3"></i></span>
                 <div>
                     <h1 class="org-header-title">{{ page_title }}</h1>
-                    <p class="org-header-meta">العرض الهرمي للقيادة والمفاهيم المشتركة، مع الجهات المعنية بكل محور — يتحدّث تلقائياً مع كل تعديل على المجموعات.</p>
+                    <p class="org-header-meta">العرض الهرمي للقيادة والمفاهيم المشتركة في الاستراتيجية العسكرية — يتحدّث تلقائياً مع كل تعديل على المجموعات.</p>
                 </div>
             </div>
             <div class="org-header-actions">
@@ -757,11 +757,11 @@
 
                     <div class="org-spacer-md" aria-hidden="true"></div>
 
-                    <!-- Second-level relay -->
+                    <!-- Second-level relay (deputy) -->
                     <div class="org-boss">
                         <div class="org-boss-card">
-                            <span class="org-boss-name">{{ central_department.responsible_person if central_department and central_department.responsible_person else 'رئيس الفريق' }}</span>
-                            <span class="org-boss-role">(المدير)</span>
+                            <span class="org-boss-name">نائب رئيس أركان القوات المسلحة</span>
+                            <span class="org-boss-role">(نائب رئيس فريق الاستراتيجية العسكرية)</span>
                         </div>
                     </div>
 
@@ -796,36 +796,8 @@
                                 </div>
                                 <h3 class="org-branch-card-title">المفهوم المشترك رقم ({{ number }})</h3>
                                 <p class="org-branch-card-desc">{{ dept.description or 'لا يوجد وصف بعد — أضف شرحاً للمفهوم من لوحة الإدارة.' }}</p>
-
-                                <div class="org-branch-card-metrics">
-                                    <div class="org-metric" title="نسبة الإنجاز">
-                                        <span class="org-metric-label">إنجاز</span>
-                                        <span class="org-metric-bar"><i style="width: {{ completion }}%"></i></span>
-                                        <span class="org-metric-value">{{ completion }}%</span>
-                                    </div>
-                                    <div class="org-metric" title="نسبة الكفاءة">
-                                        <span class="org-metric-label">كفاءة</span>
-                                        <span class="org-metric-bar"><i style="width: {{ competence }}%"></i></span>
-                                        <span class="org-metric-value">{{ competence }}%</span>
-                                    </div>
-                                </div>
-
-                                <span class="org-branch-card-cta">عرض التفاصيل <i class="bi bi-arrow-left"></i></span>
                             </a>
 
-                            <!-- Stakeholders -->
-                            <div class="org-branch-list">
-                                <p class="org-branch-list-title"><i class="bi bi-people"></i><span>الجهات المعنية</span></p>
-                                {% if stakeholders %}
-                                <ul>
-                                    {% for s in stakeholders %}
-                                    <li>{{ s }}</li>
-                                    {% endfor %}
-                                </ul>
-                                {% else %}
-                                <p class="org-empty-line">لا توجد جهات مرتبطة بعد</p>
-                                {% endif %}
-                            </div>
                         </div>
                         {% endfor %}
                     </div>

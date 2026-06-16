@@ -21,7 +21,8 @@ class Department(db.Model):
     code               = db.Column(db.String(20), unique=True, nullable=False)
     name               = db.Column(db.String(120), nullable=False)
     description        = db.Column(db.Text, default='')
-    responsible_person = db.Column(db.String(120), default='')
+    responsible_person = db.Column(db.String(120), default='')          # Title / role (e.g., "رئيس هيئة...")
+    responsible_name   = db.Column(db.String(120), default='')          # Person's name (shown above the title)
     color              = db.Column(db.String(7), default='#4F8EF7')   # Hex color
     icon               = db.Column(db.String(60), default='bi-grid-fill')
     logo_file          = db.Column(db.String(120), nullable=True)     # Custom logo filename
