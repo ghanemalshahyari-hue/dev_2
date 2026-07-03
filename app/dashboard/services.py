@@ -25,6 +25,7 @@ def get_overview_metrics() -> List[Dict]:
             'logo_file':          d.logo_file,
             'description':        d.description,
             'responsible_person': d.responsible_person,
+            'responsible_name':   d.responsible_name,
             'concept_number':     getattr(d, 'concept_number', None),
             'is_central':         bool(d.is_central),
             'director_notes':     d.director_notes or '',

@@ -3,7 +3,8 @@
     "allow": [
       "Bash(python -X utf8 -c ' *)",
       "Bash(git add *)",
-      "Bash(git checkout *)"
+      "Bash(git checkout *)",
+      "Bash(python -X utf8 _dev_scripts/add_responsible_name_column.py)"
     ]
   }
 }

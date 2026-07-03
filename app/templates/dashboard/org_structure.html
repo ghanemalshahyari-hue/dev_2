@@ -771,7 +771,8 @@
                     <div class="org-branches" style="--branches: {{ report_departments|length }};">
                         {% for dept in report_departments %}
                         {% set number = dept.concept_number or loop.index %}
-                        {% set owner_label = dept.responsible_person or ('رئيس ' ~ number) %}
+                        {% set top_line = dept.responsible_name or dept.responsible_person or ('رئيس ' ~ number) %}
+                        {% set sub_line = dept.responsible_person if dept.responsible_name else 'المدير' %}
                         {% set stakeholders = stakeholders_by_dept.get(dept.id, []) %}
                         {% set completion = dept.completion_pct|default(0)|round|int %}
                         {% set competence = dept.competence_pct|default(0)|round|int %}
@@ -780,8 +781,8 @@
                             <!-- Manager header -->
                             <div class="org-branch-head">
                                 <span class="org-branch-head-num">{{ number }}</span>
-                                <span class="org-branch-head-name">{{ owner_label }}</span>
-                                <span class="org-branch-head-role">(المدير)</span>
+                                <span class="org-branch-head-name">{{ top_line }}</span>
+                                <span class="org-branch-head-role">({{ sub_line }})</span>
                             </div>
 
                             <!-- Concept card (clickable) -->

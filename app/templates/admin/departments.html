@@ -133,6 +133,7 @@
                     <button class="btn btn-sm btn-outline-primary flex-fill" data-bs-toggle="modal"
                         data-bs-target="#editDeptModal" data-dept-id="{{ dept.id }}" data-dept-name="{{ dept.name }}"
                         data-dept-desc="{{ dept.description }}" data-dept-person="{{ dept.responsible_person }}"
+                        data-dept-resp-name="{{ dept.responsible_name or '' }}"
                         data-dept-concept="{{ dept.concept_number or '' }}" data-dept-color="{{ dept.color }}"
                         data-dept-icon="{{ dept.icon }}" data-dept-logo="{{ dept.logo_file or '' }}">
                         <i class="bi bi-pencil me-1"></i>تعديل
@@ -214,9 +215,14 @@
                                 placeholder="وصف مختصر للمجموعة"></textarea>
                         </div>
                         <div class="col-12">
-                            <label class="form-label">المسؤول</label>
+                            <label class="form-label">اسم المسؤول</label>
+                            <input type="text" name="responsible_name" class="form-control glass-input"
+                                placeholder="اسم الشخص (مثلاً: محمد أحمد)">
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">اللقب / المسمى الوظيفي</label>
                             <input type="text" name="responsible_person" class="form-control glass-input"
-                                placeholder="اسم الشخص المسؤول">
+                                placeholder="مثلاً: رئيس هيئة العمليات">
                         </div>
                     </div>
                 </div>
@@ -270,9 +276,14 @@
                                 rows="2"></textarea>
                         </div>
                         <div class="col-12">
-                            <label class="form-label">المسؤول</label>
+                            <label class="form-label">اسم المسؤول</label>
+                            <input type="text" name="responsible_name" id="editDeptRespName"
+                                class="form-control glass-input" placeholder="اسم الشخص (مثلاً: محمد أحمد)">
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">اللقب / المسمى الوظيفي</label>
                             <input type="text" name="responsible_person" id="editDeptPerson"
-                                class="form-control glass-input">
+                                class="form-control glass-input" placeholder="مثلاً: رئيس هيئة العمليات">
                         </div>
                         <div class="col-12">
                             <label class="form-label d-flex align-items-center gap-2">
@@ -394,6 +405,7 @@
         document.getElementById('editDeptName').value = btn.dataset.deptName || '';
         document.getElementById('editDeptDesc').value = btn.dataset.deptDesc || '';
         document.getElementById('editDeptPerson').value = btn.dataset.deptPerson || '';
+        document.getElementById('editDeptRespName').value = btn.dataset.deptRespName || '';
         document.getElementById('editDeptConcept').value = btn.dataset.deptConcept || '';
         document.getElementById('editDeptColor').value = btn.dataset.deptColor || '#4F8EF7';
         // document.getElementById('editDeptIcon').value = btn.dataset.deptIcon || '';
