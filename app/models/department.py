@@ -23,6 +23,7 @@ class Department(db.Model):
     description        = db.Column(db.Text, default='')
     responsible_person = db.Column(db.String(120), default='')          # Title / role (e.g., "رئيس هيئة...")
     responsible_name   = db.Column(db.String(120), default='')          # Person's name (shown above the title)
+    org_group_name     = db.Column(db.String(160), default='')          # Display name in org structure branch header
     color              = db.Column(db.String(7), default='#4F8EF7')   # Hex color
     icon               = db.Column(db.String(60), default='bi-grid-fill')
     logo_file          = db.Column(db.String(120), nullable=True)     # Custom logo filename
@@ -67,6 +68,7 @@ class Department(db.Model):
             'name':               self.name,
             'description':        self.description,
             'responsible_person': self.responsible_person,
+            'org_group_name':     self.org_group_name or '',
             'color':              self.color,
             'icon':               self.icon,
             'logo_file':          self.logo_file,

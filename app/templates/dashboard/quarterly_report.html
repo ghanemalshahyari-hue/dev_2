@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}تقرير الأداء الربع سنوي — {{ app_name }}{% endblock %}
+{% block title %}تقرير الأداء الشهري — {{ app_name }}{% endblock %}
 {% block body_class %}app-body dashboard-home-body{% endblock %}
 
 {% block extra_css %}
@@ -571,7 +571,7 @@
     <div class="quarterly-shell">
         <section class="report-header" aria-label="عنوان التقرير">
             <div>
-                <h1 class="report-title">تقرير الأداء الربع سنوي</h1>
+                <h1 class="report-title">تقرير الأداء الشهري</h1>
                 <p class="report-subtitle">عرض المفاهيم المشتركة حول المحور الاستراتيجي مع مساحة للشرح والصور.</p>
             </div>
             <div class="report-meta">
@@ -585,10 +585,10 @@
             <span class="report-ticker-title"><i class="bi bi-broadcast"></i>موجز الربع</span>
             <div class="report-ticker-window">
                 <div class="report-ticker-track">
-                    <span>متابعة تنفيذ الواجبات الرئيسية حسب المفهوم المشترك.</span>
+                    <span>متابعة تنفيذ الواجبات الرئيسية حسب المفهوم العملياتي المشترك.</span>
                     <span>إظهار المسؤول أسفل كل بطاقة لتسهيل القراءة والمتابعة.</span>
                     <span>مساحة الصور أسفل التقرير جاهزة لإضافة الأشخاص والشروحات.</span>
-                    <span>متابعة تنفيذ الواجبات الرئيسية حسب المفهوم المشترك.</span>
+                    <span>متابعة تنفيذ الواجبات الرئيسية حسب المفهوم العملياتي المشترك.</span>
                     <span>إظهار المسؤول أسفل كل بطاقة لتسهيل القراءة والمتابعة.</span>
                     <span>مساحة الصور أسفل التقرير جاهزة لإضافة الأشخاص والشروحات.</span>
                 </div>
@@ -642,7 +642,7 @@
                                 <img class="node-logo" src="{{ url_for('static', filename='img/logo.svg') }}" alt="">
                                 {% endif %}
                                 <span class="node-number">{{ number }}</span>
-                                <div class="node-title">المفهوم المشترك رقم ({{ number }})</div>
+                                <div class="node-title">المفهوم العملياتي المشترك رقم ({{ number }})</div>
                                 <p class="node-desc">{{ dept.description or 'الشرح هنا' }}</p>
                                 <span class="node-duty"><i class="bi bi-list-task"></i>عدد الواجبات: {{ dept.duties_count|default(0) }}</span>
                             </div>
@@ -655,7 +655,7 @@
                     <div class="report-node">
                         <div class="report-node-card">
                             <span class="node-number">1</span>
-                            <div class="node-title">المفهوم المشترك رقم (1)</div>
+                            <div class="node-title">المفهوم العملياتي المشترك رقم (1)</div>
                             <p class="node-desc">الشرح هنا</p>
                             <span class="node-duty"><i class="bi bi-list-task"></i>عدد الواجبات: 0</span>
                         </div>

@@ -9,7 +9,9 @@ User      → Personal view + access request
 Developer → Full dev panel (all views available)
 """
 
-from flask import render_template, url_for, abort
+from datetime import datetime
+
+from flask import render_template, url_for, abort, request, redirect, flash, jsonify
 from flask_login import login_required, current_user
 
 from app.dashboard import dashboard_bp
@@ -78,6 +80,268 @@ def agenda():
         calendar=calendar_data,
         page_title='الأجندة السنوية',
     )
+
+
+@dashboard_bp.route('/agenda/items', methods=['POST'])
+@login_required
+def create_agenda_item():
+    """Create a manually editable agenda item."""
+    from app.extensions import db
+    from app.models.agenda import AgendaItem
+
+    title = (request.form.get('title') or '').strip()
+    event_date = _parse_agenda_date(request.form.get('event_date'))
+    color = _clean_agenda_color(request.form.get('color'))
+    notes = (request.form.get('notes') or '').strip()
+
+    if not title or event_date is None:
+        flash('Please provide an agenda title and date.', 'danger')
+        return redirect(url_for('dashboard.agenda'))
+
+    db.session.add(AgendaItem(
+        title=title,
+        event_date=event_date,
+        color=color,
+        notes=notes,
+        created_by=current_user.id,
+    ))
+    db.session.commit()
+    flash('Agenda item added.', 'success')
+    return redirect(url_for('dashboard.agenda'))
+
+
+@dashboard_bp.route('/agenda/items/<int:item_id>/update', methods=['POST'])
+@login_required
+def update_agenda_item(item_id):
+    """Update an editable agenda item."""
+    from app.extensions import db
+    from app.models.agenda import AgendaItem
+
+    item = AgendaItem.query.get_or_404(item_id)
+    title = (request.form.get('title') or '').strip()
+    event_date = _parse_agenda_date(request.form.get('event_date'))
+
+    if not title or event_date is None:
+        flash('Please provide an agenda title and date.', 'danger')
+        return redirect(url_for('dashboard.agenda'))
+
+    item.title = title
+    item.event_date = event_date
+    item.color = _clean_agenda_color(request.form.get('color'))
+    item.notes = (request.form.get('notes') or '').strip()
+    db.session.commit()
+    flash('Agenda item updated.', 'success')
+    return redirect(url_for('dashboard.agenda'))
+
+
+@dashboard_bp.route('/agenda/items/<int:item_id>/delete', methods=['POST'])
+@login_required
+def delete_agenda_item(item_id):
+    """Delete an editable agenda item."""
+    from app.extensions import db
+    from app.models.agenda import AgendaItem
+
+    item = AgendaItem.query.get_or_404(item_id)
+    db.session.delete(item)
+    db.session.commit()
+    flash('Agenda item deleted.', 'success')
+    return redirect(url_for('dashboard.agenda'))
+
+
+@dashboard_bp.route('/agenda/items/<int:item_id>/move', methods=['POST'])
+@login_required
+def move_agenda_item(item_id):
+    """Move an editable agenda item to another date via drag and drop."""
+    from app.extensions import db
+    from app.models.agenda import AgendaItem
+
+    item = AgendaItem.query.get_or_404(item_id)
+    payload = request.get_json(silent=True) or request.form
+    event_date = _parse_agenda_date(payload.get('event_date'))
+
+    if event_date is None:
+        return jsonify({'ok': False, 'error': 'Invalid date.'}), 400
+
+    item.event_date = event_date
+    db.session.commit()
+    return jsonify({
+        'ok': True,
+        'item': item.to_calendar_dict(),
+    })
+
+
+@dashboard_bp.route('/agenda/items/move', methods=['POST'])
+@login_required
+def move_any_agenda_item():
+    """Move either a custom item or a generated default agenda occurrence."""
+    from app.dashboard.agenda_service import EVENT_TYPES
+    from app.extensions import db
+    from app.models.agenda import AgendaItem
+
+    payload = request.get_json(silent=True) or {}
+    item_ref = str(payload.get('item_ref') or '').strip()
+    event_date = _parse_agenda_date(payload.get('event_date'))
+
+    if not item_ref or event_date is None:
+        return jsonify({'ok': False, 'error': 'Invalid agenda move.'}), 400
+
+    if item_ref.startswith('default::'):
+        parts = item_ref.split('::', 2)
+        if len(parts) != 3:
+            return jsonify({'ok': False, 'error': 'Invalid default event.'}), 400
+
+        event_key = parts[1]
+        original_date = _parse_agenda_date(parts[2])
+        event_type = EVENT_TYPES.get(event_key)
+        if not event_type or original_date is None:
+            return jsonify({'ok': False, 'error': 'Unknown default event.'}), 400
+
+        item = AgendaItem.query.filter_by(
+            is_default=True,
+            event_key=event_key,
+            original_date=original_date,
+        ).first()
+        if item is None:
+            item = AgendaItem(
+                title=event_type['label'],
+                event_date=event_date,
+                color=event_type['color'],
+                notes='',
+                is_default=True,
+                event_key=event_key,
+                original_date=original_date,
+                created_by=current_user.id,
+            )
+            db.session.add(item)
+        else:
+            item.event_date = event_date
+    else:
+        try:
+            item_id = int(item_ref)
+        except ValueError:
+            return jsonify({'ok': False, 'error': 'Invalid item.'}), 400
+        item = AgendaItem.query.get_or_404(item_id)
+        item.event_date = event_date
+
+    db.session.commit()
+    return jsonify({'ok': True, 'item': item.to_calendar_dict()})
+
+
+@dashboard_bp.route('/agenda/items/save', methods=['POST'])
+@login_required
+def save_any_agenda_item():
+    """Save edits for either a custom item or a generated default occurrence."""
+    from app.dashboard.agenda_service import EVENT_TYPES
+    from app.extensions import db
+    from app.models.agenda import AgendaItem
+
+    item_ref = str(request.form.get('item_ref') or '').strip()
+    title = (request.form.get('title') or '').strip()
+    event_date = _parse_agenda_date(request.form.get('event_date'))
+    color = _clean_agenda_color(request.form.get('color'))
+    notes = (request.form.get('notes') or '').strip()
+
+    if not item_ref or not title or event_date is None:
+        flash('Please provide an agenda title and date.', 'danger')
+        return redirect(url_for('dashboard.agenda'))
+
+    if item_ref.startswith('default::'):
+        parts = item_ref.split('::', 2)
+        if len(parts) != 3:
+            flash('Unable to edit this agenda item.', 'danger')
+            return redirect(url_for('dashboard.agenda'))
+
+        event_key = parts[1]
+        original_date = _parse_agenda_date(parts[2])
+        event_type = EVENT_TYPES.get(event_key)
+        if not event_type or original_date is None:
+            flash('Unable to edit this agenda item.', 'danger')
+            return redirect(url_for('dashboard.agenda'))
+
+        item = AgendaItem.query.filter_by(
+            is_default=True,
+            event_key=event_key,
+            original_date=original_date,
+        ).first()
+        if item is None:
+            item = AgendaItem(
+                title=title,
+                event_date=event_date,
+                color=color or event_type['color'],
+                notes=notes,
+                is_default=True,
+                event_key=event_key,
+                original_date=original_date,
+                created_by=current_user.id,
+            )
+            db.session.add(item)
+        else:
+            item.title = title
+            item.event_date = event_date
+            item.color = color
+            item.notes = notes
+    else:
+        try:
+            item_id = int(item_ref)
+        except ValueError:
+            flash('Unable to edit this agenda item.', 'danger')
+            return redirect(url_for('dashboard.agenda'))
+        item = AgendaItem.query.get_or_404(item_id)
+        item.title = title
+        item.event_date = event_date
+        item.color = color
+        item.notes = notes
+
+    db.session.commit()
+    flash('Agenda item updated.', 'success')
+    return redirect(url_for('dashboard.agenda'))
+
+
+@dashboard_bp.route('/agenda/items/place', methods=['POST'])
+@login_required
+def place_agenda_item():
+    """Place a legend event type onto a selected calendar date."""
+    from app.dashboard.agenda_service import EVENT_TYPES
+    from app.extensions import db
+    from app.models.agenda import AgendaItem
+
+    payload = request.get_json(silent=True) or {}
+    event_key = str(payload.get('event_key') or '').strip()
+    event_date = _parse_agenda_date(payload.get('event_date'))
+    event_type = EVENT_TYPES.get(event_key)
+
+    if not event_type or event_date is None:
+        return jsonify({'ok': False, 'error': 'Invalid agenda placement.'}), 400
+
+    item = AgendaItem(
+        title=event_type['label'],
+        event_date=event_date,
+        color=event_type['color'],
+        notes='',
+        event_key=event_key,
+        created_by=current_user.id,
+    )
+    db.session.add(item)
+    db.session.commit()
+    return jsonify({'ok': True, 'item': item.to_calendar_dict()})
+
+
+def _parse_agenda_date(value):
+    try:
+        return datetime.strptime(value or '', '%Y-%m-%d').date()
+    except ValueError:
+        return None
+
+
+def _clean_agenda_color(value):
+    value = (value or '#C89B3C').strip()
+    if len(value) == 7 and value.startswith('#'):
+        try:
+            int(value[1:], 16)
+            return value.upper()
+        except ValueError:
+            pass
+    return '#C89B3C'
 
 
 @dashboard_bp.route('/military-strategy-booklet')
@@ -158,7 +422,7 @@ def quarterly_performance():
         central_department=central_department,
         report_departments=report_departments,
         averages=averages,
-        page_title='تقرير الأداء الربع سنوي',
+        page_title='تقرير الأداء الشهري',
     )
 
 

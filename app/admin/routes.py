@@ -124,6 +124,7 @@ def add_department():
         description        = request.form.get('description', '').strip(),
         responsible_person = request.form.get('responsible_person', '').strip(),
         responsible_name   = request.form.get('responsible_name', '').strip(),
+        org_group_name     = request.form.get('org_group_name', '').strip(),
         color              = request.form.get('color', '#4F8EF7'),
         icon               = request.form.get('icon', 'bi-grid-fill'),
         logo_file          = logo_file_path,
@@ -149,6 +150,7 @@ def update_department(dept_id: int):
     dept.description        = request.form.get('description', '').strip()
     dept.responsible_person = request.form.get('responsible_person', '').strip()
     dept.responsible_name   = request.form.get('responsible_name', '').strip()
+    dept.org_group_name     = request.form.get('org_group_name', '').strip()
     dept.concept_number     = request.form.get('concept_number', type=int)
     dept.color              = request.form.get('color', dept.color)
     dept.icon               = request.form.get('icon', dept.icon)

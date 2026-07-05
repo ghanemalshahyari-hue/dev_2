@@ -122,6 +122,129 @@
         font-size: 0.95rem;
     }
 
+    .ag-edit-panel {
+        padding-top: 0.8rem;
+        display: grid;
+        gap: 0.9rem;
+    }
+
+    .ag-editor-details {
+        flex-basis: 100%;
+        width: min(980px, 100%);
+        margin-top: 0.65rem;
+    }
+
+    .ag-editor-details summary {
+        cursor: pointer;
+        list-style: none;
+    }
+
+    .ag-editor-details summary::-webkit-details-marker {
+        display: none;
+    }
+
+    .ag-edit-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.75rem;
+        flex-wrap: wrap;
+    }
+
+    .ag-edit-head h2 {
+        margin: 0;
+        font-size: 1rem;
+        font-weight: 900;
+        color: var(--ag-text);
+        display: inline-flex;
+        align-items: center;
+        gap: 0.45rem;
+    }
+
+    .ag-edit-form,
+    .ag-item-form {
+        display: grid;
+        grid-template-columns: minmax(160px, 1.1fr) minmax(145px, 0.7fr) 56px minmax(180px, 1fr) auto;
+        gap: 0.55rem;
+        align-items: end;
+    }
+
+    .ag-field {
+        display: grid;
+        gap: 0.25rem;
+        min-width: 0;
+    }
+
+    .ag-field label {
+        font-size: 0.72rem;
+        font-weight: 800;
+        color: var(--ag-text-soft);
+    }
+
+    .ag-control {
+        width: 100%;
+        border: 1px solid var(--ag-border);
+        border-radius: 10px;
+        background: var(--ag-surface-soft);
+        color: var(--ag-text);
+        min-height: 40px;
+        padding: 0.45rem 0.65rem;
+        font-size: 0.86rem;
+        font-weight: 700;
+    }
+
+    .ag-control[type="color"] {
+        padding: 0.2rem;
+    }
+
+    .ag-btn {
+        border: 1px solid rgba(200, 155, 60, 0.32);
+        border-radius: 10px;
+        min-height: 40px;
+        padding: 0.45rem 0.8rem;
+        background: linear-gradient(180deg, #FFFCF3 0%, #F4E2B0 100%);
+        color: var(--ag-accent-dark);
+        font-weight: 900;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.35rem;
+        white-space: nowrap;
+    }
+
+    .ag-btn.is-danger {
+        background: #FCE9E0;
+        border-color: #E2A089;
+        color: #8B3A1F;
+    }
+
+    .ag-items {
+        display: grid;
+        gap: 0.55rem;
+    }
+
+    .ag-item-row {
+        border: 1px solid var(--ag-border-soft);
+        border-radius: 12px;
+        background: var(--ag-surface-soft);
+        padding: 0.65rem;
+        display: grid;
+        gap: 0.55rem;
+    }
+
+    .ag-item-actions {
+        display: flex;
+        gap: 0.4rem;
+        align-items: end;
+    }
+
+    .ag-empty-state {
+        margin: 0;
+        color: var(--ag-text-soft);
+        font-weight: 700;
+        font-size: 0.86rem;
+    }
+
     /* ── Legend ───────────────────────────────────────────── */
     .ag-legend {
         background: var(--ag-surface);
@@ -158,11 +281,30 @@
     .ag-legend-item {
         display: flex;
         align-items: center;
+        justify-content: flex-start;
         gap: 0.65rem;
         padding: 0.6rem 0.75rem;
         border: 1px solid var(--ag-border-soft);
         border-radius: 12px;
         background: var(--ag-surface-soft);
+        color: var(--ag-text);
+        text-align: start;
+        width: 100%;
+    }
+
+    button.ag-legend-item {
+        cursor: pointer;
+    }
+
+    button.ag-legend-item:hover,
+    button.ag-legend-item.is-selected {
+        border-color: color-mix(in srgb, var(--legend-color, var(--ag-accent)) 46%, transparent);
+        background: color-mix(in srgb, var(--legend-color, var(--ag-accent)) 12%, #FFFFFF);
+        box-shadow: 0 8px 18px color-mix(in srgb, var(--legend-color, var(--ag-accent)) 20%, transparent);
+    }
+
+    button.ag-legend-item.is-selected .ag-legend-swatch {
+        box-shadow: 0 0 0 4px color-mix(in srgb, var(--legend-color, var(--ag-accent)) 24%, transparent);
     }
 
     .ag-legend-swatch {
@@ -304,6 +446,7 @@
         color: var(--ag-text);
         transition: transform 0.15s ease, box-shadow 0.15s ease;
         overflow: hidden;
+        cursor: pointer;
     }
 
     .ag-day-num {
@@ -389,6 +532,11 @@
         box-shadow: 0 8px 18px color-mix(in srgb, var(--primary-event-color, var(--ag-accent)) 28%, transparent);
     }
 
+    .ag-day:not(.is-outside):hover {
+        border-color: rgba(200, 155, 60, 0.42);
+        box-shadow: 0 8px 18px rgba(103, 76, 27, 0.08);
+    }
+
     /* Holiday tiny corner mark */
     .ag-day.is-holiday::after {
         content: "★";
@@ -441,6 +589,71 @@
         width: auto;
         box-shadow: none;
         line-height: 1;
+    }
+
+    .ag-custom-label {
+        max-width: 100%;
+        border: 0;
+        border-radius: 999px;
+        background: color-mix(in srgb, var(--chip-color, var(--ag-accent)) 18%, #FFFFFF);
+        color: color-mix(in srgb, var(--chip-color, var(--ag-accent)) 82%, #1F1106);
+        cursor: grab;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.18rem;
+        padding: 0.1rem 0.28rem;
+        margin-top: auto;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        font-size: 0.58rem;
+        line-height: 1.1;
+        text-align: center;
+    }
+
+    .ag-custom-label:active {
+        cursor: grabbing;
+    }
+
+    .ag-custom-label.is-dragging {
+        opacity: 0.45;
+    }
+
+    .ag-custom-list {
+        width: 100%;
+        margin-top: auto;
+        display: grid;
+        gap: 2px;
+        min-width: 0;
+    }
+
+    .ag-day.is-drop-target {
+        outline: 2px dashed color-mix(in srgb, var(--ag-accent) 66%, transparent);
+        outline-offset: -2px;
+    }
+
+    .ag-day.is-drop-active {
+        transform: translateY(-2px) scale(1.03);
+        background: #FFF7E2;
+        border-color: var(--ag-accent);
+        box-shadow: 0 12px 24px rgba(200, 155, 60, 0.22);
+    }
+
+    .ag-day.is-saving {
+        opacity: 0.62;
+        pointer-events: none;
+    }
+
+    .ag-day.is-place-target {
+        outline: 2px solid color-mix(in srgb, var(--selected-event-color, var(--ag-accent)) 58%, transparent);
+        outline-offset: -2px;
+    }
+
+    .ag-day.is-place-target:hover {
+        transform: translateY(-2px) scale(1.02);
+        background: color-mix(in srgb, var(--selected-event-color, var(--ag-accent)) 12%, #FFFFFF);
+        border-color: var(--selected-event-color, var(--ag-accent));
     }
 
     /* Holidays summary panel */
@@ -504,6 +717,72 @@
         outline-offset: 1px;
     }
 
+    .ag-modal-content {
+        border: 1px solid var(--ag-border);
+        border-radius: 18px;
+        background: var(--ag-surface);
+        color: var(--ag-text);
+        box-shadow: var(--ag-shadow);
+    }
+
+    .ag-modal-header,
+    .ag-modal-footer {
+        border-color: var(--ag-border-soft);
+    }
+
+    .ag-modal-title {
+        font-weight: 900;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.45rem;
+    }
+
+    .ag-selected-date {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        padding: 0.3rem 0.65rem;
+        border-radius: 999px;
+        background: var(--ag-accent-soft);
+        color: var(--ag-accent-dark);
+        font-weight: 900;
+        font-size: 0.82rem;
+    }
+
+    .ag-modal-form {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 140px 56px;
+        gap: 0.55rem;
+        align-items: end;
+    }
+
+    .ag-modal-form .ag-field.is-wide {
+        grid-column: 1 / -1;
+    }
+
+    .ag-modal-items {
+        display: grid;
+        gap: 0.55rem;
+        margin-top: 1rem;
+        padding-top: 1rem;
+        border-top: 1px dashed var(--ag-border);
+    }
+
+    .ag-modal-item {
+        border: 1px solid var(--ag-border-soft);
+        border-radius: 12px;
+        background: var(--ag-surface-soft);
+        padding: 0.65rem;
+        display: grid;
+        gap: 0.55rem;
+    }
+
+    .ag-modal-item-actions {
+        display: flex;
+        gap: 0.45rem;
+        flex-wrap: wrap;
+    }
+
     /* ── Responsive ───────────────────────────────────────── */
     @media (max-width: 900px) {
         .ag-header {
@@ -516,6 +795,15 @@
 
         .ag-months {
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        }
+
+        .ag-edit-form,
+        .ag-item-form {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .ag-item-actions {
+            grid-column: 1 / -1;
         }
     }
 
@@ -531,6 +819,11 @@
         .ag-day {
             min-height: 32px;
             font-size: 0.72rem;
+        }
+
+        .ag-edit-form,
+        .ag-item-form {
+            grid-template-columns: 1fr;
         }
     }
 </style>
@@ -551,6 +844,67 @@
             </div>
             <div class="ag-header-actions">
                 <span class="ag-year-chip"><i class="bi bi-calendar-event"></i><span>{{ calendar.year }}</span></span>
+                <details class="ag-editor-details">
+                    <summary class="ag-btn"><i class="bi bi-pencil-square"></i><span>Edit agenda</span></summary>
+                    <div class="ag-edit-panel">
+                        <form class="ag-edit-form" action="{{ url_for('dashboard.create_agenda_item') }}" method="post">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <div class="ag-field">
+                                <label for="new-ag-title">Title</label>
+                                <input class="ag-control" id="new-ag-title" name="title" type="text" maxlength="200" required>
+                            </div>
+                            <div class="ag-field">
+                                <label for="new-ag-date">Date</label>
+                                <input class="ag-control" id="new-ag-date" name="event_date" type="date" min="{{ calendar.year }}-01-01" max="{{ calendar.year }}-12-31" required>
+                            </div>
+                            <div class="ag-field">
+                                <label for="new-ag-color">Color</label>
+                                <input class="ag-control" id="new-ag-color" name="color" type="color" value="#C89B3C">
+                            </div>
+                            <div class="ag-field">
+                                <label for="new-ag-notes">Notes</label>
+                                <input class="ag-control" id="new-ag-notes" name="notes" type="text" maxlength="500">
+                            </div>
+                            <button class="ag-btn" type="submit"><i class="bi bi-plus-lg"></i><span>Add</span></button>
+                        </form>
+                        <div class="ag-items">
+                            {% if calendar.custom_items %}
+                                {% for item in calendar.custom_items %}
+                                <div class="ag-item-row">
+                                    <form class="ag-item-form" action="{{ url_for('dashboard.update_agenda_item', item_id=item.id) }}" method="post">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                        <div class="ag-field">
+                                            <label for="ag-title-{{ item.id }}">Title</label>
+                                            <input class="ag-control" id="ag-title-{{ item.id }}" name="title" type="text" value="{{ item.title }}" maxlength="200" required>
+                                        </div>
+                                        <div class="ag-field">
+                                            <label for="ag-date-{{ item.id }}">Date</label>
+                                            <input class="ag-control" id="ag-date-{{ item.id }}" name="event_date" type="date" value="{{ item.date }}" min="{{ calendar.year }}-01-01" max="{{ calendar.year }}-12-31" required>
+                                        </div>
+                                        <div class="ag-field">
+                                            <label for="ag-color-{{ item.id }}">Color</label>
+                                            <input class="ag-control" id="ag-color-{{ item.id }}" name="color" type="color" value="{{ item.color }}">
+                                        </div>
+                                        <div class="ag-field">
+                                            <label for="ag-notes-{{ item.id }}">Notes</label>
+                                            <input class="ag-control" id="ag-notes-{{ item.id }}" name="notes" type="text" value="{{ item.notes }}" maxlength="500">
+                                        </div>
+                                        <div class="ag-item-actions">
+                                            <button class="ag-btn" type="submit" title="Save"><i class="bi bi-check-lg"></i><span>Save</span></button>
+                                        </div>
+                                    </form>
+                                    <form action="{{ url_for('dashboard.delete_agenda_item', item_id=item.id) }}" method="post">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                        <button class="ag-btn is-danger" type="submit" title="Delete"><i class="bi bi-trash"></i><span>Delete</span></button>
+                                    </form>
+                                </div>
+                                {% endfor %}
+                            {% else %}
+                                <p class="ag-empty-state">No custom agenda items yet.</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </details>
             </div>
         </header>
 
@@ -562,12 +916,19 @@
             </div>
             <div class="ag-legend-grid">
                 {% for item in calendar.legend %}
-                <div class="ag-legend-item">
+                <button
+                    class="ag-legend-item"
+                    type="button"
+                    style="--legend-color: {{ item.color }};"
+                    data-ag-palette-key="{{ item.key }}"
+                    data-ag-palette-label="{{ item.label }}"
+                    data-ag-palette-color="{{ item.color }}"
+                >
                     <span class="ag-legend-swatch" style="background: {{ item.color }};"></span>
                     <div class="ag-legend-text">
                         <span class="ag-legend-label">{{ item.label }}</span>
                     </div>
-                </div>
+                </button>
                 {% endfor %}
                 <div class="ag-legend-item">
                     <span class="ag-legend-swatch is-block" style="background: var(--ag-weekend-bg); border: 1px solid var(--ag-border-soft);"></span>
@@ -609,7 +970,8 @@
                 <div class="ag-grid">
                     {% for week in month.weeks %}
                         {% for day in week %}
-                            {% set has_events = day.events|length > 0 %}
+                            {% set has_custom = day.custom_items|length > 0 %}
+                            {% set has_events = day.events|length > 0 or has_custom %}
                             {% set is_holiday = day.holiday is not none and day.holiday %}
                             {% set day_classes = [] %}
                             {% if not day.in_month %}{% set _ = day_classes.append('is-outside') %}{% endif %}
@@ -619,13 +981,17 @@
                             {% set tooltip_parts = [] %}
                             {% if is_holiday %}{% set _ = tooltip_parts.append(day.holiday) %}{% endif %}
                             {% for k in day.events %}{% set _ = tooltip_parts.append(calendar.legend_map[k].label) %}{% endfor %}
-                            {% set primary_color = calendar.legend_map[day.events[0]].color if has_events else '' %}
+                            {% for item in day.custom_items %}{% set _ = tooltip_parts.append(item.title) %}{% endfor %}
+                            {% set primary_color = calendar.legend_map[day.events[0]].color if day.events|length > 0 else (day.custom_items[0].color if has_custom else '') %}
                             <div
                                 class="ag-day {{ day_classes|join(' ') }}"
                                 {% if day.in_month and has_events %}style="--primary-event-color: {{ primary_color }};"{% endif %}
                                 {% if day.in_month %}
                                 title="{{ tooltip_parts|join(' · ') }}"
                                 tabindex="0"
+                                role="button"
+                                data-ag-date="{{ day.date_iso }}"
+                                data-ag-items='{{ day.custom_items|tojson|e }}'
                                 {% endif %}
                             >
                                 {% if day.in_month and has_events %}
@@ -634,9 +1000,31 @@
                                     {% for ekey in day.events[:max_segs] %}
                                         <i style="--seg-color: {{ calendar.legend_map[ekey].color }}; background: {{ calendar.legend_map[ekey].color }};"></i>
                                     {% endfor %}
+                                    {% for item in day.custom_items[:max_segs - day.events[:max_segs]|length] %}
+                                        <i style="--seg-color: {{ item.color }}; background: {{ item.color }};"></i>
+                                    {% endfor %}
                                 </span>
                                 {% endif %}
                                 <span class="ag-day-num">{{ day.day }}</span>
+                                {% if day.in_month and has_custom %}
+                                <span class="ag-custom-list">
+                                    {% for item in day.custom_items[:2] %}
+                                    <span
+                                        class="ag-custom-label"
+                                        draggable="true"
+                                        style="--chip-color: {{ item.color }};"
+                                        data-ag-item-id="{{ item.id }}"
+                                        data-ag-item-title="{{ item.title }}"
+                                        title="اسحب لنقل: {{ item.title }}"
+                                    >
+                                        {{ item.title }}
+                                    </span>
+                                    {% endfor %}
+                                    {% if day.custom_items|length > 2 %}
+                                    <span class="ag-day-dot is-more">+{{ day.custom_items|length - 2 }}</span>
+                                    {% endif %}
+                                </span>
+                                {% endif %}
                                 {% if day.in_month and has_events and day.events|length > 1 %}
                                 <span class="ag-day-events">
                                     {% set max_dots = 4 %}
@@ -673,6 +1061,45 @@
             </div>
         </section>
         {% endif %}
+    </div>
+</div>
+
+<div class="modal fade" id="agendaQuickModal" tabindex="-1" aria-labelledby="agendaQuickModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content ag-modal-content">
+            <div class="modal-header ag-modal-header">
+                <h5 class="modal-title ag-modal-title" id="agendaQuickModalLabel">
+                    <i class="bi bi-calendar-plus"></i>
+                    <span>تعديل الأجندة</span>
+                </h5>
+                <span class="ag-selected-date" id="agendaSelectedDate"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form class="ag-modal-form" action="{{ url_for('dashboard.create_agenda_item') }}" method="post">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <div class="ag-field">
+                        <label for="quickAgendaTitle">العنوان</label>
+                        <input class="ag-control" id="quickAgendaTitle" name="title" type="text" maxlength="200" required>
+                    </div>
+                    <div class="ag-field">
+                        <label for="quickAgendaDate">التاريخ</label>
+                        <input class="ag-control" id="quickAgendaDate" name="event_date" type="date" min="{{ calendar.year }}-01-01" max="{{ calendar.year }}-12-31" required>
+                    </div>
+                    <div class="ag-field">
+                        <label for="quickAgendaColor">اللون</label>
+                        <input class="ag-control" id="quickAgendaColor" name="color" type="color" value="#C89B3C">
+                    </div>
+                    <div class="ag-field is-wide">
+                        <label for="quickAgendaNotes">ملاحظات</label>
+                        <input class="ag-control" id="quickAgendaNotes" name="notes" type="text" maxlength="500">
+                    </div>
+                    <button class="ag-btn" type="submit"><i class="bi bi-plus-lg"></i><span>إضافة</span></button>
+                </form>
+
+                <div class="ag-modal-items" id="agendaModalItems"></div>
+            </div>
+        </div>
     </div>
 </div>
 {% endblock %}
@@ -713,6 +1140,284 @@
                 today.getDate() === dayNum
             ) {
                 cell.classList.add('is-today');
+            }
+        });
+    });
+
+    const quickModalEl = document.getElementById('agendaQuickModal');
+    const selectedDateEl = document.getElementById('agendaSelectedDate');
+    const quickDateInput = document.getElementById('quickAgendaDate');
+    const quickTitleInput = document.getElementById('quickAgendaTitle');
+    const quickNotesInput = document.getElementById('quickAgendaNotes');
+    const quickColorInput = document.getElementById('quickAgendaColor');
+    const modalItemsEl = document.getElementById('agendaModalItems');
+    const quickModal = quickModalEl ? new bootstrap.Modal(quickModalEl) : null;
+    const csrfToken = '{{ csrf_token() }}';
+    let draggedAgendaItemId = null;
+    let selectedPaletteItem = null;
+
+    function escapeHtml(value) {
+        return String(value || '')
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+    }
+
+    function itemTemplate(item) {
+        const safeTitle = escapeHtml(item.title);
+        const safeDate = escapeHtml(item.date);
+        const safeColor = escapeHtml(item.color || '#C89B3C');
+        const safeNotes = escapeHtml(item.notes || '');
+        const safeItemRef = escapeHtml(item.id);
+        const canDelete = !String(item.id).startsWith('default::');
+        const deleteForm = canDelete ? `
+                <form action="/agenda/items/${safeItemRef}/delete" method="post">
+                    <input type="hidden" name="csrf_token" value="${csrfToken}">
+                    <button class="ag-btn is-danger" type="submit"><i class="bi bi-trash"></i><span>حذف</span></button>
+                </form>
+        ` : '';
+        return `
+            <div class="ag-modal-item">
+                <form class="ag-modal-form" action="/agenda/items/save" method="post">
+                    <input type="hidden" name="csrf_token" value="${csrfToken}">
+                    <input type="hidden" name="item_ref" value="${safeItemRef}">
+                    <div class="ag-field">
+                        <label>العنوان</label>
+                        <input class="ag-control" name="title" type="text" maxlength="200" value="${safeTitle}" required>
+                    </div>
+                    <div class="ag-field">
+                        <label>التاريخ</label>
+                        <input class="ag-control" name="event_date" type="date" min="{{ calendar.year }}-01-01" max="{{ calendar.year }}-12-31" value="${safeDate}" required>
+                    </div>
+                    <div class="ag-field">
+                        <label>اللون</label>
+                        <input class="ag-control" name="color" type="color" value="${safeColor}">
+                    </div>
+                    <div class="ag-field is-wide">
+                        <label>ملاحظات</label>
+                        <input class="ag-control" name="notes" type="text" maxlength="500" value="${safeNotes}">
+                    </div>
+                    <div class="ag-modal-item-actions">
+                        <button class="ag-btn" type="submit"><i class="bi bi-check-lg"></i><span>حفظ / نقل</span></button>
+                    </div>
+                </form>
+                ${deleteForm}
+            </div>
+        `;
+    }
+
+    function openAgendaModal(cell) {
+        if (!quickModal || !quickDateInput || !selectedDateEl || !modalItemsEl) return;
+        const date = cell.dataset.agDate;
+        if (!date) return;
+
+        let items = [];
+        try {
+            items = JSON.parse(cell.dataset.agItems || '[]');
+        } catch (error) {
+            items = [];
+        }
+
+        selectedDateEl.textContent = date;
+        quickDateInput.value = date;
+        quickTitleInput.value = '';
+        quickNotesInput.value = '';
+        quickColorInput.value = '#C89B3C';
+
+        if (items.length) {
+            modalItemsEl.innerHTML = items.map(itemTemplate).join('');
+        } else {
+            modalItemsEl.innerHTML = '<p class="ag-empty-state">لا توجد عناصر مضافة لهذا اليوم.</p>';
+        }
+
+        quickModal.show();
+        setTimeout(() => quickTitleInput.focus(), 180);
+    }
+
+    function clearDropState() {
+        document.querySelectorAll('.ag-day.is-drop-target, .ag-day.is-drop-active, .ag-day.is-saving').forEach(cell => {
+            cell.classList.remove('is-drop-target', 'is-drop-active', 'is-saving');
+        });
+    }
+
+    function readCellItems(cell) {
+        try {
+            return JSON.parse(cell.dataset.agItems || '[]');
+        } catch (error) {
+            return [];
+        }
+    }
+
+    function writeCellItems(cell, items) {
+        cell.dataset.agItems = JSON.stringify(items);
+    }
+
+    function bindDraggableAgendaLabel(label) {
+        label.addEventListener('click', event => {
+            event.stopPropagation();
+        });
+        label.addEventListener('dragstart', event => {
+            draggedAgendaItemId = label.dataset.agItemId;
+            label.classList.add('is-dragging');
+            event.dataTransfer.effectAllowed = 'move';
+            event.dataTransfer.setData('text/plain', draggedAgendaItemId || '');
+            document.querySelectorAll('.ag-day[data-ag-date]').forEach(cell => {
+                cell.classList.add('is-drop-target');
+            });
+        });
+        label.addEventListener('dragend', () => {
+            label.classList.remove('is-dragging');
+            draggedAgendaItemId = null;
+            clearDropState();
+        });
+    }
+
+    function renderPlacedItem(cell, item) {
+        let list = cell.querySelector('.ag-custom-list');
+        if (!list) {
+            list = document.createElement('span');
+            list.className = 'ag-custom-list';
+            const dayEvents = cell.querySelector('.ag-day-events');
+            cell.insertBefore(list, dayEvents || null);
+        }
+
+        const chip = document.createElement('span');
+        chip.className = 'ag-custom-label';
+        chip.draggable = true;
+        chip.style.setProperty('--chip-color', item.color || '#C89B3C');
+        chip.dataset.agItemId = item.id;
+        chip.dataset.agItemTitle = item.title || '';
+        chip.title = `اسحب لنقل: ${item.title || ''}`;
+        chip.textContent = item.title || '';
+        list.appendChild(chip);
+        bindDraggableAgendaLabel(chip);
+
+        cell.classList.add('is-event', 'has-events');
+        if (!cell.style.getPropertyValue('--primary-event-color')) {
+            cell.style.setProperty('--primary-event-color', item.color || '#C89B3C');
+        }
+    }
+
+    function setPaletteSelection(button) {
+        document.querySelectorAll('[data-ag-palette-key]').forEach(item => {
+            item.classList.remove('is-selected');
+        });
+
+        if (selectedPaletteItem && selectedPaletteItem.key === button.dataset.agPaletteKey) {
+            selectedPaletteItem = null;
+        } else {
+            selectedPaletteItem = {
+                key: button.dataset.agPaletteKey,
+                label: button.dataset.agPaletteLabel,
+                color: button.dataset.agPaletteColor,
+            };
+            button.classList.add('is-selected');
+        }
+
+        document.querySelectorAll('.ag-day[data-ag-date]').forEach(cell => {
+            cell.classList.toggle('is-place-target', Boolean(selectedPaletteItem));
+            if (selectedPaletteItem) {
+                cell.style.setProperty('--selected-event-color', selectedPaletteItem.color);
+            } else {
+                cell.style.removeProperty('--selected-event-color');
+            }
+        });
+    }
+
+    async function placePaletteItem(cell) {
+        if (!selectedPaletteItem || !cell.dataset.agDate) return;
+        cell.classList.add('is-saving');
+        const response = await fetch('/agenda/items/place', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken,
+            },
+            body: JSON.stringify({
+                event_key: selectedPaletteItem.key,
+                event_date: cell.dataset.agDate,
+            }),
+        });
+
+        cell.classList.remove('is-saving');
+        if (!response.ok) {
+            alert('تعذر إضافة عنصر الأجندة. حاول مرة أخرى.');
+            return;
+        }
+
+        const result = await response.json();
+        if (!result.ok || !result.item) return;
+        const items = readCellItems(cell);
+        items.push(result.item);
+        writeCellItems(cell, items);
+        renderPlacedItem(cell, result.item);
+    }
+
+    async function moveAgendaItem(itemRef, targetDate, targetCell) {
+        if (!itemRef || !targetDate) return;
+        targetCell.classList.add('is-saving');
+        const response = await fetch('/agenda/items/move', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken,
+            },
+            body: JSON.stringify({
+                item_ref: itemRef,
+                event_date: targetDate,
+            }),
+        });
+
+        if (!response.ok) {
+            targetCell.classList.remove('is-saving');
+            alert('تعذر نقل عنصر الأجندة. حاول مرة أخرى.');
+            return;
+        }
+
+        window.location.reload();
+    }
+
+    document.querySelectorAll('.ag-custom-label[draggable="true"]').forEach(bindDraggableAgendaLabel);
+
+    document.querySelectorAll('[data-ag-palette-key]').forEach(button => {
+        button.addEventListener('click', () => setPaletteSelection(button));
+    });
+
+    document.querySelectorAll('.ag-day[data-ag-date]').forEach(cell => {
+        cell.addEventListener('click', event => {
+            if (event.target.closest('.ag-custom-label')) return;
+            if (selectedPaletteItem) {
+                placePaletteItem(cell);
+                return;
+            }
+            openAgendaModal(cell);
+        });
+        cell.addEventListener('dragover', event => {
+            if (!draggedAgendaItemId) return;
+            event.preventDefault();
+            event.dataTransfer.dropEffect = 'move';
+            cell.classList.add('is-drop-active');
+        });
+        cell.addEventListener('dragleave', event => {
+            if (!cell.contains(event.relatedTarget)) {
+                cell.classList.remove('is-drop-active');
+            }
+        });
+        cell.addEventListener('drop', event => {
+            if (!draggedAgendaItemId) return;
+            event.preventDefault();
+            event.stopPropagation();
+            const itemId = event.dataTransfer.getData('text/plain') || draggedAgendaItemId;
+            const targetDate = cell.dataset.agDate;
+            clearDropState();
+            moveAgendaItem(itemId, targetDate, cell);
+        });
+        cell.addEventListener('keydown', event => {
+            if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                openAgendaModal(cell);
             }
         });
     });

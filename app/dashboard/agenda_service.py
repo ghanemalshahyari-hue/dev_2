@@ -14,6 +14,8 @@ import calendar
 from datetime import date, timedelta
 from typing import Dict, List
 
+from app.models.agenda import AgendaItem
+
 
 # ── Arabic month names ────────────────────────────────────────────────
 ARABIC_MONTHS = [
@@ -182,6 +184,25 @@ def build_year_calendar(year: int = 2026) -> dict:
     """
     holidays = _build_holidays_2026() if year == 2026 else {}
     events_by_date = _build_events_2026(holidays) if year == 2026 else {}
+    agenda_items = AgendaItem.query.filter(
+        AgendaItem.event_date >= date(year, 1, 1),
+        AgendaItem.event_date <= date(year, 12, 31),
+    ).order_by(AgendaItem.event_date.asc(), AgendaItem.created_at.asc()).all()
+    default_overrides = [item for item in agenda_items if item.is_default]
+    custom_items = [item for item in agenda_items if not item.is_default]
+
+    for item in default_overrides:
+        if item.original_date and item.event_key:
+            original_events = events_by_date.get(item.original_date, [])
+            events_by_date[item.original_date] = [
+                key for key in original_events if key != item.event_key
+            ]
+
+    custom_by_date: Dict[date, List[dict]] = {}
+    for item in custom_items:
+        custom_by_date.setdefault(item.event_date, []).append(item.to_calendar_dict())
+    for item in default_overrides:
+        custom_by_date.setdefault(item.event_date, []).append(item.to_calendar_dict())
 
     # Monday-first week (ISO convention)
     cal = calendar.Calendar(firstweekday=0)
@@ -199,8 +220,23 @@ def build_year_calendar(year: int = 2026) -> dict:
                 is_weekend = weekday in (5, 6)  # Sat=5, Sun=6
                 holiday_name = holidays.get(d) if in_month else None
                 day_events = events_by_date.get(d, []) if in_month else []
+                day_default_items = []
+                for event_key in day_events:
+                    event_type = EVENT_TYPES[event_key]
+                    day_default_items.append({
+                        'id': f'default::{event_key}::{d.isoformat()}',
+                        'title': event_type['label'],
+                        'date': d.isoformat(),
+                        'color': event_type['color'],
+                        'notes': '',
+                        'is_default': True,
+                        'event_key': event_key,
+                        'original_date': d.isoformat(),
+                    })
+                day_custom_items = custom_by_date.get(d, []) if in_month else []
+                day_visible_items = day_default_items + day_custom_items
                 if in_month:
-                    month_event_count += len(day_events)
+                    month_event_count += len(day_visible_items)
                 row.append({
                     'day': d.day,
                     'date_iso': d.isoformat(),
@@ -208,6 +244,7 @@ def build_year_calendar(year: int = 2026) -> dict:
                     'is_weekend': is_weekend,
                     'holiday': holiday_name,
                     'events': day_events,
+                    'custom_items': day_visible_items,
                 })
             weeks_out.append(row)
 
@@ -237,4 +274,5 @@ def build_year_calendar(year: int = 2026) -> dict:
         'legend': legend,
         'legend_map': legend_map,
         'holidays': holiday_list,
+        'custom_items': [item.to_calendar_dict() for item in custom_items],
     }

@@ -34,6 +34,7 @@ def _run_migrations(app):
                 'director_notes':     'TEXT DEFAULT ""',
                 'concept_number':     'INTEGER',
                 'responsible_person': 'VARCHAR(120) DEFAULT ""',
+                'org_group_name':     'VARCHAR(160) DEFAULT ""',
             }
             with db.engine.connect() as conn:
                 for col, ddl in needed.items():
@@ -58,6 +59,28 @@ def _run_migrations(app):
                         ))
                         conn.commit()
                         print(f'✓  Migration: added column main_tasks.{col}')
+
+
+        # 3. agenda_items table - create it for existing databases
+        if 'agenda_items' not in inspector.get_table_names():
+            from app.models.agenda import AgendaItem
+            AgendaItem.__table__.create(db.engine, checkfirst=True)
+            print('Migration: created table agenda_items')
+        else:
+            existing_agenda = {col['name'] for col in inspector.get_columns('agenda_items')}
+            needed_agenda = {
+                'is_default': 'BOOLEAN NOT NULL DEFAULT 0',
+                'event_key': 'VARCHAR(80)',
+                'original_date': 'DATE',
+            }
+            with db.engine.connect() as conn:
+                for col, ddl in needed_agenda.items():
+                    if col not in existing_agenda:
+                        conn.execute(text(
+                            f'ALTER TABLE agenda_items ADD COLUMN {col} {ddl}'
+                        ))
+                        conn.commit()
+                        print(f'Migration: added column agenda_items.{col}')
 
 
 def init_database(app):

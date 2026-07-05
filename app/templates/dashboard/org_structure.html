@@ -771,8 +771,8 @@
                     <div class="org-branches" style="--branches: {{ report_departments|length }};">
                         {% for dept in report_departments %}
                         {% set number = dept.concept_number or loop.index %}
-                        {% set top_line = dept.responsible_name or dept.responsible_person or ('رئيس ' ~ number) %}
-                        {% set sub_line = dept.responsible_person if dept.responsible_name else 'المدير' %}
+                        {% set top_line = dept.org_group_name or dept.name %}
+                        {% set sub_line = dept.responsible_person or 'المدير' %}
                         {% set stakeholders = stakeholders_by_dept.get(dept.id, []) %}
                         {% set completion = dept.completion_pct|default(0)|round|int %}
                         {% set competence = dept.competence_pct|default(0)|round|int %}
@@ -795,7 +795,7 @@
                                     {% endif %}
                                     <span class="org-branch-card-duty"><i class="bi bi-list-task"></i>{{ dept.duties_count|default(0) }} واجب</span>
                                 </div>
-                                <h3 class="org-branch-card-title">المفهوم المشترك رقم ({{ number }})</h3>
+                                <h3 class="org-branch-card-title">المفهوم العملياتي المشترك رقم ({{ number }})</h3>
                                 <p class="org-branch-card-desc">{{ dept.description or 'لا يوجد وصف بعد — أضف شرحاً للمفهوم من لوحة الإدارة.' }}</p>
                             </a>
 
